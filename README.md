@@ -2,6 +2,8 @@
 
 ## 简介
 
+[![Build Status](https://travis-ci.org/jnrainerds/luohua.png)](https://travis-ci.org/jnrainerds/luohua)
+
 下一代江南听雨网站的后端项目。现在啥也没有，过两个月再来吧。
 
 

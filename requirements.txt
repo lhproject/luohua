@@ -1,0 +1,1 @@
+git+https://github.com/xen0n/weiyu.git#egg=weiyu [riak,redis,celery,mako]
