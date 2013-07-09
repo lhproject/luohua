@@ -21,36 +21,50 @@ from __future__ import unicode_literals, division
 
 
 class VThread(object):
+    '''虚线索, 支持最多两层的回复 (楼中楼).
+
+    这是落花存储线索类数据的核心. 之所以名字叫 "虚" 线索有以下几条原因:
+    
+    * 因为这个数据结构的外在表现形式不一定是一条讨论串,
+    * 单名 "线索" 的英文名 ``Thread`` 和 "线程" 冲突,
+    * 主要使用场景下线索的节点都是虚文件, 为了一致性而取了这个名字.
+
+    '''
+
     def __init__(self, l):
         self._tree = l
         self._build_state()
 
     def __len__(self):
-        '''本条虚线索的直接回复和楼中楼回复数。'''
+        '''本条虚线索的直接回复和楼中楼回复数.'''
 
-        return self._len
+        # 为了性能, 假定所有 node 对象在上面的字典里都不冲突
+        # 这一点对实际使用情况的 VFile 对象做节点的情况是成立的
+        # 于是节点总数就是节点字典的总长啦
+        # self._len = 1 + sum(len(reply_l) for reply_l in self._tree[1:])
+        return len(self._flatnodes)
 
     def num_direct_children(self):
-        '''本条虚线索的直接回复数。'''
+        '''本条虚线索的直接回复数.'''
 
         return len(self._directreplies) - 1
 
     def num_pages(self, limit):
-        '''本条虚线索总共需要占用的页数。'''
+        '''本条虚线索总共需要占用的页数.'''
 
         pages, rem = divmod(len(self), limit)
         return pages if rem == 0 else pages + 1
 
     def __contains__(self, obj):
-        '''判断某元素是否属于这条虚线索。'''
+        '''判断某元素是否属于这条虚线索.'''
 
         return obj in self._nodes
 
     @property
     def tree(self):
-        '''提供对虚线索树形结构的只读访问。
+        '''提供对虚线索树形结构的只读访问.
 
-        对虚线索执行改动应该通过其他成员方法进行。
+        对虚线索执行改动应该通过其他成员方法进行.
 
         '''
 
@@ -58,39 +72,39 @@ class VThread(object):
 
     @property
     def root(self):
-        '''提供对虚线索根节点的只读访问。'''
+        '''提供对虚线索根节点的只读访问.'''
 
         return self._root
 
     def iter(self):
-        '''按时间顺序遍历所有直接回复。'''
+        '''按时间顺序遍历所有直接回复.'''
 
         yield self._root
         for node in self._nodes[self._root]:
             yield node
 
     def iter_time_order(self):
-        '''按时间顺序遍历所有直接回复和楼中楼回复。
+        '''按时间顺序遍历所有直接回复和楼中楼回复.
 
-        用于实现传统阅读体验。
+        用于实现传统阅读体验.
 
         '''
 
         # 直接对节点排序
-        # 这一步的排序肯定需要避免重复进行，否则时间复杂度会非常坏
+        # 这一步的排序肯定需要避免重复进行, 否则时间复杂度会非常坏
         # TODO: 把结果缓存
         return sorted(self._flatnodes.iterkeys())
 
     def iter_paginated(self, limit, idx):
-        '''按时间顺序对所有直接回复和楼中楼回复进行分页。
+        '''按时间顺序对所有直接回复和楼中楼回复进行分页.
 
-        用于支持移动端的分页浏览。因为需要节约流量，不方便实行客户端分页。
+        用于支持移动端的分页浏览. 因为需要节约流量, 不方便实行客户端分页.
 
         '''
 
-        # 需要借助上一步构造的时序遍历结果进行分页。
-        # 如果上一步有缓存的话，这一步的复杂度就是 O(n)，否则至少是 O(n^2)
-        # TODO: 这一步的结果可能也需要缓存。做 profile 确定必要性
+        # 需要借助上一步构造的时序遍历结果进行分页.
+        # 如果上一步有缓存的话, 这一步的复杂度就是 O(n), 否则至少是 O(n^2)
+        # TODO: 这一步的结果可能也需要缓存. 做 profile 确定必要性
         timeorder = list(self.iter_time_order())
         return iter(timeorder[limit * idx:limit * (idx + 1)])
 
@@ -113,13 +127,6 @@ class VThread(object):
             # 更新节点前驱缓存
             self._flatnodes[reply_root] = root
             self._flatnodes.update({sr: reply_root for sr in subreplies})
-
-        # 计算并缓存长度数据
-        # 为了性能，假定所有 node 对象在上面的字典里都不冲突
-        # 这一点对实际使用情况的 VFile 对象做节点的情况是成立的
-        # 于是节点总数就是节点字典的总长啦
-        # self._len = 1 + sum(len(reply_l) for reply_l in self._tree[1:])
-        self._len = len(self._flatnodes)
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
