@@ -45,6 +45,9 @@ class TestVThread(Case):
     def teardown_class(cls):
         pass
 
+    def test_root(self):
+        assert self.thread_1.root == 'A'
+
     def test_lengths(self):
         assert len(self.thread_0) == 1
         assert self.thread_0.num_direct_children() == 0
@@ -57,11 +60,11 @@ class TestVThread(Case):
         assert Z not in self.thread_1
 
     def test_flatten(self):
-        seq_0 = ''.join(self.thread_0.iter_time_order())
-        seq_1 = ''.join(self.thread_1.iter_time_order())
+        assert 'A' == ''.join(self.thread_0.iter())
+        assert 'ABCFIK' == ''.join(self.thread_1.iter())
 
-        assert seq_0 == 'A'
-        assert seq_1 == 'ABCDEFGHIJKL'
+        assert 'A' == ''.join(self.thread_0.iter_time_order())
+        assert 'ABCDEFGHIJKL' == ''.join(self.thread_1.iter_time_order())
 
     def test_pagination(self):
         # 总页数计算
