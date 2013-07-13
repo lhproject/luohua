@@ -30,10 +30,10 @@ class TestPassword(Case):
     def setup_class(cls):
         # 这个其实是从已经消失的 weiyu.auth 包的测试套件里继承的测试数据
         # hash 部分简单修改了下
-        uid = 'testuser123'
-        psw1 = '*JE&%5e^&YU4w%ftWRtfSEfAEt%$&Ww47%6w56T#Wtq345q2'
-        psw2 = r"-+|0\\!n.eOO!>UFg lO`J3_/1p)kLB'"
-        hash1_kbs = 'kbs$db36e2d26576ccc8e36239e8b767a0de'
+        uid = cls.uid = 'testuser123'
+        psw1 = cls.psw1 = '*JE&%5e^&YU4w%ftWRtfSEfAEt%$&Ww47%6w56T#Wtq345q2'
+        psw2 = cls.psw2 = r"-+|0\\!n.eOO!>UFg lO`J3_/1p)kLB'"
+        hash1_kbs = cls.hash1_kbs = 'kbs$db36e2d26576ccc8e36239e8b767a0de'
         hash2_kbs = 'kbs$56a52bf0a79a247139fba25f8751a15e'
         hash1_lh1 = (
                 'lh1$pwCyJLoiMcsGZaPn|7a6e6337bea5e6b15c8ac602ef279d516c210'
@@ -55,9 +55,23 @@ class TestPassword(Case):
     def teardown_class(cls):
         pass
 
+    # 密码验证测试
     def test_chkpasswd(self):
         for psw, (input_pw, should_pass, ) in zip(self.passwds, self.cases):
             assert psw.check(input_pw) == should_pass
+
+    # 密码创建测试
+    # 先创建, 再确认用原始密码可以通过验证
+    def test_create_kbs(self):
+        psw_obj = passwd.KBSHashAlgorithm.create(self.uid, self.psw1)
+
+        # 对 KBS 这种不随机加盐的 hash 而言可以多一层 sanity 防护
+        assert str(psw_obj.alg) == self.hash1_kbs
+        assert psw_obj.check(self.psw1)
+
+    def test_create_lh1(self):
+        psw_obj = passwd.Luohua1HashAlgorithm.create(self.uid, self.psw1)
+        assert psw_obj.check(self.psw1)
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:

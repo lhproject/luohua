@@ -34,10 +34,10 @@ def hash_alg(thing):
 
 
 class Password(object):
-    def __init__(self, uid, hash):
+    def __init__(self, uid, alghash):
         self.uid = uid
-        algorithm, digest = hash.split('$', 1)
-        self.alg = HASH_ALGORITHMS[algorithm](uid, digest)
+        algorithm, hash = alghash.split('$', 1)
+        self.alg = HASH_ALGORITHMS[algorithm](uid, hash)
 
     def check(self, psw):
         return self.alg.check(psw)
@@ -45,7 +45,15 @@ class Password(object):
 
 class BaseHashAlgorithm(object):
     __metaclass__ = abc.ABCMeta
+
+    # Hash 算法的内部名称.
+    # 因为会出现在所有此算法生成的 hash 中, 所以需要尽量简洁, 2 到 4
+    # 个字符为好.
     algorithm = ''
+
+    # 此 hash 算法是否加盐.
+    # 如果为 ``False``, 生成的 hash 字符串将没有 salt 段.
+    salted = True
 
     def __init__(self, uid, hash):
         digest, salt = self.split_hash(hash)
@@ -71,19 +79,42 @@ class BaseHashAlgorithm(object):
         return self.digest == self.make_hash(psw, self.salt)
 
     @abc.abstractmethod
-    def make_hash(self, psw, salt=None):
+    def make_hash(self, psw, salt):
         pass
+
+    @classmethod
+    def create(cls, uid, psw):
+        # 16 个随机字母数字的盐够长了吧...
+        new_salt = random_salt(16)
+
+        # XXX KBS Hash 无视随机生成的盐, 而需要使用 UID (这也是这个密码类需要
+        # 同时传入用户 ID 才能正常工作的唯一原因)! 所以 make_hash 目前只能是
+        # 成员方法 (本来应该是个类方法的), 这里就不能直接用. 必须先用假 hash
+        # 包一层. 这个 kludge 在 KBS hash 失去主流之后将被立即删除
+        fake_psw = cls(uid, '|')
+        new_hash = fake_psw.make_hash(psw, new_salt)
+
+        # 为了兼容性... 只能引入多一个类变量了
+        # 构造一个完整的 alghash 用来回传进 Password.__init__()
+        # 来构造真正的返回对象
+        if cls.salted:
+            alghash = '%s$%s|%s' % (cls.algorithm, new_salt, new_hash, )
+        else:
+            alghash = '%s$%s' % (cls.algorithm, new_hash, )
+
+        return Password(uid, alghash)
 
 
 @hash_alg
 class KBSHashAlgorithm(BaseHashAlgorithm):
     algorithm = 'kbs'
+    salted = False
 
     @classmethod
     def split_hash(cls, hash):
         return hash, None
 
-    def make_hash(self, psw, salt=None):
+    def make_hash(self, psw, salt):
         s = ''.join([_KBS_MAGIC, psw, _KBS_MAGIC, self.uid]).encode('utf-8')
         return hashlib.md5(s).hexdigest()
 
@@ -91,14 +122,14 @@ class KBSHashAlgorithm(BaseHashAlgorithm):
 @hash_alg
 class Luohua1HashAlgorithm(BaseHashAlgorithm):
     algorithm = 'lh1'
+    salted = True
 
     @classmethod
     def split_hash(self, hash):
         salt, dgst = hash.split('|', 1)
         return dgst, salt
 
-    def make_hash(self, psw, salt=None):
-        salt = salt or random_salt(16)
+    def make_hash(self, psw, salt):
         return hashlib.sha512(salt + psw.encode('utf-8')).hexdigest()
 
 
