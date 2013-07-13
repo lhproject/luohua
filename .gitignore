@@ -43,3 +43,7 @@ pip-log.txt
 
 # development virtualenvs
 venv/
+
+# site config file
+conf.json
+conf.yml
