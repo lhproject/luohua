@@ -28,11 +28,9 @@ _KBS_MAGIC = r'wwj&kcn4SMTHBBS MD5 p9w2d gen2rat8, //grin~~, 2001/5/7'
 HASH_ALGORITHMS = {}
 
 
-def hash_alg(name):
-    def _decorator_(thing):
-        HASH_ALGORITHMS[name] = thing
-        return thing
-    return _decorator_
+def hash_alg(thing):
+    HASH_ALGORITHMS[thing.algorithm] = thing
+    return thing
 
 
 class Password(object):
@@ -47,42 +45,57 @@ class Password(object):
 
 class BaseHashAlgorithm(object):
     __metaclass__ = abc.ABCMeta
+    algorithm = ''
 
-    @abc.abstractmethod
     def __init__(self, uid, hash):
-        pass
+        digest, salt = self.split_hash(hash)
+        self.uid, self.digest, self.salt = uid, digest, salt
 
+    def __unicode__(self):
+        if self.salt is not None:
+            return '%s$%s|%s' % (self.algorithm, self.salt, self.digest, )
+        return '%s$%s' % (self.algorithm, self.digest, )
+
+    def __str__(self):
+        return unicode(self).encode('utf-8')
+
+    def __repr__(self):
+        return b"<HashAlgorithm '%s': %s>" % (self.algorithm, str(self), )
+
+    @classmethod
     @abc.abstractmethod
+    def split_hash(cls, hash):
+        return hash, None
+
     def check(self, psw):
-        pass
+        return self.digest == self.make_hash(psw, self.salt)
 
     @abc.abstractmethod
     def make_hash(self, psw, salt=None):
         pass
 
 
-@hash_alg('kbs')
+@hash_alg
 class KBSHashAlgorithm(BaseHashAlgorithm):
-    def __init__(self, uid, digest):
-        self.uid = uid
-        self.digest = digest
+    algorithm = 'kbs'
 
-    def check(self, psw):
-        return self.digest == self.make_hash(psw, None)
+    @classmethod
+    def split_hash(cls, hash):
+        return hash, None
 
     def make_hash(self, psw, salt=None):
         s = ''.join([_KBS_MAGIC, psw, _KBS_MAGIC, self.uid]).encode('utf-8')
         return hashlib.md5(s).hexdigest()
 
 
-@hash_alg('lh1')
+@hash_alg
 class Luohua1HashAlgorithm(BaseHashAlgorithm):
-    def __init__(self, uid, digest):
-        salt, dgst = digest.split('|', 1)
-        self.uid, self.salt, self.digest = uid, salt, dgst
+    algorithm = 'lh1'
 
-    def check(self, psw):
-        return self.digest == self.make_hash(psw, self.salt)
+    @classmethod
+    def split_hash(self, hash):
+        salt, dgst = hash.split('|', 1)
+        return dgst, salt
 
     def make_hash(self, psw, salt=None):
         salt = salt or random_salt(16)
