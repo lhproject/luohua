@@ -34,10 +34,10 @@ def hash_alg(thing):
 
 
 class Password(object):
-    def __init__(self, uid, hash):
+    def __init__(self, uid, alghash):
         self.uid = uid
-        algorithm, digest = hash.split('$', 1)
-        self.alg = HASH_ALGORITHMS[algorithm](uid, digest)
+        algorithm, hash = alghash.split('$', 1)
+        self.alg = HASH_ALGORITHMS[algorithm](uid, hash)
 
     def check(self, psw):
         return self.alg.check(psw)
