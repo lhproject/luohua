@@ -1,0 +1,32 @@
+site:
+  $$nodup: true
+
+  session:
+    backend: redis
+    options:
+      struct_id: luohua.session
+      cookie-key: lh_s
+      secret: '7h1z_must_13e_s3cr37'
+      ttl: 300
+
+  staticfile:
+    root: ../jnrain2/static/
+
+# 数据库配置
+weiyu.db:
+  databases:
+    main-kv:
+      driver: riak
+      host: 127.0.0.1
+      port: 10018
+    mem-kv:
+      driver: redis
+      host: 127.0.0.1
+      port: 6379
+
+  storage:
+    luohua.user: main-kv/users
+    luohua.session: mem-kv/(int)0
+
+
+# vim:set ai et ts=2 sw=2 sts=2 fenc=utf=8:

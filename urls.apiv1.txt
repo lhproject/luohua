@@ -1,0 +1,8 @@
+--exact
+--renderer=json
+--scope=api
+
+session/:
+    --regex
+    ^login/$ session-login-v1
+    ^logout/$ session-logout-v1

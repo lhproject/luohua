@@ -43,3 +43,11 @@ pip-log.txt
 
 # development virtualenvs
 venv/
+
+# site config file
+conf.json
+conf.yml
+
+# suggested name of entry point file
+# this may contain modifications to loader parameters
+main.py
