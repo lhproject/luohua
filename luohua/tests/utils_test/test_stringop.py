@@ -25,7 +25,7 @@ from ..shortcuts import *
 from luohua.utils import stringop
 
 
-class TestSession(Case):
+class TestStringOp(Case):
     @classmethod
     def setup_class(cls):
         pass
