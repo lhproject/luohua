@@ -50,6 +50,11 @@ class TestViewHelpers(Case):
         assert () == viewhelpers.parse_form(req)
         assert (1, ) == viewhelpers.parse_form(req, 'a', )
         assert (2, 1, 3, ) == viewhelpers.parse_form(req, 'b', 'a', 'c', )
+        assert (1, 3, 0, ) == viewhelpers.parse_form(
+                req,
+                'a', 'c', 'd',
+                c=0, d=0,
+                )
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
