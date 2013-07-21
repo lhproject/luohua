@@ -21,11 +21,19 @@ from __future__ import unicode_literals, division
 
 __all__ = [
         'jsonreply',
+        'parse_form',
         ]
 
 
 def jsonreply(**kwargs):
     return 200, kwargs, {}
+
+
+def parse_form(request, *args):
+    '''从请求对象顺序解出表单参数成 tuple.'''
+
+    frm = request.form
+    return tuple(frm[i] for i in args)
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
