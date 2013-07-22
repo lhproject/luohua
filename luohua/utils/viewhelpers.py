@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 落花 / 测试套件 / 包
+# 落花 / 工具 / 视图辅助函数
 #
 # Copyright (C) 2013 JNRain
 #
@@ -19,31 +19,28 @@
 
 from __future__ import unicode_literals, division
 
-import os
-
-from weiyu.shortcuts import load_all
-
-TEST_SUITE_PATH = os.path.realpath(os.path.split(__file__)[0])
-REPO_PATH = os.path.abspath(os.path.join(TEST_SUITE_PATH, '../..'))
+__all__ = [
+        'jsonreply',
+        'parse_form',
+        ]
 
 
-def setup_package():
-    os.chdir(REPO_PATH)
-
-    # 这里是 Travis CI 么?
-    # 根据 http://about.travis-ci.org/docs/user/ci-environment/
-    # 因为这个环境变量名字最长所以用了...
-    # 这是怕不小心在本机设置导致用错配置文件, 不是恶趣味!
-    if os.environ.get('HAS_JOSH_K_SEAL_OF_APPROVAL', None) == 'true':
-        conf = 'conf.for-travis.yml'
-    else:
-        conf = 'conf.yml'
-
-    load_all(conf_path=os.path.join(REPO_PATH, conf))
+def jsonreply(**kwargs):
+    return 200, kwargs, {}
 
 
-def teardown_package():
-    pass
+def parse_form(request, *args, **kwargs):
+    '''从请求对象顺序解出表单参数成 tuple.
+
+    支持将一些参数设置为可选, 这些参数的默认值用同名的命名参数方式传入.
+
+    '''
+
+    frm = request.form
+    return tuple(
+            frm[i] if i not in kwargs else frm.get(i, kwargs[i])
+            for i in args
+            )
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
