@@ -1,0 +1,5 @@
+--exact
+--renderer=json
+
+/v1/:
+    --include=urls.apiv1.txt
