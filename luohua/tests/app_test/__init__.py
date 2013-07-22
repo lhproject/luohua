@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 落花 / 测试套件 / 包
+# 落花 / 测试套件 / 应用 / 包
 #
 # Copyright (C) 2013 JNRain
 #
@@ -19,27 +19,9 @@
 
 from __future__ import unicode_literals, division
 
-import os
-
-from weiyu.shortcuts import load_all
-
-TEST_SUITE_PATH = os.path.realpath(os.path.split(__file__)[0])
-REPO_PATH = os.path.abspath(os.path.join(TEST_SUITE_PATH, '../..'))
-
 
 def setup_package():
-    os.chdir(REPO_PATH)
-
-    # 这里是 Travis CI 么?
-    # 根据 http://about.travis-ci.org/docs/user/ci-environment/
-    # 因为这个环境变量名字最长所以用了...
-    # 这是怕不小心在本机设置导致用错配置文件, 不是恶趣味!
-    if os.environ.get('HAS_JOSH_K_SEAL_OF_APPROVAL', None) == 'true':
-        conf = 'conf.for-travis.yml'
-    else:
-        conf = 'conf.yml'
-
-    load_all(conf_path=os.path.join(REPO_PATH, conf))
+    pass
 
 
 def teardown_package():

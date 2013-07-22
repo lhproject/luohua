@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 落花 / 测试套件 / 工具 / 字符串操作
+# 落花 / 测试套件 / 工具 / 视图辅助函数
 #
 # Copyright (C) 2013 JNRain
 #
@@ -22,10 +22,10 @@ from __future__ import unicode_literals, division
 from ..utils import Case
 from ..shortcuts import *
 
-from luohua.utils import stringop
+from luohua.utils import viewhelpers
 
 
-class TestStringOp(Case):
+class TestViewHelpers(Case):
     @classmethod
     def setup_class(cls):
         pass
@@ -34,10 +34,27 @@ class TestStringOp(Case):
     def teardown_class(cls):
         pass
 
-    def test_escape_lucene(self):
-        assert r'' == stringop.escape_lucene(r'')
-        assert r'\(1\+1\)\:2' == stringop.escape_lucene(r'(1+1):2')
-        assert r'a\&&b\: c\\\||d' == stringop.escape_lucene(r'a&&b: c\||d')
+    def test_jsonreply(self):
+        status, content, ctx = viewhelpers.jsonreply(r=0)
+        assert status == 200
+        assert content == {'r': 0, }
+        assert ctx == {}
+
+    def test_parse_form(self):
+        class MockRequest(object):
+            def __init__(self, form):
+                self.form = form
+
+        req = MockRequest({'a': 1, 'b': 2, 'c': 3, })
+
+        assert () == viewhelpers.parse_form(req)
+        assert (1, ) == viewhelpers.parse_form(req, 'a', )
+        assert (2, 1, 3, ) == viewhelpers.parse_form(req, 'b', 'a', 'c', )
+        assert (1, 3, 0, ) == viewhelpers.parse_form(
+                req,
+                'a', 'c', 'd',
+                c=0, d=0,
+                )
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
