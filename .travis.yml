@@ -15,7 +15,7 @@ install:
 
 before_script:
   - search-cmd install users
-  - search-cmd set-schema users ./install/rs-schema/users.config
+  - search-cmd set-schema users ${TRAVIS_BUILD_DIR}/install/rs-schema/users.config
 
 script: nosetests
 
