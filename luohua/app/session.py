@@ -75,6 +75,10 @@ def session_login_v1_view(request):
     except KeyError:
         return jsonreply(r=3)
 
+    if not lease.isdigit():
+        return jsonreply(r=3)
+
+    lease = int(lease)
     if lease not in (0, 1, 7, 14, 30):
         return jsonreply(r=3)
 
