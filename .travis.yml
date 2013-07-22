@@ -13,6 +13,13 @@ install:
   - sudo apt-get install protobuf-compiler
   - pip install -r requirements.txt --use-mirrors
 
+before_script:
+  - which riak
+  - which search-cmd
+  - ls -alF /usr/local
+  - ls -alF /usr/local/bin
+  - ls -alF /opt
+
 script: nosetests
 
 notifications:
