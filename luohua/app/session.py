@@ -23,7 +23,7 @@ from weiyu.shortcuts import *
 from weiyu.utils.decorators import only_methods
 
 from ..auth.user import User
-from ..utils.viewhelpers import jsonreply
+from ..utils.viewhelpers import jsonreply, parse_form
 
 
 @http('session-login-v1')
@@ -32,22 +32,50 @@ from ..utils.viewhelpers import jsonreply
 def session_login_v1_view(request):
     '''v1 登陆接口.
 
-    :方法: POST
+    :Allow: POST
     :参数:
-        * ``name`` 登录名, 可能是邮箱/ID/学号之类的信息
-        * ``pass`` 密码
+        ======= ======== ==================================================
+         字段    类型     说明
+        ======= ======== ==================================================
+         name    unicode  **必须** 登录名, 可能是邮箱/ID/学号之类的信息
+         pass    unicode  **必须** 密码
+         lease   int      **可选** 登陆会话 cookie 保存时间
+
+                          ================= ============
+                           取值              保留时间
+                          ================= ============
+                           0 或省略          仅本次会话
+                           1                 1 天
+                           7                 1 周
+                           14                2 周
+                           30                1 月
+                          ================= ============
+
+        ======= ======== ==================================================
 
     :返回:
-        * ``{ "r": 0 }`` 登陆成功
-        * ``{ "r": 1 }`` 登陆失败, 用户名或密码错误
-        * ``{ "r": 2 }`` 登陆失败, 无法唯一匹配用户 (见代码实现)
-        * ``{ "r": 3 }`` 登陆失败, 调用格式不正确
+        :r:
+            === ===========================================================
+             0   登陆成功
+             1   登陆失败, 用户名或密码错误
+             2   登陆失败, 无法唯一匹配用户 (见代码实现)
+             3   登陆失败, 调用格式不正确
+            === ===========================================================
+
+    :副作用:
+        * 登陆成功时:
+            - 如请求未带 cookie 或 cookie 所示会话过期, 新建服务器端会话, 发送
+              ``Set-Cookie`` HTTP 头
+            - 在服务器会话中记录 UID
 
     '''
 
     try:
-        name, pass_ = request.form['name'], request.form['pass']
+        name, pass_, lease = parse_form(request, 'name', 'pass', 'lease', lease=0)
     except KeyError:
+        return jsonreply(r=3)
+
+    if lease not in (0, 1, 7, 14, 30):
         return jsonreply(r=3)
 
     try:
@@ -67,6 +95,8 @@ def session_login_v1_view(request):
 
     # 密码验证通过, 设置会话
     request.session['uid'] = usr['uid']
+    if lease:
+        request.session.set_cookie_prop(86400 * lease)
     # TODO: 在全局用户状态里做相应设置
 
     return jsonreply(r=0)
@@ -78,11 +108,19 @@ def session_login_v1_view(request):
 def session_logout_v1_view(request):
     '''v1 注销接口.
 
-    :方法: POST
+    :Allow: POST
     :参数: 无
     :返回:
-        * ``{ "r": 0 }`` 注销成功
-        * ``{ "r": 1 }`` 注销不成功, 很可能是因为当前并没有登陆
+        :r:
+            === ===========================================================
+             0   注销成功
+             1   注销不成功, 很可能是因为当前并没有登陆
+            === ===========================================================
+
+    :副作用:
+        * 注销成功时:
+            - 从会话中删去 UID
+            - 刷新会话 ID
 
     '''
 
@@ -90,6 +128,8 @@ def session_logout_v1_view(request):
         return jsonreply(r=1)
 
     del request.session['uid']
+    request.session.new_id()
+
     return jsonreply(r=0)
 
 
