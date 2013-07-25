@@ -31,5 +31,5 @@ def random_string_from_seq(length, seq):
 def random_salt(length):
     return random_string_from_seq(length, string.ascii_letters)
 
-            
+
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:

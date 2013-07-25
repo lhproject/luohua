@@ -13,6 +13,10 @@ install:
   - sudo apt-get install protobuf-compiler
   - pip install -r requirements.txt --use-mirrors
 
+before_script:
+  - search-cmd install users
+  - search-cmd set-schema users ${TRAVIS_BUILD_DIR}/install/rs-schema/users.config
+
 script: nosetests
 
 notifications:
