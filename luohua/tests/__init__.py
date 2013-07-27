@@ -23,6 +23,8 @@ import os
 
 from weiyu.shortcuts import load_all
 
+from . import fixtures
+
 TEST_SUITE_PATH = os.path.realpath(os.path.split(__file__)[0])
 REPO_PATH = os.path.abspath(os.path.join(TEST_SUITE_PATH, '../..'))
 
@@ -41,9 +43,13 @@ def setup_package():
 
     load_all(conf_path=os.path.join(REPO_PATH, conf))
 
+    # 设置数据库
+    fixtures.users_setup()
+
 
 def teardown_package():
-    pass
+    # 还原数据库状态
+    fixtures.users_teardown()
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:

@@ -26,7 +26,7 @@ from ..shortcuts import *
 
 from luohua.auth.user import User
 
-from . import TEST_USERS
+from ..fixtures import TEST_USERS
 
 
 class TestUser(Case):
