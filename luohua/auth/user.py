@@ -95,7 +95,7 @@ def user_dec_v1(data):
             'password': Password(alias or uid, data['p']),
             'alias': alias,
             'email': data['e'],
-            'roles': data['r'],
+            'roles': data['r'].split(' '),
             }
 
 
@@ -105,7 +105,7 @@ def user_enc_v1(user):
             'p': user['password'].make_hash(),
             'a': user['alias'],
             'e': user['email'],
-            'r': user['roles'],
+            'r': ' '.join(user['roles']),
             }
 
 
