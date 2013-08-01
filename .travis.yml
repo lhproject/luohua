@@ -15,7 +15,9 @@ install:
 
 before_script:
   - search-cmd install users
+  - search-cmd install roles
   - search-cmd set-schema users ${TRAVIS_BUILD_DIR}/install/rs-schema/users.config
+  - search-cmd set-schema roles ${TRAVIS_BUILD_DIR}/install/rs-schema/roles.config
 
 script: nosetests
 

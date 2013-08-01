@@ -26,6 +26,7 @@ weiyu.db:
 
   storage:
     luohua.user: main-kv/users
+    luohua.role: main-kv/roles
     luohua.session: mem-kv/(int)0
 
 
