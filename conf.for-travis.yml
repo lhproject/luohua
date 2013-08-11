@@ -17,8 +17,12 @@ weiyu.db:
   databases:
     main-kv:
       driver: riak
-      host: 127.0.0.1
-      port: 8098
+      # Protobuf used to mimic production settings
+      protocol: pbc
+      nodes:
+        -
+          host: 127.0.0.1
+          pb_port: 8087
     mem-kv:
       driver: redis
       host: 127.0.0.1
@@ -26,6 +30,7 @@ weiyu.db:
 
   storage:
     luohua.user: main-kv/users
+    luohua.role: main-kv/roles
     luohua.session: mem-kv/(int)0
 
 

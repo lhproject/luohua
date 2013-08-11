@@ -20,6 +20,7 @@
 from __future__ import unicode_literals, division
 
 from luohua.auth.user import User
+from luohua.auth.role import Role
 
 
 TEST_USERS = {
@@ -32,20 +33,33 @@ TEST_USERS = {
                 '8a414c9c7f52507d5e53436df62f8f16f55fb383a1a9a88971b3f152566'
                 '0e6ff6b6f49c2a9f1c7b9f58adce29c'
                 ),
-            'r': [],
+            'r': 'user',
             },
         '0012cdf931a64c01ab97cb26f5f84bf0': {
             '_V': 1,
             'a': 'test2',
             'e': 'fsck+qq@youknow.com',
             'p': 'kbs$0b84f4bb2b3c572572015dd1050b3232',
-            'r': [],
+            'r': 'user adm',
             },
         }
 
 TEST_PASSWORDS = {
         '9fabe73980ff48aba62303812aa93765': 'testtest',
         '0012cdf931a64c01ab97cb26f5f84bf0': 'woshiruomima',
+        }
+
+TEST_ROLES = {
+        'user': {
+            '_V': 1,
+            'n': '用户',
+            'c': 'c1 c2',
+            },
+        'adm': {
+            '_V': 1,
+            'n': '鹳狸猿',
+            'c': 'c2 c3 c5',
+            },
         }
 
 
@@ -63,6 +77,20 @@ def users_teardown():
         for uid in TEST_USERS:
             conn.get(uid).delete()
             print '[-User] %s' % uid
+
+
+def roles_setup():
+    with Role.storage as conn:
+        for rid, data in TEST_ROLES.iteritems():
+            conn.new(rid, data).store()
+            print '[+Role] %s' % rid
+
+
+def roles_teardown():
+    with Role.storage as conn:
+        for rid in TEST_ROLES:
+            conn.get(rid).delete()
+            print '[-Role] %s' % rid
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:

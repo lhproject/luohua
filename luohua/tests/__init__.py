@@ -45,10 +45,12 @@ def setup_package():
 
     # 设置数据库
     fixtures.users_setup()
+    fixtures.roles_setup()
 
 
 def teardown_package():
     # 还原数据库状态
+    fixtures.roles_teardown()
     fixtures.users_teardown()
 
 
