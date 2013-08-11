@@ -77,7 +77,7 @@ class User(Document):
 
             # 拿出 ID, 生成对象返回
             uid = docs[0]['id']
-            data = conn.get(uid).get_data()
+            data = conn.get(uid).data
             data['uid'] = uid
             return cls(data)
 

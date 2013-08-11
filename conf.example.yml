@@ -17,8 +17,12 @@ weiyu.db:
   databases:
     main-kv:
       driver: riak
-      host: 127.0.0.1
-      port: 10018
+      # HTTP protocol used in case debugging needs sniffing raw packets
+      nodes:
+        -
+          host: 127.0.0.1
+          http_port: 10018
+          pb_port: 10017
     mem-kv:
       driver: redis
       host: 127.0.0.1

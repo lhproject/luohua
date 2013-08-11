@@ -68,7 +68,7 @@ class Role(Document):
 
             # 拿出 ID, 生成对象返回
             rid = docs[0]['id']
-            data = conn.get(rid).get_data()
+            data = conn.get(rid).data
             data['rid'] = rid
             return cls(data)
 
