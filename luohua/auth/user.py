@@ -61,7 +61,11 @@ class User(Document):
             # http://docs.basho.com/riak/latest/dev/advanced/search/
             # 和 Search Schema 的内容
             # TODO: 根据 name 的形式 (含 '@', 全数字等) 在这里就定下查询字段
-            r = conn.search('a:"%s" e:"%s"' % (name_escaped, name_escaped, ))
+            qs = 'a:"%s" e:"%s"' % (name_escaped, name_escaped, )
+
+            # protobuf 协议要求查询字串必须是字节流, 所以编个码
+            # HTTP 协议无所谓, unicode 或者 bytes 都可以
+            r = conn.search(qs.encode('utf-8'))
 
             # 检查下结果的数量, 应该只有一个. 如果不是一个就抛异常
             num, docs = r['num_found'], r['docs']
