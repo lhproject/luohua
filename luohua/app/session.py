@@ -26,7 +26,7 @@ from ..auth.user import User
 from ..utils.viewhelpers import jsonreply, parse_form
 
 
-@http('session-login-v1')
+@http
 @jsonview
 @only_methods(['POST', ])
 def session_login_v1_view(request):
@@ -106,7 +106,7 @@ def session_login_v1_view(request):
     return jsonreply(r=0)
 
 
-@http('session-logout-v1')
+@http
 @jsonview
 @only_methods(['POST', ])
 def session_logout_v1_view(request):
