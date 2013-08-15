@@ -71,7 +71,13 @@ def session_login_v1_view(request):
     '''
 
     try:
-        name, pass_, lease = parse_form(request, 'name', 'pass', 'lease', lease=0)
+        name, pass_, lease = parse_form(
+                request,
+                'name',
+                'pass',
+                'lease',
+                lease=0,
+                )
     except KeyError:
         return jsonreply(r=3)
 
