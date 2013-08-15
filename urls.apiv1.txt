@@ -6,3 +6,4 @@ session/:
     --regex
     ^login/$ session-login-v1
     ^logout/$ session-logout-v1
+    ^ping/$ session-ping-v1
