@@ -41,6 +41,7 @@ class TestSession(Case):
 
         assert 'session-login-v1' in http_views
         assert 'session-logout-v1' in http_views
+        assert 'session-ping-v1' in http_views
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
