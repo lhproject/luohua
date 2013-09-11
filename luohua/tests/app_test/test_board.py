@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 落花 / 测试套件 / 应用 / 会话
+# 落花 / 测试套件 / 应用 / 版面
 #
 # Copyright (C) 2013 JNRain
 #
@@ -26,7 +26,7 @@ from weiyu.router import router_hub
 from luohua.app import session
 
 
-class TestSession(Case):
+class TestBoard(Case):
     @classmethod
     def setup_class(cls):
         pass
@@ -39,9 +39,11 @@ class TestSession(Case):
         # XXX 这里使用了微雨框架的实现细节
         http_views = router_hub._endpoints['http']
 
-        assert 'session-login-v1' in http_views
-        assert 'session-logout-v1' in http_views
-        assert 'session-ping-v1' in http_views
+        assert 'board-list-v1' in http_views
+        assert 'board-create-v1' in http_views
+        assert 'board-info-v1' in http_views
+        assert 'board-update-v1' in http_views
+        assert 'board-delete-v1' in http_views
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:

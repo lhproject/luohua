@@ -26,7 +26,7 @@ from ..auth.user import User
 from ..utils.viewhelpers import jsonreply, parse_form
 
 
-@http('session-login-v1')
+@http
 @jsonview
 @only_methods(['POST', ])
 def session_login_v1_view(request):
@@ -71,7 +71,13 @@ def session_login_v1_view(request):
     '''
 
     try:
-        name, pass_, lease = parse_form(request, 'name', 'pass', 'lease', lease=0)
+        name, pass_, lease = parse_form(
+                request,
+                'name',
+                'pass',
+                'lease',
+                lease=0,
+                )
     except KeyError:
         return jsonreply(r=3)
 
@@ -106,7 +112,7 @@ def session_login_v1_view(request):
     return jsonreply(r=0)
 
 
-@http('session-logout-v1')
+@http
 @jsonview
 @only_methods(['POST', ])
 def session_logout_v1_view(request):
@@ -135,6 +141,26 @@ def session_logout_v1_view(request):
     request.session.new_id()
 
     return jsonreply(r=0)
+
+
+@http
+@jsonview
+@only_methods(['GET', ])
+def session_ping_v1_view(request):
+    '''v1 Ping 测试接口.
+
+    :Allow: GET
+    :参数: 无
+    :返回:
+        :r: 常数 0
+        :m: 常量字符串 ``'pong'``
+        :s: 会话 ID
+
+    :副作用: 无
+
+    '''
+
+    return jsonreply(r=0, m='pong', s=request.session.id)
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
