@@ -12,6 +12,22 @@ site:
   staticfile:
     root: ../jnrain2/static/
 
+  middlewares:
+    pre:
+      - session
+    post:
+      - session
+
+  views:
+    package: luohua.app
+    modules:
+      - .session
+      - .account
+      - .vpool
+      - .vthread
+      - .vfile
+
+
 # 数据库配置
 weiyu.db:
   databases:

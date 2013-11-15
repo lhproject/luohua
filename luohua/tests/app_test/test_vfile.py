@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 落花 / 测试套件 / 应用 / 用户
+# 落花 / 测试套件 / 应用 / 虚线索池
 #
 # Copyright (C) 2013 JNRain
 #
@@ -23,10 +23,10 @@ from ..utils import Case
 from ..shortcuts import *
 
 from weiyu.router import router_hub
-from luohua.app import session
+from luohua.app import vfile
 
 
-class TestUserViews(Case):
+class TestVFileViews(Case):
     @classmethod
     def setup_class(cls):
         pass
@@ -39,9 +39,11 @@ class TestUserViews(Case):
         # XXX 这里使用了微雨框架的实现细节
         http_views = router_hub._endpoints['http']
 
-        assert 'user-create-v1' in http_views
-        assert 'user-info-v1' in http_views
-        assert 'user-update-v1' in http_views
+        assert 'vfile-stat-v1' in http_views
+        assert 'vfile-read-v1' in http_views
+        assert 'vfile-creat-v1' in http_views
+        assert 'vfile-fcntl-v1' in http_views
+        assert 'vfile-unlink-v1' in http_views
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:

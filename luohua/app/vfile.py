@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 落花 / 测试套件 / 应用 / 会话
+# 落花 / 应用 / 虚文件
 #
 # Copyright (C) 2013 JNRain
 #
@@ -19,29 +19,41 @@
 
 from __future__ import unicode_literals, division
 
-from ..utils import Case
-from ..shortcuts import *
+from weiyu.shortcuts import *
+from weiyu.utils.decorators import only_methods
 
-from weiyu.router import router_hub
-from luohua.app import session
+from ..auth.user import User
+from ..utils.viewhelpers import jsonreply, parse_form
 
 
-class TestSessionViews(Case):
-    @classmethod
-    def setup_class(cls):
-        pass
+@http
+@jsonview
+def vfile_stat_v1_view(request):
+    raise NotImplementedError
 
-    @classmethod
-    def teardown_class(cls):
-        pass
 
-    def test_view_presence_v1(self):
-        # XXX 这里使用了微雨框架的实现细节
-        http_views = router_hub._endpoints['http']
+@http
+@jsonview
+def vfile_read_v1_view(request):
+    raise NotImplementedError
 
-        assert 'session-login-v1' in http_views
-        assert 'session-logout-v1' in http_views
-        assert 'session-ping-v1' in http_views
+
+@http
+@jsonview
+def vfile_creat_v1_view(request):
+    raise NotImplementedError
+
+
+@http
+@jsonview
+def vfile_fcntl_v1_view(request):
+    raise NotImplementedError
+
+
+@http
+@jsonview
+def vfile_unlink_v1_view(request):
+    raise NotImplementedError
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:

@@ -7,3 +7,40 @@ session/:
     ^login/$ session-login-v1
     ^logout/$ session-logout-v1
     ^ping/$ session-ping-v1
+
+account/:
+    --regex
+    ^stat/$ account-stat-v1
+    ^creat/$ account-creat-v1
+    ^fcntl/$ account-fcntl-v1
+    ^unlink/$ account-unlink-v1
+
+vp/:
+    --regex
+    ^list/$ vpool-list-v1
+    ^(?P<name>[^/]+)/:
+        --regex
+        ^stat/$ vpool-stat-v1
+        ^readdir/$ vpool-getdents-v1
+        ^creat/$ vpool-creat-v1
+        ^fcntl/$ vpool-fcntl-v1
+        ^unlink/$ vpool-unlink-v1
+
+vth/:
+    --regex
+    ^(?P<vth_id>\d+)/:
+        --regex
+        ^stat/$ vthread-stat-v1
+        ^readdir/$ vthread-getdents-v1
+        ^fcntl/$ vthread-fcntl-v1
+        ^unlink/$ vthread-unlink-v1
+
+vf/:
+    --regex
+    ^(?P<vf_id>\d+)/:
+        --regex
+        ^stat/$ vfile-stat-v1
+        ^read/$ vfile-read-v1
+        ^creat/$ vfile-creat-v1
+        ^fcntl/$ vfile-fcntl-v1
+        ^unlink/$ vfile-unlink-v1
