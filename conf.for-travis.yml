@@ -21,11 +21,11 @@ site:
   views:
     package: luohua.app
     modules:
-      - .session
-      - .account
-      - .vpool
-      - .vthread
-      - .vfile
+      - .v1.session
+      - .v1.account
+      - .v1.vpool
+      - .v1.vthread
+      - .v1.vfile
 
 
 # 数据库配置

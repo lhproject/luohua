@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 落花 / 应用 / 会话
+# 落花 / 应用 / API v1 / 会话
 #
 # Copyright (C) 2013 JNRain
 #
@@ -22,8 +22,8 @@ from __future__ import unicode_literals, division
 from weiyu.shortcuts import *
 from weiyu.utils.decorators import only_methods
 
-from ..auth.user import User
-from ..utils.viewhelpers import jsonreply, parse_form
+from ...auth.user import User
+from ...utils.viewhelpers import jsonreply, parse_form
 
 
 @http

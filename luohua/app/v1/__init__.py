@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 落花 / 测试套件 / 应用 / 账户
+# 落花 / 应用 / API v1 / 包
 #
 # Copyright (C) 2013 JNRain
 #
@@ -18,31 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import unicode_literals, division
-
-from ..utils import Case
-from ..shortcuts import *
-
-from weiyu.router import router_hub
-from luohua.app.v1 import account
-
-
-class TestAccountViews(Case):
-    @classmethod
-    def setup_class(cls):
-        pass
-
-    @classmethod
-    def teardown_class(cls):
-        pass
-
-    def test_view_presence_v1(self):
-        # XXX 这里使用了微雨框架的实现细节
-        http_views = router_hub._endpoints['http']
-
-        assert 'account-stat-v1' in http_views
-        assert 'account-creat-v1' in http_views
-        assert 'account-fcntl-v1' in http_views
-        assert 'account-unlink-v1' in http_views
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:

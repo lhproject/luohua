@@ -23,7 +23,7 @@ from ..utils import Case
 from ..shortcuts import *
 
 from weiyu.router import router_hub
-from luohua.app import session
+from luohua.app.v1 import session
 
 
 class TestSessionViews(Case):

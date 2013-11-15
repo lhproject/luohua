@@ -23,7 +23,7 @@ from ..utils import Case
 from ..shortcuts import *
 
 from weiyu.router import router_hub
-from luohua.app import vfile
+from luohua.app.v1 import vfile
 
 
 class TestVFileViews(Case):

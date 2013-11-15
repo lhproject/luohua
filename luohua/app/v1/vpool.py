@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 落花 / 应用 / 账户
+# 落花 / 应用 / API v1 / 虚线索池
 #
 # Copyright (C) 2013 JNRain
 #
@@ -22,31 +22,42 @@ from __future__ import unicode_literals, division
 from weiyu.shortcuts import *
 from weiyu.utils.decorators import only_methods
 
-from ..auth.user import User
-from ..utils.viewhelpers import jsonreply, parse_form
+from ...utils.viewhelpers import jsonreply, parse_form
 
 
 @http
 @jsonview
-def account_stat_v1_view(request):
+def vpool_list_v1_view(request):
     raise NotImplementedError
 
 
 @http
 @jsonview
-def account_creat_v1_view(request):
+def vpool_stat_v1_view(request, name):
     raise NotImplementedError
 
 
 @http
 @jsonview
-def account_fcntl_v1_view(request):
+def vpool_getdents_v1_view(request):
     raise NotImplementedError
 
 
 @http
 @jsonview
-def account_unlink_v1_view(request):
+def vpool_creat_v1_view(request, name):
+    raise NotImplementedError
+
+
+@http
+@jsonview
+def vpool_fcntl_v1_view(request):
+    raise NotImplementedError
+
+
+@http
+@jsonview
+def vpool_unlink_v1_view(request):
     raise NotImplementedError
 
 
