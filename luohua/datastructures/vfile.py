@@ -19,15 +19,83 @@
 
 from __future__ import unicode_literals, division
 
+from weiyu.db.mapper import mapper_hub
+from weiyu.db.mapper.base import Document
 
-class VFile(object):
-    def __init__(self, id, owner, ctime, topic, content, extras):
-        self.id = id
-        self.owner = owner
-        self.ctime = ctime
-        self.topic = topic
-        self.content = content
-        self.extras = extras
+VF_STRUCT_ID = 'luohua.vf'
+mapper_hub.register_struct(VF_STRUCT_ID)
+
+
+class VFile(Document):
+    '''虚文件.
+
+    本结构的存储后端应为 Riak.
+
+    '''
+
+    struct_id = VF_STRUCT_ID
+
+    def __init__(self, data=None, vfid=None):
+        super(VFile, self).__init__()
+
+        if data is not None:
+            self.update(self.decode(data))
+
+        if vfid is not None:
+            self['id'] = vfid
+
+    @classmethod
+    def find(cls, vfid):
+        '''按文档 ID 获取一个虚文件.'''
+
+        with cls.storage as conn:
+            obj = conn.get(vfid)
+            return cls(obj.data, obj.key)
+
+    @classmethod
+    def find_multiple(cls, ids):
+        '''按文档 ID 列表一次性获取多个虚文件.'''
+
+        with cls.storage as conn:
+            for vfid in ids:
+                obj = conn.get(vfid)
+                yield cls(obj.data, obj.key)
+
+    def save(self):
+        '''保存虚文件到数据库.'''
+
+        with self.storage as conn:
+            # 文档 ID 未指定则自动生成
+            obj = conn.new(self.get('id', None), self.encode())
+            obj.save()
+
+
+@mapper_hub.decoder_for(VF_STRUCT_ID, 1)
+def vf_dec_v1(data):
+    return {
+            'owner': data['o'],
+            'ctime': data['c'],
+            'title': data['t'],
+            'content': data['n'],
+            'xattr': data['x'],
+            }
+
+
+@mapper_hub.encoder_for(VF_STRUCT_ID, 1)
+def vf_enc_v1(vf):
+    assert 'owner' in vf
+    assert 'ctime' in vf
+    assert 'title' in vf
+    assert 'content' in vf
+    assert 'xattr' in vf
+
+    return {
+            'o': vf['owner'],
+            'c': vf['ctime'],
+            't': vf['title'],
+            'n': vf['content'],
+            'x': vf['xattr'],
+            }
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:

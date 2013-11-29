@@ -31,35 +31,38 @@ class TestVFile(Case):
         cls.vfile_id = 123454321
         cls.owner_id = 42
         cls.ctime = 1329493828  # 这个其实是微雨 repo 的初始提交时间
-        cls.topic = 'Test topic 测试话题 ざわざわ'
+        cls.title = 'Test topic 测试话题 ざわざわ'
         cls.content = '这是测试内容。\n有换行，显得比较真实\n'
-        cls.extras = {
+        cls.xattr = {
                 'a': 1,
                 'b': True,
                 }
 
         cls.file_1 = vfile.VFile(
+                {
+                    '_V': 1,
+                    'o': cls.owner_id,
+                    'c': cls.ctime,
+                    't': cls.title,
+                    'n': cls.content,
+                    'x': cls.xattr,
+                    },
                 cls.vfile_id,
-                cls.owner_id,
-                cls.ctime,
-                cls.topic,
-                cls.content,
-                cls.extras,
                 )
 
     @classmethod
     def teardown_class(cls):
         pass
 
-    def test_ctor(self):
+    def test_props_v1(self):
         vf = self.file_1
 
-        assert vf.id == self.vfile_id
-        assert vf.owner == self.owner_id
-        assert vf.ctime == self.ctime
-        assert vf.topic == self.topic
-        assert vf.content == self.content
-        assert vf.extras == self.extras
+        assert vf['id']== self.vfile_id
+        assert vf['owner'] == self.owner_id
+        assert vf['ctime'] == self.ctime
+        assert vf['title'] == self.title
+        assert vf['content'] == self.content
+        assert vf['xattr'] == self.xattr
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
