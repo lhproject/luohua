@@ -20,8 +20,8 @@
 from __future__ import unicode_literals, division
 
 
-class VThread(object):
-    '''虚线索, 支持最多两层的回复 (楼中楼).
+class VThreadTree(object):
+    '''虚线索树, 支持最多两层的回复 (楼中楼).
 
     这是落花存储线索类数据的核心. 之所以名字叫 "虚" 线索有以下几条原因:
 

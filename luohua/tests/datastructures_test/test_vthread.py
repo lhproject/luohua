@@ -25,7 +25,7 @@ from ..shortcuts import *
 from luohua.datastructures import vthread
 
 
-class TestVThread(Case):
+class TestVThreadTree(Case):
     @classmethod
     def setup_class(cls):
         t0 = [A]
@@ -38,8 +38,8 @@ class TestVThread(Case):
                 [K, L, ],
                 ]
 
-        cls.thread_0 = vthread.VThread(t0)
-        cls.thread_1 = vthread.VThread(t1)
+        cls.thread_0 = vthread.VThreadTree(t0)
+        cls.thread_1 = vthread.VThreadTree(t1)
 
     @classmethod
     def teardown_class(cls):
