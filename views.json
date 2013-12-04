@@ -1,6 +1,0 @@
-{
-  "package": "luohua.app",
-  "modules": [
-    ".session"
-    ]
-}
