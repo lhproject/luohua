@@ -15,7 +15,7 @@ account/:
     ^fcntl/$ account-fcntl-v1
     ^unlink/$ account-unlink-v1
 
-vp/:
+vtp/:
     --regex
     ^list/$ vpool-list-v1
     ^(?P<name>[^/]+)/:
