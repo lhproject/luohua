@@ -75,6 +75,20 @@ class VFile(Document):
             obj.store()
             self['id'] = obj.key
 
+    def purge(self):
+        '''从数据库中彻底删除此条虚文件.'''
+
+        with self.storage as conn:
+            if self._rawobj is None:
+                raise ValueError(
+                        'not associated with a Riak object, thus not '
+                        'purgeable'
+                        )
+
+            self._rawobj.delete()
+            self._rawobj = None
+            del self['id']
+
 
 @mapper_hub.decoder_for(VF_STRUCT_ID, 1)
 def vf_dec_v1(data):
