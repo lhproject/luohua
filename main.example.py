@@ -7,7 +7,7 @@ from weiyu.init import inject_app
 from weiyu.utils.server import cli_server
 
 
-inject_app(conf_path='conf.yml')
+inject_app()
 
 
 if __name__ == '__main__':

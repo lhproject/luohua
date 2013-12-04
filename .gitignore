@@ -47,6 +47,7 @@ venv/
 # site config file
 conf.json
 conf.yml
+Rainfile.yml
 
 # suggested name of entry point file
 # this may contain modifications to loader parameters
