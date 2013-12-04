@@ -19,6 +19,18 @@
 
 from __future__ import unicode_literals, division
 
+import six
+
+from weiyu.db.mapper import mapper_hub
+from weiyu.db.mapper.base import Document
+
+from .vfile import VFile
+
+VTH_STRUCT_ID = 'luohua.vth'
+mapper_hub.register_struct(VTH_STRUCT_ID)
+
+VTH_VTP_INDEX = 'vtp_bin'
+
 
 class VThreadTree(object):
     '''虚线索树, 支持最多两层的回复 (楼中楼).
@@ -127,6 +139,102 @@ class VThreadTree(object):
             # 更新节点前驱缓存
             self._flatnodes[reply_root] = root
             self._flatnodes.update({sr: reply_root for sr in subreplies})
+
+
+class VThread(Document):
+    '''虚线索.
+
+    本结构的存储后端应为 Riak.
+
+    '''
+
+    struct_id = VTH_STRUCT_ID
+
+    def __init__(self, data=None, vthid=None, rawobj=None):
+        super(VThread, self).__init__()
+
+        if data is not None:
+            self.update(self.decode(data))
+
+        if vthid is not None:
+            self['id'] = vthid
+
+        self._rawobj = rawobj
+
+    @classmethod
+    def _from_obj(cls, obj):
+        '''从数据库对象生成 Python 对象. 这是内部方法, 外界不应直接使用.'''
+
+        return cls(obj.data, obj.key, obj)
+
+    @classmethod
+    def find(cls, vthid):
+        with cls.storage as conn:
+            obj = conn.get(vthid)
+            return cls._from_obj(obj)
+
+    @classmethod
+    def find_multiple(cls, ids):
+        with cls.storage as conn:
+            for vthid in ids:
+                obj = conn.get(vthid)
+                yield cls._from_obj(obj)
+
+    @classmethod
+    def from_vpool(cls, vtpid, max_results=10, continuation=None):
+        with cls.storage as conn:
+            page = conn.get_index(
+                    VTH_VTP_INDEX,
+                    vtpid,
+                    max_results=max_results,
+                    continuation=continuation,
+                    )
+            for vthid in page.results:
+                obj = conn.get(vthid)
+                yield cls._from_obj(obj)
+
+    def save(self):
+        with self.storage as conn:
+            obj = self._rawobj if self._rawobj is not None else conn.new()
+            obj.key, obj.data = self.get('id'), self.encode()
+            obj.set_index(VTH_VTP_INDEX, self['vtpid'])
+            obj.store()
+            self['id'] = obj.key
+
+
+@mapper_hub.decoder_for(VTH_STRUCT_ID, 1)
+def vth_dec_v1(data):
+    return {
+            'title': data['t'],
+            'owner': data['o'],
+            'tree': VThreadTree(data['r']),
+            'tags': data['g'],
+            'vtpid': data['p'],
+            'xattr': data['x'],
+            }
+
+
+@mapper_hub.encoder_for(VTH_STRUCT_ID, 1)
+def vth_enc_v1(vth):
+    assert 'title' in vth
+    assert isinstance(vth['title'], six.text_type)
+    assert 'owner' in vth
+    assert 'tree' in vth
+    assert isinstance(vth['tree'], VThreadTree)
+    assert 'tags' in vth
+    assert all(isinstance(tag, six.text_type) for tag in vth['tags'])
+    assert 'vtpid' in vth
+    assert 'xattr' in vth
+    assert isinstance(vth['xattr'], dict)
+
+    return {
+            't': vth['title'],
+            'o': vth['owner'],
+            'r': vth['tree'].tree,
+            'g': vth['tags'],
+            'p': vth['vtpid'],
+            'x': vth['xattr'],
+            }
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
