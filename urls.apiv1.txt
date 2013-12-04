@@ -10,25 +10,28 @@ session/:
 
 account/:
     --regex
-    ^stat/$ account-stat-v1
     ^creat/$ account-creat-v1
-    ^fcntl/$ account-fcntl-v1
-    ^unlink/$ account-unlink-v1
+    ^(?P<userid>[^/]+)/:
+        --regex
+        ^stat/$ account-stat-v1
+        ^fcntl/$ account-fcntl-v1
+        ^unlink/$ account-unlink-v1
 
 vtp/:
     --regex
-    ^list/$ vpool-list-v1
-    ^(?P<name>[^/]+)/:
+    ^(?P<vtpid>[^/]+)/:
         --regex
-        ^stat/$ vpool-stat-v1
-        ^readdir/$ vpool-getdents-v1
-        ^creat/$ vpool-creat-v1
-        ^fcntl/$ vpool-fcntl-v1
-        ^unlink/$ vpool-unlink-v1
+        ^vtag/(?P<vtagid>[^/]+)/:
+            --regex
+            ^stat/$ vpool-stat-v1
+            ^readdir/$ vpool-getdents-v1
+            ^creat/$ vpool-creat-v1
+            ^fcntl/$ vpool-fcntl-v1
+            ^unlink/$ vpool-unlink-v1
 
 vth/:
     --regex
-    ^(?P<vth_id>\d+)/:
+    ^(?P<vthid>[^/]+)/:
         --regex
         ^stat/$ vthread-stat-v1
         ^readdir/$ vthread-getdents-v1
@@ -37,7 +40,7 @@ vth/:
 
 vf/:
     --regex
-    ^(?P<vf_id>\d+)/:
+    ^(?P<vfid>[^/]+)/:
         --regex
         ^stat/$ vfile-stat-v1
         ^read/$ vfile-read-v1
