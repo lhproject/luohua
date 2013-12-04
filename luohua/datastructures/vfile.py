@@ -73,7 +73,9 @@ class VFile(Document):
             obj = self._rawobj if self._rawobj is not None else conn.new()
             obj.key, obj.data = self.get('id'), self.encode()
             obj.store()
-            self['id'] = obj.key
+
+            # 刷新对象关联信息
+            self['id'], self._rawobj = obj.key, obj
 
     def purge(self):
         '''从数据库中彻底删除此条虚文件.'''
