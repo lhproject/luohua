@@ -44,3 +44,6 @@ vf/:
         ^creat/$ vfile-creat-v1
         ^fcntl/$ vfile-fcntl-v1
         ^unlink/$ vfile-unlink-v1
+
+
+# vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8 syn=weiyu-urls:
