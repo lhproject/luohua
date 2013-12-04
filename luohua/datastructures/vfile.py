@@ -19,6 +19,8 @@
 
 from __future__ import unicode_literals, division
 
+import six
+
 from weiyu.db.mapper import mapper_hub
 from weiyu.db.mapper.base import Document
 
@@ -35,7 +37,7 @@ class VFile(Document):
 
     struct_id = VF_STRUCT_ID
 
-    def __init__(self, data=None, vfid=None):
+    def __init__(self, data=None, vfid=None, rawobj=None):
         super(VFile, self).__init__()
 
         if data is not None:
@@ -44,13 +46,15 @@ class VFile(Document):
         if vfid is not None:
             self['id'] = vfid
 
+        self._rawobj = rawobj
+
     @classmethod
     def find(cls, vfid):
         '''按文档 ID 获取一个虚文件.'''
 
         with cls.storage as conn:
             obj = conn.get(vfid)
-            return cls(obj.data, obj.key)
+            return cls(obj.data, obj.key, obj)
 
     @classmethod
     def find_multiple(cls, ids):
@@ -59,15 +63,17 @@ class VFile(Document):
         with cls.storage as conn:
             for vfid in ids:
                 obj = conn.get(vfid)
-                yield cls(obj.data, obj.key)
+                yield cls(obj.data, obj.key, obj)
 
     def save(self):
         '''保存虚文件到数据库.'''
 
         with self.storage as conn:
             # 文档 ID 未指定则自动生成
-            obj = conn.new(self.get('id', None), self.encode())
-            obj.save()
+            obj = self._rawobj if self._rawobj is not None else conn.new()
+            obj.key, obj.data = self.get('id'), self.encode()
+            obj.store()
+            self['id'] = obj.key
 
 
 @mapper_hub.decoder_for(VF_STRUCT_ID, 1)
@@ -86,8 +92,11 @@ def vf_enc_v1(vf):
     assert 'owner' in vf
     assert 'ctime' in vf
     assert 'title' in vf
+    assert isinstance(vf['title'], six.text_type)
     assert 'content' in vf
+    assert isinstance(vf['content'], six.text_type)
     assert 'xattr' in vf
+    assert isinstance(vf['xattr'], dict)
 
     return {
             'o': vf['owner'],
