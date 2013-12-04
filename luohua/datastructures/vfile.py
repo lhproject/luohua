@@ -54,7 +54,7 @@ class VFile(Document):
 
         with cls.storage as conn:
             obj = conn.get(vfid)
-            return cls(obj.data, obj.key, obj)
+            return cls(obj.data, obj.key, obj) if obj.exists else None
 
     @classmethod
     def find_multiple(cls, ids):
@@ -63,7 +63,7 @@ class VFile(Document):
         with cls.storage as conn:
             for vfid in ids:
                 obj = conn.get(vfid)
-                yield cls(obj.data, obj.key, obj)
+                yield cls(obj.data, obj.key, obj) if obj.exists else None
 
     def save(self):
         '''保存虚文件到数据库.'''

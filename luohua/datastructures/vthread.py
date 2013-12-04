@@ -165,7 +165,7 @@ class VThread(Document):
     def _from_obj(cls, obj):
         '''从数据库对象生成 Python 对象. 这是内部方法, 外界不应直接使用.'''
 
-        return cls(obj.data, obj.key, obj)
+        return cls(obj.data, obj.key, obj) if obj.exists else None
 
     @classmethod
     def find(cls, vthid):
