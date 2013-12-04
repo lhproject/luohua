@@ -12,6 +12,7 @@ Contents:
     :maxdepth: 2
 
     app/index
+    datastructures/index
 
 
 索引页面
