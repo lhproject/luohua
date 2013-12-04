@@ -199,7 +199,9 @@ class VThread(Document):
             obj.key, obj.data = self.get('id'), self.encode()
             obj.set_index(VTH_VTP_INDEX, self['vtpid'])
             obj.store()
-            self['id'] = obj.key
+
+            # 刷新对象关联信息
+            self['id'], self._rawobj = obj.key, obj
 
 
 @mapper_hub.decoder_for(VTH_STRUCT_ID, 1)
