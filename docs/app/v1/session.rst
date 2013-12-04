@@ -1,7 +1,7 @@
 会话管理 API
 ------------
 
-.. automodule:: luohua.app.session
+.. automodule:: luohua.app.v1.session
     :members:
     :private-members:
 
