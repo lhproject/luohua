@@ -30,6 +30,7 @@ VTH_STRUCT_ID = 'luohua.vth'
 mapper_hub.register_struct(VTH_STRUCT_ID)
 
 VTH_VTP_INDEX = 'vtp_bin'
+VTH_VTAG_INDEX = 'vtag_bin'
 
 
 class VThreadTree(object):
@@ -197,7 +198,27 @@ class VThread(Document):
         with self.storage as conn:
             obj = self._rawobj if self._rawobj is not None else conn.new()
             obj.key, obj.data = self.get('id'), self.encode()
+
+            # 同步 2i 索引
+            # 虚线索池
             obj.set_index(VTH_VTP_INDEX, self['vtpid'])
+
+            # 虚标签
+            # 这个可能比较麻烦, 因为涉及的虚标签可能比较多.
+            # 那么先检查下变化吧
+            curr_vtags_set = set(
+                    idx[1]
+                    for idx in obj.indexes if
+                    idx[0] == VTH_VTAG_INDEX
+                    )
+            new_vtags_set = set(self['tags'])
+            if curr_vtags_set != new_vtags_set:
+                # 干掉当前的虚标签索引
+                obj.remove_index(VTH_VTAG_INDEX)
+                # 重设虚标签索引
+                for vtag in new_vtags_set:
+                    obj.add_index(VTH_VTAG_INDEX, vtag)
+
             obj.store()
 
             # 刷新对象关联信息
@@ -210,7 +231,7 @@ def vth_dec_v1(data):
             'title': data['t'],
             'owner': data['o'],
             'tree': VThreadTree(data['r']),
-            'tags': data['g'],
+            'vtags': data['g'],
             'vtpid': data['p'],
             'xattr': data['x'],
             }
@@ -233,7 +254,7 @@ def vth_enc_v1(vth):
             't': vth['title'],
             'o': vth['owner'],
             'r': vth['tree'].tree,
-            'g': vth['tags'],
+            'g': vth['vtags'],
             'p': vth['vtpid'],
             'x': vth['xattr'],
             }
