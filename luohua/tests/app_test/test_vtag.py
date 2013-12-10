@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 落花 / 应用 / API v1 / 虚线索池
+# 落花 / 测试套件 / 应用 / 虚标签
 #
 # Copyright (C) 2013 JNRain
 #
@@ -19,46 +19,31 @@
 
 from __future__ import unicode_literals, division
 
-from weiyu.shortcuts import *
-from weiyu.utils.decorators import only_methods
+from ..utils import Case
+from ..shortcuts import *
 
-from ...utils.viewhelpers import jsonreply, parse_form
-
-
-@http
-@jsonview
-def vpool_list_v1_view(request):
-    raise NotImplementedError
+from weiyu.router import router_hub
+from luohua.app.v1 import vtag
 
 
-@http
-@jsonview
-def vpool_stat_v1_view(request, name):
-    raise NotImplementedError
+class TestVTagViews(Case):
+    @classmethod
+    def setup_class(cls):
+        pass
 
+    @classmethod
+    def teardown_class(cls):
+        pass
 
-@http
-@jsonview
-def vpool_getdents_v1_view(request):
-    raise NotImplementedError
+    def test_view_presence_v1(self):
+        # XXX 这里使用了微雨框架的实现细节
+        http_views = router_hub._endpoints['http']
 
-
-@http
-@jsonview
-def vpool_creat_v1_view(request, name):
-    raise NotImplementedError
-
-
-@http
-@jsonview
-def vpool_fcntl_v1_view(request):
-    raise NotImplementedError
-
-
-@http
-@jsonview
-def vpool_unlink_v1_view(request):
-    raise NotImplementedError
+        assert 'vtag-stat-v1' in http_views
+        assert 'vtag-getdents-v1' in http_views
+        assert 'vtag-creat-v1' in http_views
+        assert 'vtag-fcntl-v1' in http_views
+        assert 'vtag-unlink-v1' in http_views
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:

@@ -27,25 +27,25 @@ from ...utils.viewhelpers import jsonreply, parse_form
 
 @http
 @jsonview
-def vthread_stat_v1_view(request):
+def vthread_stat_v1_view(request, vthid):
     raise NotImplementedError
 
 
 @http
 @jsonview
-def vthread_getdents_v1_view(request):
+def vthread_getdents_v1_view(request, vthid):
     raise NotImplementedError
 
 
 @http
 @jsonview
-def vthread_fcntl_v1_view(request):
+def vthread_fcntl_v1_view(request, vthid):
     raise NotImplementedError
 
 
 @http
 @jsonview
-def vthread_unlink_v1_view(request):
+def vthread_unlink_v1_view(request, vthid):
     raise NotImplementedError
 
 

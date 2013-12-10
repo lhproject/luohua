@@ -27,31 +27,31 @@ from ...utils.viewhelpers import jsonreply, parse_form
 
 @http
 @jsonview
-def vfile_stat_v1_view(request):
+def vfile_stat_v1_view(request, vfid):
     raise NotImplementedError
 
 
 @http
 @jsonview
-def vfile_read_v1_view(request):
+def vfile_read_v1_view(request, vfid):
     raise NotImplementedError
 
 
 @http
 @jsonview
-def vfile_creat_v1_view(request):
+def vfile_creat_v1_view(request, vfid):
     raise NotImplementedError
 
 
 @http
 @jsonview
-def vfile_fcntl_v1_view(request):
+def vfile_fcntl_v1_view(request, vfid):
     raise NotImplementedError
 
 
 @http
 @jsonview
-def vfile_unlink_v1_view(request):
+def vfile_unlink_v1_view(request, vfid):
     raise NotImplementedError
 
 

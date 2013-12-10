@@ -21,13 +21,15 @@ vtp/:
     --regex
     ^(?P<vtpid>[^/]+)/:
         --regex
-        ^vtag/(?P<vtagid>[^/]+)/:
+        ^vtag/:
             --regex
-            ^stat/$ vpool-stat-v1
-            ^readdir/$ vpool-getdents-v1
-            ^creat/$ vpool-creat-v1
-            ^fcntl/$ vpool-fcntl-v1
-            ^unlink/$ vpool-unlink-v1
+            ^creat/$ vtag-creat-v1
+            ^(?P<vtagid>[^/]+)/:
+                --regex
+                ^stat/$ vtag-stat-v1
+                ^readdir/$ vtag-getdents-v1
+                ^fcntl/$ vtag-fcntl-v1
+                ^unlink/$ vtag-unlink-v1
 
 vth/:
     --regex

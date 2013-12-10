@@ -27,7 +27,7 @@ from ...utils.viewhelpers import jsonreply, parse_form
 
 @http
 @jsonview
-def account_stat_v1_view(request):
+def account_stat_v1_view(request, userid):
     raise NotImplementedError
 
 
@@ -39,13 +39,13 @@ def account_creat_v1_view(request):
 
 @http
 @jsonview
-def account_fcntl_v1_view(request):
+def account_fcntl_v1_view(request, userid):
     raise NotImplementedError
 
 
 @http
 @jsonview
-def account_unlink_v1_view(request):
+def account_unlink_v1_view(request, userid):
     raise NotImplementedError
 
 
