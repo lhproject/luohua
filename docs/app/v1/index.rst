@@ -5,6 +5,7 @@ API 版本 1
     :maxdepth: 2
 
     session
+    vpool
 
 
 .. vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
