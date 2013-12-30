@@ -19,28 +19,145 @@
 
 from __future__ import unicode_literals, division
 
-from weiyu.shortcuts import *
+from weiyu.shortcuts import http, jsonview
 from weiyu.utils.decorators import only_methods
 
 from ...utils.viewhelpers import jsonreply, parse_form
+from ...datastructures.vtag import VTag
+from ...datastructures.vthread import VThread
 
 
 @http
 @jsonview
 def vtag_creat_v1_view(request, vtpid):
-    raise NotImplementedError
+    '''v1 虚标签创建接口.
+
+    '''
+
+    pass
 
 
 @http
 @jsonview
 def vtag_stat_v1_view(request, vtpid, vtagid):
-    raise NotImplementedError
+    '''v1 虚标签状态接口.
+
+    :Allow:  GET
+    :URL 格式: ``vtp/<虚线索池 ID>/vtag/<虚标签 ID>/stat/``
+    :POST 参数: 无
+    :返回:
+        :r:
+            === ===========================================================
+             0   查询成功
+             2   所请求的虚标签不存在
+            === ===========================================================
+
+        :s:
+            所请求虚标签的状态. 如果查询不成功, 此属性不存在.
+
+            ======= ======== ==============================================
+             字段    类型     说明
+            ======= ======== ==============================================
+             n       unicode  虚标签名称
+             t       bool     是否为自然虚标签, ``false`` 表示程序自动生成
+             x       dict     虚标签上附着的扩展属性
+            ======= ======== ==============================================
+
+    :副作用: 无
+
+    '''
+
+    vtag = VTag.find(vtagid)
+    if vtag is None or vtag['vtpid'] != vtpid:
+        return jsonreply(r=2)
+
+    stat_obj = {
+            'n': vtag['name'],
+            't': vtag['natural'],
+            'x': vtag['xattr'],
+            }
+
+    return jsonreply(r=0, s=stat_obj)
 
 
 @http
 @jsonview
 def vtag_getdents_v1_view(request, vtpid, vtagid):
-    raise NotImplementedError
+    '''v1 虚线索列表接口.
+
+    :Allow:  POST
+    :URL 格式: ``vtp/<虚线索池 ID>/vtag/<虚标签 ID>/getdents/``
+    :POST 参数:
+            ======== ======== =============================================
+             字段     类型     说明
+            ======== ======== =============================================
+             pagesz   int      **必须** 每页结果数, 最小 20, 最大 100
+             cont     unicode  **可选** 上一页结果链接指针, 用它查询下一页.
+                               如果省略则为查询第一页.
+            ======== ======== =============================================
+
+    :返回:
+        :r:
+            ==== ==========================================================
+             0    查询成功
+             2    所请求的虚标签不存在
+             22   传入参数格式不正确
+            ==== ==========================================================
+
+        :l:
+            一页虚线索的列表. 如果查询不成功, 此属性为空列表.
+
+            列表中每个虚线索的形式如下.
+
+            ======= ======== ==============================================
+             字段    类型     说明
+            ======= ======== ==============================================
+             i       unicode  虚线索 ID
+             t       unicode  虚线索标题
+             o       unicode  虚线索所有者 ID
+            ======= ======== ==============================================
+
+        :c:
+            下一页结果的链接指针, 将它再次传入此接口可以查询下一页的结果.
+            如果当前页为最后一页, 此属性为空字符串.
+
+            如果查询不成功, 此属性不存在.
+
+    :副作用: 无
+
+    '''
+
+    try:
+        pagesz, cont = parse_form(
+                request,
+                'pagesz',
+                'cont',
+                cont=None,
+                )
+    except KeyError:
+        return jsonreply(r=22, l=[])
+
+    if not pagesz.isdigit():
+        return jsonreply(r=22, l=[])
+
+    pagesz = int(pagesz)
+    if not 20 <= pagesz <= 100:
+        return jsonreply(r=22, l=[])
+
+    vtag = VTag.find(vtagid)
+    if vtag is None or vtag['vtpid'] != vtpid:
+        return jsonreply(r=2, l=[])
+
+    result, continuation_box = [], []
+    cont_receiver = lambda x: continuation_box.append(x)
+    for vth in VThread.from_vtag(vtag['id'], pagesz, cont, cont_receiver):
+        result.append({
+                'i': vth['id'],
+                't': vth['title'],
+                'o': vth['owner'],
+                })
+
+    return jsonreply(r=0, l=result, c=continuation_box[0])
 
 
 @http

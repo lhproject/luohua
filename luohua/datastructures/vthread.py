@@ -182,7 +182,14 @@ class VThread(Document):
                 yield cls._from_obj(obj)
 
     @classmethod
-    def _do_fetch_by_index(cls, idx, key, max_results, continuation):
+    def _do_fetch_by_index(
+            cls,
+            idx,
+            key,
+            max_results,
+            continuation,
+            continuation_callback,
+            ):
         with cls.storage as conn:
             page = conn.get_index(
                     idx,
@@ -194,22 +201,43 @@ class VThread(Document):
                 obj = conn.get(vthid)
                 yield cls._from_obj(obj)
 
+            if continuation_callback is not None:
+                continuation_callback(
+                        page.continuation
+                        if page.has_next_page()
+                        else ''
+                        )
+
     @classmethod
-    def from_vpool(cls, vtpid, max_results=10, continuation=None):
+    def from_vpool(
+            cls,
+            vtpid,
+            max_results=10,
+            continuation=None,
+            continuation_callback=None,
+            ):
         return cls._do_fetch_by_index(
                 VTH_VTP_INDEX,
                 vtpid,
                 max_results,
                 continuation,
+                continuation_callback,
                 )
 
     @classmethod
-    def from_vtag(cls, vtagid, max_results=10, continuation=None):
+    def from_vtag(
+            cls,
+            vtagid,
+            max_results=10,
+            continuation=None,
+            continuation_callback=None,
+            ):
         return cls._do_fetch_by_index(
                 VTH_VTAG_INDEX,
                 vtagid,
                 max_results,
                 continuation,
+                continuation_callback,
                 )
 
     def save(self):
