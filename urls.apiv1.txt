@@ -1,49 +1,39 @@
 --exact
+--default-type=regex
 --renderer=json
 --scope=api
 
 session/:
-    --regex
     ^login/$ session-login-v1
     ^logout/$ session-logout-v1
     ^ping/$ session-ping-v1
 
 account/:
-    --regex
     ^creat/$ account-creat-v1
     ^(?P<userid>[^/]+)/:
-        --regex
         ^stat/$ account-stat-v1
         ^fcntl/$ account-fcntl-v1
         ^unlink/$ account-unlink-v1
 
 vtp/:
-    --regex
     ^(?P<vtpid>[^/]+)/:
-        --regex
         ^vtag/:
-            --regex
             ^creat/$ vtag-creat-v1
             ^(?P<vtagid>[^/]+)/:
-                --regex
                 ^stat/$ vtag-stat-v1
                 ^readdir/$ vtag-getdents-v1
                 ^fcntl/$ vtag-fcntl-v1
                 ^unlink/$ vtag-unlink-v1
 
 vth/:
-    --regex
     ^(?P<vthid>[^/]+)/:
-        --regex
         ^stat/$ vthread-stat-v1
         ^readdir/$ vthread-getdents-v1
         ^fcntl/$ vthread-fcntl-v1
         ^unlink/$ vthread-unlink-v1
 
 vf/:
-    --regex
     ^(?P<vfid>[^/]+)/:
-        --regex
         ^stat/$ vfile-stat-v1
         ^read/$ vfile-read-v1
         ^creat/$ vfile-creat-v1
