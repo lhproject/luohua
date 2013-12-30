@@ -59,6 +59,25 @@ class VTag(Document):
         return cls(obj.data, obj.key, obj) if obj.exists else None
 
     @classmethod
+    def _do_fetch_by_index(cls, idx, key, max_results, continuation):
+        with cls.storage as conn:
+            page = conn.get_index(
+                    idx,
+                    key,
+                    max_results=max_results,
+                    continuation=continuation,
+                    )
+            for vthid in page.results:
+                obj = conn.get(vthid)
+                yield cls._from_obj(obj)
+
+    @classmethod
+    def from_vpool(cls, vtpid):
+        '''返回指定虚线索池中所有虚标签.'''
+
+        return cls._do_fetch_by_index(VTAG_VTP_INDEX, vtpid, None, None)
+
+    @classmethod
     def find(cls, vtagid):
         '''按文档 ID 获取一个虚标签.'''
 
