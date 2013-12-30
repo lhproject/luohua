@@ -182,17 +182,35 @@ class VThread(Document):
                 yield cls._from_obj(obj)
 
     @classmethod
-    def from_vpool(cls, vtpid, max_results=10, continuation=None):
+    def _do_fetch_by_index(cls, idx, key, max_results, continuation):
         with cls.storage as conn:
             page = conn.get_index(
-                    VTH_VTP_INDEX,
-                    vtpid,
+                    idx,
+                    key,
                     max_results=max_results,
                     continuation=continuation,
                     )
             for vthid in page.results:
                 obj = conn.get(vthid)
                 yield cls._from_obj(obj)
+
+    @classmethod
+    def from_vpool(cls, vtpid, max_results=10, continuation=None):
+        return cls._do_fetch_by_index(
+                VTH_VTP_INDEX,
+                vtpid,
+                max_results,
+                continuation,
+                )
+
+    @classmethod
+    def from_vtag(cls, vtagid, max_results=10, continuation=None):
+        return cls._do_fetch_by_index(
+                VTH_VTAG_INDEX,
+                vtagid,
+                max_results,
+                continuation,
+                )
 
     def save(self):
         with self.storage as conn:
