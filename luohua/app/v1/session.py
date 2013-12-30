@@ -19,7 +19,7 @@
 
 from __future__ import unicode_literals, division
 
-from weiyu.shortcuts import *
+from weiyu.shortcuts import http, jsonview
 from weiyu.utils.decorators import only_methods
 
 from ...auth.user import User
@@ -89,7 +89,7 @@ def session_login_v1_view(request):
         return jsonreply(r=3)
 
     try:
-        usr = User.find(name)
+        usr = User.find_by_name(name)
     except KeyError:
         # 没有拥有这个登陆身份的用户
         return jsonreply(r=2)
@@ -104,7 +104,7 @@ def session_login_v1_view(request):
         return jsonreply(r=1)
 
     # 密码验证通过, 设置会话
-    request.session['uid'] = usr['uid']
+    request.session['uid'] = usr['id']
     if lease:
         request.session.set_cookie_prop(86400 * lease)
     # TODO: 在全局用户状态里做相应设置

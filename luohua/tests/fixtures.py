@@ -34,6 +34,7 @@ TEST_USERS = {
                 '0e6ff6b6f49c2a9f1c7b9f58adce29c'
                 ),
             'r': 'user',
+            'x': {},
             },
         '0012cdf931a64c01ab97cb26f5f84bf0': {
             '_V': 1,
@@ -41,6 +42,7 @@ TEST_USERS = {
             'e': 'fsck+qq@youknow.com',
             'p': 'kbs$0b84f4bb2b3c572572015dd1050b3232',
             'r': 'user adm',
+            'x': {},
             },
         }
 

@@ -39,23 +39,23 @@ class TestUser(Case):
         pass
 
     # 匹配登陆身份测试
-    def test_find(self):
+    def test_find_by_name(self):
         email1 = 'fsck+qq@youknow.com'
         email2 = 'nonexistent@in.testsuite.my'
 
-        assert User.find('test0')['alias'] == 'test0'
-        assert User.find(email1)['email'] == email1
-        assert_raises(KeyError, User.find, email2, )
+        assert User.find_by_name('test0')['alias'] == 'test0'
+        assert User.find_by_name(email1)['email'] == email1
+        assert_raises(KeyError, User.find_by_name, email2, )
 
     # 密码验证测试
     def test_chkpasswd(self):
         # new hash
-        test0 = User.find('test0')
+        test0 = User.find_by_name('test0')
         assert test0.chkpasswd('testtest')
         assert not test0.chkpasswd('deadf00d')
 
         # KBS hash
-        test2 = User.find('test2')
+        test2 = User.find_by_name('test2')
         assert test2.chkpasswd('woshiruomima')
         assert not test2.chkpasswd('th1s-1z_mUCh>S7r0nG3r')
 
