@@ -17,6 +17,7 @@ account/:
 
 vtp/:
     ^(?P<vtpid>[^/]+)/:
+        ^readdir/$ vpool-getdents-v1
         ^vtag/:
             ^creat/$ vtag-creat-v1
             ^(?P<vtagid>[^/]+)/:

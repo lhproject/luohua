@@ -23,6 +23,7 @@ site:
     modules:
       - .v1.session
       - .v1.account
+      - .v1.vpool
       - .v1.vtag
       - .v1.vthread
       - .v1.vfile
