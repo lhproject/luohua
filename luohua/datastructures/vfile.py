@@ -19,6 +19,8 @@
 
 from __future__ import unicode_literals, division
 
+import functools
+
 import six
 
 from weiyu.db.mapper import mapper_hub
@@ -28,6 +30,7 @@ VF_STRUCT_ID = 'luohua.vf'
 mapper_hub.register_struct(VF_STRUCT_ID)
 
 
+@functools.total_ordering
 class VFile(Document):
     '''虚文件.
 
@@ -47,6 +50,13 @@ class VFile(Document):
             self['id'] = vfid
 
         self._rawobj = rawobj
+
+    def __eq__(self, other):
+        return (self['ctime'], self['id']) == (other['ctime'], other['id'])
+
+    def __lt__(self, other):
+        # 时间顺序排列, 其次是 ID
+        return (self['ctime'], self['id']) < (other['ctime'], other['id'])
 
     @classmethod
     def find(cls, vfid):
