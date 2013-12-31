@@ -19,6 +19,7 @@
 
 from __future__ import unicode_literals, division
 
+from weiyu.helpers.misc import smartstr
 from weiyu.shortcuts import http, jsonview
 from weiyu.utils.decorators import only_methods
 
@@ -29,12 +30,76 @@ from ...datastructures.vthread import VThread
 
 @http
 @jsonview
+@only_methods(['POST', ])
 def vtag_creat_v1_view(request, vtpid):
     '''v1 虚标签创建接口.
 
+    :Allow: POST
+    :URL 格式: ``vtp/<虚线索池 ID>/vtag/creat/``
+    :POST 参数:
+        ======== ======== =================================================
+         字段     类型     说明
+        ======== ======== =================================================
+         vtagid   unicode  **可选** 希望拿到的虚标签 ID, 省略则自动生成
+         name     unicode  **必须** 虚标签名称
+         natural  int      **可选** 是否为自然虚标签, 为 ``1``
+                           表示待创建的虚标签代表实际存在的一个版块,
+                           为 ``0`` 表示此虚标签为程序生成. 默认为 ``1``
+        ======== ======== =================================================
+
+    :返回:
+        :r:
+            ==== ==========================================================
+             0    创建成功
+             17   希望拿到的虚标签 ID 已被占用
+             22   传入参数格式不正确
+            ==== ==========================================================
+
+        :t: 新建虚标签的 ID. 如果创建不成功, 此属性不存在.
+
+    :副作用:
+        如果调用成功, 会在指定的虚线索池中创建一个虚标签.
+        调用不成功则无副作用.
+
     '''
 
-    pass
+    try:
+        vtagid, name, natural = parse_form(
+                request,
+                'vtagid',
+                'name',
+                'natural',
+                vtagid=None,
+                natural='1',
+                )
+    except KeyError:
+        return jsonreply(r=22)
+
+    if natural not in {'0', '1', }:
+        return jsonreply(r=22)
+
+    natural = natural == '1'
+
+    # 判断是否重复
+    if vtagid is not None and VTag.find(vtagid) is not None:
+        return jsonreply(r=17)
+
+    # 初始化虚标签对象并保存到数据库
+    vtag = VTag()
+
+    if vtagid is not None:
+        vtag['id'] = vtagid
+
+    vtag['name'] = smartstr(name)
+    vtag['vtpid'] = vtpid
+    vtag['natural'] = natural
+
+    # 不设置 xattr 的原因参见 vpool.py 相应注释
+    vtag['xattr'] = {}
+
+    vtag.save()
+
+    return jsonreply(r=0, t=vtag['id'])
 
 
 @http
