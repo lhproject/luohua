@@ -82,6 +82,7 @@ def vtag_stat_v1_view(request, vtpid, vtagid):
 
 @http
 @jsonview
+@only_methods(['POST', ])
 def vtag_getdents_v1_view(request, vtpid, vtagid):
     '''v1 虚线索列表接口.
 
