@@ -39,6 +39,8 @@ class TestVPoolViews(Case):
         # XXX 这里使用了微雨框架的实现细节
         http_views = router_hub._endpoints['http']
 
+        assert 'vpool-creat-v1' in http_views
+        assert 'vpool-stat-v1' in http_views
         assert 'vpool-getdents-v1' in http_views
 
 

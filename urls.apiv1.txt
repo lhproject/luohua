@@ -16,7 +16,9 @@ account/:
         ^unlink/$ account-unlink-v1
 
 vtp/:
+    ^creat/$ vpool-creat-v1
     ^(?P<vtpid>[^/]+)/:
+        ^stat/$ vpool-stat-v1
         ^readdir/$ vpool-getdents-v1
         ^vtag/:
             ^creat/$ vtag-creat-v1
