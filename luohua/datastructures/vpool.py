@@ -54,7 +54,7 @@ class VPool(Document):
 
     @classmethod
     def _from_obj(cls, obj):
-        return cls(obj.data, obj,key, obj) if obj.exists else None
+        return cls(obj.data, obj.key, obj) if obj.exists else None
 
     @classmethod
     def find(cls, vtpid):

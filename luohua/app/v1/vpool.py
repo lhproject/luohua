@@ -19,6 +19,7 @@
 
 from __future__ import unicode_literals, division
 
+from weiyu.helpers.misc import smartstr
 from weiyu.shortcuts import http, jsonview
 from weiyu.utils.decorators import only_methods
 
@@ -88,7 +89,7 @@ def vpool_creat_v1_view(request):
     if vtpid is not None:
         vtp['id'] = vtpid
 
-    vtp['name'] = name
+    vtp['name'] = smartstr(name)
     vtp['natural'] = natural
 
     # 因为序列化不一定方便, 就不在这里一并初始化了, 反正是 API v1,
