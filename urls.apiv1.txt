@@ -36,10 +36,10 @@ vth/:
         ^unlink/$ vthread-unlink-v1
 
 vf/:
+    ^creat/$ vfile-creat-v1
     ^(?P<vfid>[^/]+)/:
         ^stat/$ vfile-stat-v1
         ^read/$ vfile-read-v1
-        ^creat/$ vfile-creat-v1
         ^fcntl/$ vfile-fcntl-v1
         ^unlink/$ vfile-unlink-v1
 
