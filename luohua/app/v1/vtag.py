@@ -104,6 +104,7 @@ def vtag_creat_v1_view(request, vtpid):
 
 @http
 @jsonview
+@only_methods(['GET', ])
 def vtag_stat_v1_view(request, vtpid, vtagid):
     '''v1 虚标签状态接口.
 
