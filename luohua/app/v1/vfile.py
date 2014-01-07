@@ -134,8 +134,177 @@ def vfile_read_v1_view(request, vfid):
 
 @http
 @jsonview
-def vfile_creat_v1_view(request, vfid):
-    raise NotImplementedError
+def vfile_creat_v1_view(request):
+    '''v1 虚文件创建接口.
+
+    :Allow: POST
+    :URL 格式: ``vf/creat/``
+    :POST 参数:
+        ========= ======== ================================================
+         字段     类型     说明
+        ========= ======== ================================================
+         vthid     unicode  **可选** 新建虚文件从属于哪个虚线索,
+                            省略则自动新建对应的虚线索
+         vtpid     unicode  新建虚文件所属虚线索池 ID,
+                            新建虚线索时\ **必须**\ 传入, 否则\ **不能**\
+                            传入
+         vtags     list     新建虚文件所属虚标签列表的 JSON 表示,
+                            长度至少为 1. 新建虚线索时\ **必须**\ 传入,
+                            否则\ **不能**\ 传入
+         inreply2  unicode  **可选** 新建虚文件属于哪个虚文件的直接回复.
+                            只能支持一层间接回复; 省略则回复楼主.
+                            新建虚线索时此参数\ **不能**\ 传入
+         title     unicode  **可选** 虚文件标题,
+                            新建虚线索时\ **必须**\ 传入
+         content   unicode  **必须** 虚文件内容
+        ========= ======== ================================================
+
+    :返回:
+        :r:
+            ===== =========================================================
+             0     创建成功
+             22    传入参数格式不正确
+             101   有一些所请求的虚标签不存在
+             102   指定的虚线索不存在
+             103   在指定虚线索中要回复的虚文件不存在, 或已经为楼中楼回复
+            ===== =========================================================
+
+        :f: 新建虚文件的 ID. 如果创建不成功, 此属性不存在.
+        :t:
+            新建虚线索的 ID. 如果不是顺带新建虚线索的请求或创建不成功,
+            此属性不存在.
+
+    :副作用:
+
+        如果调用成功, 会创建一个虚文件, 或者根据参数, 可能顺带新建一个虚线索.
+        调用不成功则无副作用.
+
+    '''
+
+    try:
+        vtpid, vtags_json, vthid, inreply2, title, content = parse_form(
+                request,
+                'vtpid',
+                'vtags',
+                'vthid',
+                'inreply2',
+                'title',
+                'content',
+                vtpid=None,
+                vtags=None,
+                vthid=None,
+                inreply2=None,
+                title=None,
+                )
+    except KeyError:
+        return jsonreply(r=22)
+
+    # 是否顺便新建 VThread
+    is_new_vth = vthid is None
+
+    # 预先把 UTF-8 编码解开
+    title_str, content_str = smartstr(title), smartstr(content)
+
+    if is_new_vth:
+        return _do_creat_vf_with_vth(
+                vtpid,
+                vtags_json,
+                inreply2,
+                title_str,
+                content_str,
+                )
+
+    return _do_creat_vf_reply(
+            vtpid,
+            vtags_json,
+            vthid,
+            inreply2,
+            title_str,
+            content_str,
+            )
+
+
+def _do_creat_vf_with_vth(vtpid, vtags_json, inreply2, title, content):
+    # 如果新建 VThread, title 必须, vtpid 必须, vtags 必须,
+    # inreply2 不能传入 (无意义)
+    if title is None or vtpid is None or vtags_json is None:
+        return jsonreply(r=22)
+
+    if inreply2 is not None:
+        return jsonreply(r=22)
+
+    # 反序列化并验证 VTag ID 列表
+    try:
+        vtags = json.loads(vtags_json)
+    except ValueError:
+        return jsonreply(r=22)
+
+    if not isinstance(vtags, list):
+        return jsonreply(r=22)
+
+    if not all(isinstance(vtagid, six.text_type) for vtagid in vtags):
+        return jsonreply(r=22)
+
+    # 验证 VTag 存在性
+    for vtagid in vtags:
+        vtag = VTag.find(vtagid)
+        if vtag is None or vtag['vtpid'] != vtpid:
+            return jsonreply(r=101)
+
+    # 新建 VFile
+    new_vf = VFile()
+    # TODO: 所有者
+    new_vf['owner'] = 'TODO'
+    new_vf['ctime'] = int(time.time())
+    new_vf['title'] = title
+    new_vf['content'] = content
+    new_vf['xattr'] = {}
+    new_vf.save()
+
+    # 新建 VThread
+    new_vth = VThread()
+    new_vth['title'] = title
+    new_vth['owner'] = 'TODO'
+    new_vth['tree'] = VThreadTree([new_vf['id'], ])
+    new_vth['vtags'] = vtags
+    new_vth['vtpid'] = vtpid
+    new_vth['xattr'] = {}
+    new_vth.save()
+
+    return jsonreply(r=0, f=new_vf['id'], t=new_vth['id'], )
+
+
+def _do_creat_vf_reply(vtpid, vtags_json, vthid, inreply2, title, content):
+    # 如果新建回复, vtpid, vtags 不能传入
+    if vtpid is not None or vtags_json is not None:
+        return jsonreply(r=22)
+
+    vth = VThread.find(vthid)
+    if vth is None:
+        return jsonreply(r=102)
+
+    # 是否为新建楼中楼回复?
+    if inreply2 is not None:
+        # 该条虚线索里有没有这个 VFile?
+        if inreply2 not in vth['tree']:
+            return jsonreply(r=103)
+
+    # 创建虚文件
+    new_vf = VFile()
+    new_vf['owner'] = 'TODO'
+    new_vf['ctime'] = int(time.time())
+    new_vf['title'] = title if title is not None else ''
+    new_vf['content'] = content
+    new_vf['xattr'] = {}
+    new_vf.save()
+
+    # 更新虚线索
+    # inreply2 为 None 则为直接回复, 这个参数的语义和 VThreadTree 里的实现
+    # 正好是一致的, 就直接传了
+    vth['tree'].append_to(inreply2, new_vf['id'])
+    vth.save()
+
+    return jsonreply(r=0, f=new_vf['id'], )
 
 
 @http
