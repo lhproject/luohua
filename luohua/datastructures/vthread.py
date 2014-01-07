@@ -121,6 +121,41 @@ class VThreadTree(object):
         timeorder = list(self.iter_time_order())
         return iter(timeorder[limit * idx:limit * (idx + 1)])
 
+    def append_to(self, in_reply_to, obj):
+        '''添加回复.
+
+        ``in_reply_to`` 为 ``None`` 则为直接回复, 否则为回复到该参数所指定的\
+        楼中. 如果该参数所指元素不存在或不为直接回复, 则抛 :exc:`ValueError`.
+
+        '''
+
+        if in_reply_to is None:
+            # 直接回复
+            self._tree.append([obj, ])
+
+            # 更新缓存
+            self._directreplies.append(obj)
+            self._reply_idx_map[obj] = len(self._tree) - 1  # 因为是最后一个
+            self._nodes[self._root].append(obj)
+            self._nodes[obj] = []
+            self._flatnodes[obj] = self._root
+
+            return
+
+        # 寻找指定元素
+        if in_reply_to not in self._nodes:
+            # 能执行到这里也可能是因为压根不存在, 反正不是直接回复就对了
+            raise ValueError("%s is not a direct reply" % repr(in_reply_to))
+
+        # 更新树
+        self._tree[self._reply_idx_map[in_reply_to]].append(obj)
+
+        # 更新缓存
+        self._nodes[in_reply_to].append(obj)
+        self._flatnodes[obj] = in_reply_to
+
+        return
+
     def _build_state(self):
         # 从嵌套列表构造树形结构
         # 先是根节点
@@ -131,8 +166,15 @@ class VThreadTree(object):
         # 直接回复列表
         self._directreplies = [root] + self._nodes[root]
 
-        for reply_l in self._tree[1:]:
+        # 直接回复对应原树形结构 index 的映射
+        self._reply_idx_map = {}
+
+        for reply_idx, reply_l in enumerate(self._tree[1:]):
             reply_root, subreplies = reply_l[0], reply_l[1:]
+
+            # 更新 index 缓存
+            # 注意那个 reply_idx 应该加上 1 才能对上原列表的序号
+            self._reply_idx_map[reply_root] = reply_idx + 1
 
             # 更新树形结构缓存
             self._nodes[reply_root] = subreplies
