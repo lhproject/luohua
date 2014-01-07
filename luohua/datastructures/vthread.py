@@ -299,7 +299,7 @@ class VThread(Document):
                     for idx in obj.indexes if
                     idx[0] == VTH_VTAG_INDEX
                     )
-            new_vtags_set = set(self['tags'])
+            new_vtags_set = set(self['vtags'])
             if curr_vtags_set != new_vtags_set:
                 # 干掉当前的虚标签索引
                 obj.remove_index(VTH_VTAG_INDEX)
