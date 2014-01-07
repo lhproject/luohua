@@ -19,22 +19,117 @@
 
 from __future__ import unicode_literals, division
 
-from weiyu.shortcuts import *
+try:
+    import ujson as json
+except ImportError:
+    import json
+
+import six
+import time
+
+from weiyu.helpers.misc import smartstr
+from weiyu.shortcuts import http, jsonview
 from weiyu.utils.decorators import only_methods
 
 from ...utils.viewhelpers import jsonreply, parse_form
+from ...datastructures.vtag import VTag
+from ...datastructures.vthread import VThread, VThreadTree
+from ...datastructures.vfile import VFile
 
 
 @http
 @jsonview
 def vfile_stat_v1_view(request, vfid):
-    raise NotImplementedError
+    '''v1 虚文件状态接口.
+
+    :Allow: GET
+    :URL 格式: ``vf/<虚文件 ID>/stat/``
+    :POST 参数: 无
+    :返回:
+        :r:
+            === ===========================================================
+             0   查询成功
+             2   所请求的虚文件不存在
+            === ===========================================================
+
+        :s:
+            所请求虚文件的状态. 如果查询不成功, 此属性不存在.
+
+            ====== ======== ===============================================
+             字段   类型     说明
+            ====== ======== ===============================================
+             t      unicode  虚文件标题
+             o      unicode  所有者 ID
+             c      int      创建时间 Unix 时间戳
+             l      int      内容长度
+             x      dict     虚文件上附着的扩展属性
+            ====== ======== ===============================================
+
+    :副作用: 无
+
+    '''
+
+    vf = VFile.find(vfid)
+    if vf is None:
+        return jsonreply(r=2)
+
+    stat_obj = {
+            't': vf['title'],
+            'o': vf['owner'],
+            'c': vf['ctime'],
+            'l': len(vf['content']),
+            'x': vf['xattr'],
+            }
+
+    return jsonreply(r=0, s=stat_obj)
 
 
 @http
 @jsonview
 def vfile_read_v1_view(request, vfid):
-    raise NotImplementedError
+    '''v1 虚文件读取接口.
+
+    :Allow: GET
+    :URL 格式: ``vf/<虚文件 ID>/read/``
+    :POST 参数: 无
+    :返回:
+        :r:
+            === ===========================================================
+             0   查询成功
+             2   所请求的虚文件不存在
+            === ===========================================================
+
+        :s:
+            所请求虚文件的内容. 如果查询不成功, 此属性不存在.
+            比起 stat 接口唯一的差别是内容长度字段变成了实际的内容.
+
+            ====== ======== ===============================================
+             字段   类型     说明
+            ====== ======== ===============================================
+             t      unicode  虚文件标题
+             o      unicode  所有者 ID
+             c      int      创建时间 Unix 时间戳
+             n      int      虚文件内容
+             x      dict     虚文件上附着的扩展属性
+            ====== ======== ===============================================
+
+    :副作用: 无
+
+    '''
+
+    vf = VFile.find(vfid)
+    if vf is None:
+        return jsonreply(r=2)
+
+    stat_obj = {
+            't': vf['title'],
+            'o': vf['owner'],
+            'c': vf['ctime'],
+            'n': vf['content'],
+            'x': vf['xattr'],
+            }
+
+    return jsonreply(r=0, s=stat_obj)
 
 
 @http
