@@ -153,7 +153,7 @@ def vtag_getdents_v1_view(request, vtpid, vtagid):
     '''v1 虚线索列表接口.
 
     :Allow:  POST
-    :URL 格式: ``vtp/<虚线索池 ID>/vtag/<虚标签 ID>/getdents/``
+    :URL 格式: ``vtp/<虚线索池 ID>/vtag/<虚标签 ID>/readdir/``
     :POST 参数:
             ======== ======== =============================================
              字段     类型     说明
