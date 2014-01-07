@@ -19,6 +19,10 @@
 
 from __future__ import unicode_literals, division
 
+import copy
+
+from nose.tools import assert_raises
+
 from ..utils import Case
 from ..shortcuts import *
 
@@ -40,6 +44,9 @@ class TestVThreadTree(Case):
 
         cls.thread_0 = vthread.VThreadTree(t0)
         cls.thread_1 = vthread.VThreadTree(t1)
+
+        # 单独给插入回复测试用, 因为会变
+        cls.thread_2 = vthread.VThreadTree(copy.deepcopy(t1))
 
     @classmethod
     def teardown_class(cls):
@@ -88,6 +95,14 @@ class TestVThreadTree(Case):
         assert seq_1_1 == 'FGHIJ'
         assert seq_1_2 == 'KL'
         assert seq_1_100 == ''
+
+    def test_append_to(self):
+        self.thread_2.append_to(None, M)
+        self.thread_2.append_to(C, N)
+        assert_raises(ValueError, self.thread_2.append_to, D, O)
+
+        assert 'ABCFIKM' == ''.join(self.thread_2.iter())
+        assert 'CEJN' == ''.join(self.thread_2.tree[2])
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
