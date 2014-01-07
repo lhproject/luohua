@@ -332,8 +332,8 @@ def vth_enc_v1(vth):
     assert 'owner' in vth
     assert 'tree' in vth
     assert isinstance(vth['tree'], VThreadTree)
-    assert 'tags' in vth
-    assert all(isinstance(tag, six.text_type) for tag in vth['tags'])
+    assert 'vtags' in vth
+    assert all(isinstance(tag, six.text_type) for tag in vth['vtags'])
     assert 'vtpid' in vth
     assert 'xattr' in vth
     assert isinstance(vth['xattr'], dict)
