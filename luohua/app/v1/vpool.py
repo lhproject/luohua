@@ -79,7 +79,7 @@ def vpool_creat_v1_view(request):
     natural = natural == '1'
 
     # 如果有指定 ID 的话就先判断是否会重复
-    if vtpid is not None and VPool.find(vtpid) is not None:
+    if vtpid is not None and VPool.get(vtpid) is not None:
         # 所请求的 vtpid 已经被占据了
         return jsonreply(r=17)
 
@@ -132,7 +132,7 @@ def vpool_stat_v1_view(request, vtpid):
 
     '''
 
-    vtp = VPool.find(vtpid)
+    vtp = VPool.get(vtpid)
     if vtp is None:
         return jsonreply(r=2)
 
@@ -179,7 +179,7 @@ def vpool_getdents_v1_view(request, vtpid):
 
     '''
 
-    vtp = VPool.find(vtpid)
+    vtp = VPool.get(vtpid)
     if vtp is None:
         return jsonreply(r=2, t=[])
 

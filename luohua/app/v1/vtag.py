@@ -81,7 +81,7 @@ def vtag_creat_v1_view(request, vtpid):
     natural = natural == '1'
 
     # 判断是否重复
-    if vtagid is not None and VTag.find(vtagid) is not None:
+    if vtagid is not None and VTag.get(vtagid) is not None:
         return jsonreply(r=17)
 
     # 初始化虚标签对象并保存到数据库
@@ -133,7 +133,7 @@ def vtag_stat_v1_view(request, vtpid, vtagid):
 
     '''
 
-    vtag = VTag.find(vtagid)
+    vtag = VTag.get(vtagid)
     if vtag is None or vtag['vtpid'] != vtpid:
         return jsonreply(r=2)
 
@@ -211,7 +211,7 @@ def vtag_getdents_v1_view(request, vtpid, vtagid):
     if not 20 <= pagesz <= 100:
         return jsonreply(r=22, l=[])
 
-    vtag = VTag.find(vtagid)
+    vtag = VTag.get(vtagid)
     if vtag is None or vtag['vtpid'] != vtpid:
         return jsonreply(r=2, l=[])
 

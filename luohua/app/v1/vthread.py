@@ -59,7 +59,7 @@ def vthread_stat_v1_view(request, vthid):
 
     '''
 
-    vth = VThread.find(vthid)
+    vth = VThread.get(vthid)
     if vth is None:
         return jsonreply(r=2)
 
@@ -110,7 +110,7 @@ def vthread_getdents_v1_view(request, vthid):
 
     '''
 
-    vth = VThread.find(vthid)
+    vth = VThread.get(vthid)
     if vth is None:
         return jsonreply(r=2)
 

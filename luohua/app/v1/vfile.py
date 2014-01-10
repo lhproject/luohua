@@ -69,7 +69,7 @@ def vfile_stat_v1_view(request, vfid):
 
     '''
 
-    vf = VFile.find(vfid)
+    vf = VFile.get(vfid)
     if vf is None:
         return jsonreply(r=2)
 
@@ -118,7 +118,7 @@ def vfile_read_v1_view(request, vfid):
 
     '''
 
-    vf = VFile.find(vfid)
+    vf = VFile.get(vfid)
     if vf is None:
         return jsonreply(r=2)
 
