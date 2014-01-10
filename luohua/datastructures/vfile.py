@@ -24,14 +24,15 @@ import functools
 import six
 
 from weiyu.db.mapper import mapper_hub
-from weiyu.db.mapper.base import Document
+
+from ..utils.dblayer import RiakDocument
 
 VF_STRUCT_ID = 'luohua.vf'
 mapper_hub.register_struct(VF_STRUCT_ID)
 
 
 @functools.total_ordering
-class VFile(Document):
+class VFile(RiakDocument):
     '''虚文件.
 
     本结构的存储后端应为 Riak.
@@ -41,15 +42,7 @@ class VFile(Document):
     struct_id = VF_STRUCT_ID
 
     def __init__(self, data=None, vfid=None, rawobj=None):
-        super(VFile, self).__init__()
-
-        if data is not None:
-            self.update(self.decode(data))
-
-        if vfid is not None:
-            self['id'] = vfid
-
-        self._rawobj = rawobj
+        super(VFile, self).__init__(data, vfid, rawobj)
 
     def __eq__(self, other):
         return (self['ctime'], self['id']) == (other['ctime'], other['id'])
@@ -57,49 +50,6 @@ class VFile(Document):
     def __lt__(self, other):
         # 时间顺序排列, 其次是 ID
         return (self['ctime'], self['id']) < (other['ctime'], other['id'])
-
-    @classmethod
-    def find(cls, vfid):
-        '''按文档 ID 获取一个虚文件.'''
-
-        with cls.storage as conn:
-            obj = conn.get(vfid)
-            return cls(obj.data, obj.key, obj) if obj.exists else None
-
-    @classmethod
-    def find_multiple(cls, ids):
-        '''按文档 ID 列表一次性获取多个虚文件.'''
-
-        with cls.storage as conn:
-            for vfid in ids:
-                obj = conn.get(vfid)
-                yield cls(obj.data, obj.key, obj) if obj.exists else None
-
-    def save(self):
-        '''保存虚文件到数据库.'''
-
-        with self.storage as conn:
-            # 文档 ID 未指定则自动生成
-            obj = self._rawobj if self._rawobj is not None else conn.new()
-            obj.key, obj.data = self.get('id'), self.encode()
-            obj.store()
-
-            # 刷新对象关联信息
-            self['id'], self._rawobj = obj.key, obj
-
-    def purge(self):
-        '''从数据库中彻底删除此条虚文件.'''
-
-        with self.storage as conn:
-            if self._rawobj is None:
-                raise ValueError(
-                        'not associated with a Riak object, thus not '
-                        'purgeable'
-                        )
-
-            self._rawobj.delete()
-            self._rawobj = None
-            del self['id']
 
 
 @mapper_hub.decoder_for(VF_STRUCT_ID, 1)

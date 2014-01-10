@@ -22,7 +22,8 @@ from __future__ import unicode_literals, division
 import six
 
 from weiyu.db.mapper import mapper_hub
-from weiyu.db.mapper.base import Document
+
+from ..utils.dblayer import RiakDocument
 
 VTAG_STRUCT_ID = 'luohua.vtag'
 mapper_hub.register_struct(VTAG_STRUCT_ID)
@@ -30,7 +31,7 @@ mapper_hub.register_struct(VTAG_STRUCT_ID)
 VTAG_VTP_INDEX = 'vtp_bin'
 
 
-class VTag(Document):
+class VTag(RiakDocument):
     '''虚标签.
 
     这是组织虚线索的单位, 存在于虚线索池中.
@@ -42,34 +43,10 @@ class VTag(Document):
     '''
 
     struct_id = VTAG_STRUCT_ID
+    uses_2i = True
 
     def __init__(self, data=None, vtagid=None, rawobj=None):
-        super(VTag, self).__init__()
-
-        if data is not None:
-            self.update(self.decode(data))
-
-        if vtagid is not None:
-            self['id'] = vtagid
-
-        self._rawobj = rawobj
-
-    @classmethod
-    def _from_obj(cls, obj):
-        return cls(obj.data, obj.key, obj) if obj.exists else None
-
-    @classmethod
-    def _do_fetch_by_index(cls, idx, key, max_results, continuation):
-        with cls.storage as conn:
-            page = conn.get_index(
-                    idx,
-                    key,
-                    max_results=max_results,
-                    continuation=continuation,
-                    )
-            for vthid in page.results:
-                obj = conn.get(vthid)
-                yield cls._from_obj(obj)
+        super(VTag, self).__init__(data, vtagid, rawobj)
 
     @classmethod
     def from_vpool(cls, vtpid):
@@ -77,28 +54,9 @@ class VTag(Document):
 
         return cls._do_fetch_by_index(VTAG_VTP_INDEX, vtpid, None, None)
 
-    @classmethod
-    def find(cls, vtagid):
-        '''按文档 ID 获取一个虚标签.'''
-
-        with cls.storage as conn:
-            obj = conn.get(vtagid)
-            return cls._from_obj(obj)
-
-    def save(self):
-        '''保存虚标签到数据库.'''
-
-        with self.storage as conn:
-            obj = self._rawobj if self._rawobj is not None else conn.new()
-            obj.key, obj.data = self.get('id'), self.encode()
-
-            # 同步 2i 索引
-            obj.set_index(VTAG_VTP_INDEX, self['vtpid'])
-
-            obj.store()
-
-            # 刷新对象关联信息
-            self['id'], self._rawobj = obj.key, obj
+    def _do_sync_2i(self, obj):
+        obj.set_index(VTAG_VTP_INDEX, self['vtpid'])
+        return obj
 
 
 @mapper_hub.decoder_for(VTAG_STRUCT_ID, 1)

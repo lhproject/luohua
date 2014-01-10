@@ -22,8 +22,8 @@ from __future__ import unicode_literals, division
 import six
 
 from weiyu.db.mapper import mapper_hub
-from weiyu.db.mapper.base import Document
 
+from ..utils.dblayer import RiakDocument
 from .vfile import VFile
 
 VTH_STRUCT_ID = 'luohua.vth'
@@ -184,7 +184,7 @@ class VThreadTree(object):
             self._flatnodes.update({sr: reply_root for sr in subreplies})
 
 
-class VThread(Document):
+class VThread(RiakDocument):
     '''虚线索.
 
     本结构的存储后端应为 Riak.
@@ -192,63 +192,10 @@ class VThread(Document):
     '''
 
     struct_id = VTH_STRUCT_ID
+    uses_2i = True
 
     def __init__(self, data=None, vthid=None, rawobj=None):
-        super(VThread, self).__init__()
-
-        if data is not None:
-            self.update(self.decode(data))
-
-        if vthid is not None:
-            self['id'] = vthid
-
-        self._rawobj = rawobj
-
-    @classmethod
-    def _from_obj(cls, obj):
-        '''从数据库对象生成 Python 对象. 这是内部方法, 外界不应直接使用.'''
-
-        return cls(obj.data, obj.key, obj) if obj.exists else None
-
-    @classmethod
-    def find(cls, vthid):
-        with cls.storage as conn:
-            obj = conn.get(vthid)
-            return cls._from_obj(obj)
-
-    @classmethod
-    def find_multiple(cls, ids):
-        with cls.storage as conn:
-            for vthid in ids:
-                obj = conn.get(vthid)
-                yield cls._from_obj(obj)
-
-    @classmethod
-    def _do_fetch_by_index(
-            cls,
-            idx,
-            key,
-            max_results,
-            continuation,
-            continuation_callback,
-            ):
-        with cls.storage as conn:
-            page = conn.get_index(
-                    idx,
-                    key,
-                    max_results=max_results,
-                    continuation=continuation,
-                    )
-            for vthid in page.results:
-                obj = conn.get(vthid)
-                yield cls._from_obj(obj)
-
-            if continuation_callback is not None:
-                continuation_callback(
-                        page.continuation
-                        if page.has_next_page()
-                        else ''
-                        )
+        super(VThread, self).__init__(data, vthid, rawobj)
 
     @classmethod
     def from_vpool(
@@ -282,35 +229,28 @@ class VThread(Document):
                 continuation_callback,
                 )
 
-    def save(self):
-        with self.storage as conn:
-            obj = self._rawobj if self._rawobj is not None else conn.new()
-            obj.key, obj.data = self.get('id'), self.encode()
+    def _do_sync_2i(self, obj):
+        # 同步 2i 索引
+        # 虚线索池
+        obj.set_index(VTH_VTP_INDEX, self['vtpid'])
 
-            # 同步 2i 索引
-            # 虚线索池
-            obj.set_index(VTH_VTP_INDEX, self['vtpid'])
+        # 虚标签
+        # 这个可能比较麻烦, 因为涉及的虚标签可能比较多.
+        # 那么先检查下变化吧
+        curr_vtags_set = set(
+                idx[1]
+                for idx in obj.indexes if
+                idx[0] == VTH_VTAG_INDEX
+                )
+        new_vtags_set = set(self['vtags'])
+        if curr_vtags_set != new_vtags_set:
+            # 干掉当前的虚标签索引
+            obj.remove_index(VTH_VTAG_INDEX)
+            # 重设虚标签索引
+            for vtag in new_vtags_set:
+                obj.add_index(VTH_VTAG_INDEX, vtag)
 
-            # 虚标签
-            # 这个可能比较麻烦, 因为涉及的虚标签可能比较多.
-            # 那么先检查下变化吧
-            curr_vtags_set = set(
-                    idx[1]
-                    for idx in obj.indexes if
-                    idx[0] == VTH_VTAG_INDEX
-                    )
-            new_vtags_set = set(self['vtags'])
-            if curr_vtags_set != new_vtags_set:
-                # 干掉当前的虚标签索引
-                obj.remove_index(VTH_VTAG_INDEX)
-                # 重设虚标签索引
-                for vtag in new_vtags_set:
-                    obj.add_index(VTH_VTAG_INDEX, vtag)
-
-            obj.store()
-
-            # 刷新对象关联信息
-            self['id'], self._rawobj = obj.key, obj
+        return obj
 
 
 @mapper_hub.decoder_for(VTH_STRUCT_ID, 1)

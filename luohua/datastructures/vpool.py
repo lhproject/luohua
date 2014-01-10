@@ -22,13 +22,14 @@ from __future__ import unicode_literals, division
 import six
 
 from weiyu.db.mapper import mapper_hub
-from weiyu.db.mapper.base import Document
+
+from ..utils.dblayer import RiakDocument
 
 VTP_STRUCT_ID = 'luohua.vtp'
 mapper_hub.register_struct(VTP_STRUCT_ID)
 
 
-class VPool(Document):
+class VPool(RiakDocument):
     '''虚线索池.
 
     本结构的存储后端应为 Riak.
@@ -42,50 +43,7 @@ class VPool(Document):
     struct_id = VTP_STRUCT_ID
 
     def __init__(self, data=None, vtpid=None, rawobj=None):
-        super(VPool, self).__init__()
-
-        if data is not None:
-            self.update(self.decode(data))
-
-        if vtpid is not None:
-            self['id'] = vtpid
-
-        self._rawobj = rawobj
-
-    @classmethod
-    def _from_obj(cls, obj):
-        return cls(obj.data, obj.key, obj) if obj.exists else None
-
-    @classmethod
-    def find(cls, vtpid):
-        '''按文档 ID 获取一个虚线索池.'''
-
-        with cls.storage as conn:
-            obj = conn.get(vtpid)
-            return cls._from_obj(obj)
-
-    @classmethod
-    def find_all(cls):
-        '''一次性获取所有虚线索池.'''
-
-        with cls.storage as conn:
-            for vtpid in conn.get_keys():
-                obj = conn.get(vtpid)
-                yield cls._from_obj(obj)
-
-    def save(self):
-        '''保存虚线索池到数据库.'''
-
-        with self.storage as conn:
-            obj = self._rawobj if self._rawobj is not None else conn.new()
-
-            # 文档 ID 未指定则自动生成
-            obj.key, obj.data = self.get('id'), self.encode()
-
-            obj.store()
-
-            # 刷新对象关联信息
-            self['id'], self._rawobj = obj.key, obj
+        super(VPool, self).__init__(data, vtpid, rawobj)
 
 
 @mapper_hub.decoder_for(VTP_STRUCT_ID, 1)
