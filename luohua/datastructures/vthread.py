@@ -208,7 +208,7 @@ class VThread(RiakDocument):
         key_start = '%s_%s' % (vtagid, time_descending(time_start), )
         key_end = '%s_%s' % (vtagid, time_descending(time_end), )
         return cls._do_fetch_range_by_index(
-                VTH_VTAG_INDEX,
+                idx,
                 key_start,
                 key_end,
                 )
