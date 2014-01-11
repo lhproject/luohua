@@ -36,19 +36,27 @@ class TestSequences(Case):
     def teardown_class(cls):
         pass
 
-    def test_time_descending(self):
-        id1 = sequences.time_descending()
-        time.sleep(1)
-        id2 = sequences.time_descending()
-        assert isinstance(id1, six.text_type)
-        assert id1 > id2
+    def test_time_sequences(self):
+        # 为了节约时间, 都挤在一个 case 里了
+        td1 = sequences.time_descending()
+        ta1 = sequences.time_ascending()
+        dt1 = sequences.descending_ts()
 
-    def test_time_ascending(self):
-        id1 = sequences.time_ascending()
         time.sleep(1)
-        id2 = sequences.time_ascending()
-        assert isinstance(id1, six.text_type)
-        assert id1 < id2
+
+        td2 = sequences.time_descending()
+        ta2 = sequences.time_ascending()
+        dt2 = sequences.descending_ts()
+
+        # 返回类型
+        assert isinstance(td1, six.text_type)
+        assert isinstance(ta1, six.text_type)
+        assert isinstance(dt1, six.integer_types)
+
+        # 顺序约定
+        assert td1 > td2
+        assert ta1 < ta2
+        assert dt1 > dt2
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
