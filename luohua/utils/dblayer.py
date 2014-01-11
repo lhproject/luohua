@@ -65,15 +65,16 @@ class RiakDocument(Document):
                 yield cls._from_obj(obj)
 
     @classmethod
-    def get(cls, key):
+    def fetch(cls, key):
         '''按文档 ID 获取一个被包装对象.'''
 
+        # XXX 这个方法不能叫 get, 因为那样会覆盖掉 dict 的 get 方法!
         with cls.storage as conn:
             obj = conn.get(key)
             return cls._from_obj(obj)
 
     @classmethod
-    def get_multiple(cls, keys):
+    def fetch_multiple(cls, keys):
         '''按文档 ID 列表一次性获取多个被包装对象.'''
 
         with cls.storage as conn:

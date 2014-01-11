@@ -41,7 +41,7 @@ from ...datastructures.vfile import VFile
 def _new_vfid(timestamp):
     for trial in xrange(5):
         temp_vfid = time_ascending_suffixed(timestamp)
-        if VFile.get(temp_vfid) is None:
+        if VFile.fetch(temp_vfid) is None:
             # 不重复, 可用
             return temp_vfid
     raise RuntimeError('UNLIKELY: failed to generate sequential vfid')
@@ -50,7 +50,7 @@ def _new_vfid(timestamp):
 def _new_vthid(timestamp):
     for trial in xrange(5):
         temp_vthid = time_ascending_suffixed(timestamp)
-        if VThread.get(temp_vthid) is None:
+        if VThread.fetch(temp_vthid) is None:
             # 不重复, 可用
             return temp_vthid
     raise RuntimeError('UNLIKELY: failed to generate sequential vthid')
@@ -88,7 +88,7 @@ def vfile_stat_v1_view(request, vfid):
 
     '''
 
-    vf = VFile.get(vfid)
+    vf = VFile.fetch(vfid)
     if vf is None:
         return jsonreply(r=2)
 
@@ -137,7 +137,7 @@ def vfile_read_v1_view(request, vfid):
 
     '''
 
-    vf = VFile.get(vfid)
+    vf = VFile.fetch(vfid)
     if vf is None:
         return jsonreply(r=2)
 
@@ -267,7 +267,7 @@ def _do_creat_vf_with_vth(vtpid, vtags_json, inreply2, title, content):
 
     # 验证 VTag 存在性
     for vtagid in vtags:
-        vtag = VTag.get(vtagid)
+        vtag = VTag.fetch(vtagid)
         if vtag is None or vtag['vtpid'] != vtpid:
             return jsonreply(r=101)
 
@@ -306,7 +306,7 @@ def _do_creat_vf_reply(vtpid, vtags_json, vthid, inreply2, title, content):
     if vtpid is not None or vtags_json is not None:
         return jsonreply(r=22)
 
-    vth = VThread.get(vthid)
+    vth = VThread.fetch(vthid)
     if vth is None:
         return jsonreply(r=102)
 
