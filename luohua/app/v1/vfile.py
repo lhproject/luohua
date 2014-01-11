@@ -32,9 +32,28 @@ from weiyu.shortcuts import http, jsonview
 from weiyu.utils.decorators import only_methods
 
 from ...utils.viewhelpers import jsonreply, parse_form
+from ...utils.sequences import time_ascending_suffixed
 from ...datastructures.vtag import VTag
 from ...datastructures.vthread import VThread, VThreadTree
 from ...datastructures.vfile import VFile
+
+
+def _new_vfid(timestamp):
+    for trial in xrange(5):
+        temp_vfid = time_ascending_suffixed(timestamp)
+        if VFile.get(temp_vfid) is None:
+            # 不重复, 可用
+            return temp_vfid
+    raise RuntimeError('UNLIKELY: failed to generate sequential vfid')
+
+
+def _new_vthid(timestamp):
+    for trial in xrange(5):
+        temp_vthid = time_ascending_suffixed(timestamp)
+        if VThread.get(temp_vthid) is None:
+            # 不重复, 可用
+            return temp_vthid
+    raise RuntimeError('UNLIKELY: failed to generate sequential vthid')
 
 
 @http
@@ -248,15 +267,19 @@ def _do_creat_vf_with_vth(vtpid, vtags_json, inreply2, title, content):
 
     # 验证 VTag 存在性
     for vtagid in vtags:
-        vtag = VTag.find(vtagid)
+        vtag = VTag.get(vtagid)
         if vtag is None or vtag['vtpid'] != vtpid:
             return jsonreply(r=101)
 
+    # 记录时间一次, 之后都用这个
+    now = int(time.time())
+
     # 新建 VFile
     new_vf = VFile()
+    new_vf['id'] = _new_vfid(now)
     # TODO: 所有者
     new_vf['owner'] = 'TODO'
-    new_vf['ctime'] = int(time.time())
+    new_vf['ctime'] = now
     new_vf['title'] = title
     new_vf['content'] = content
     new_vf['xattr'] = {}
@@ -264,8 +287,11 @@ def _do_creat_vf_with_vth(vtpid, vtags_json, inreply2, title, content):
 
     # 新建 VThread
     new_vth = VThread()
+    new_vth['id'] = _new_vthid(now)
     new_vth['title'] = title
     new_vth['owner'] = 'TODO'
+    new_vth['ctime'] = now
+    new_vth['mtime'] = now
     new_vth['tree'] = VThreadTree([new_vf['id'], ])
     new_vth['vtags'] = vtags
     new_vth['vtpid'] = vtpid
@@ -280,7 +306,7 @@ def _do_creat_vf_reply(vtpid, vtags_json, vthid, inreply2, title, content):
     if vtpid is not None or vtags_json is not None:
         return jsonreply(r=22)
 
-    vth = VThread.find(vthid)
+    vth = VThread.get(vthid)
     if vth is None:
         return jsonreply(r=102)
 
@@ -290,8 +316,11 @@ def _do_creat_vf_reply(vtpid, vtags_json, vthid, inreply2, title, content):
         if inreply2 not in vth['tree']:
             return jsonreply(r=103)
 
+    now = int(time.time())
+
     # 创建虚文件
     new_vf = VFile()
+    new_vf['id'] = _new_vfid(now)
     new_vf['owner'] = 'TODO'
     new_vf['ctime'] = int(time.time())
     new_vf['title'] = title if title is not None else ''
@@ -302,6 +331,7 @@ def _do_creat_vf_reply(vtpid, vtags_json, vthid, inreply2, title, content):
     # 更新虚线索
     # inreply2 为 None 则为直接回复, 这个参数的语义和 VThreadTree 里的实现
     # 正好是一致的, 就直接传了
+    vth['mtime'] = now
     vth['tree'].append_to(inreply2, new_vf['id'])
     vth.save()
 
