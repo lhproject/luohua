@@ -36,17 +36,17 @@ class TestSequences(Case):
     def teardown_class(cls):
         pass
 
-    def test_time_ascending(self):
-        id1 = sequences.time_ascending()
-        time.sleep(1)
-        id2 = sequences.time_ascending()
-        assert isinstance(id1, six.text_type)
-        assert id1 > id2
-
     def test_time_descending(self):
         id1 = sequences.time_descending()
         time.sleep(1)
         id2 = sequences.time_descending()
+        assert isinstance(id1, six.text_type)
+        assert id1 > id2
+
+    def test_time_ascending(self):
+        id1 = sequences.time_ascending()
+        time.sleep(1)
+        id2 = sequences.time_ascending()
         assert isinstance(id1, six.text_type)
         assert id1 < id2
 

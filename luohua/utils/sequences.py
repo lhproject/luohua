@@ -35,17 +35,17 @@ PRNG = random.SystemRandom()
 
 
 def time_ascending(timestamp=None):
-    '''生成一个随时间推移而比较顺序上减小的字符串.'''
-
-    ts = timestamp if timestamp is not None else int(time.time())
-    return to36(TIMESTAMP_LIMIT - ts) + ('%04d' % PRNG.randint(0, 9999))
-
-
-def time_descending(timestamp=None):
     '''生成一个随时间推移而比较顺序上增大的字符串.'''
 
     ts = timestamp if timestamp is not None else int(time.time())
     return to36(ts) + ('%04d' % PRNG.randint(0, 9999))
+
+
+def time_descending(timestamp=None):
+    '''生成一个随时间推移而比较顺序上减小的字符串.'''
+
+    ts = timestamp if timestamp is not None else int(time.time())
+    return to36(TIMESTAMP_LIMIT - ts) + ('%04d' % PRNG.randint(0, 9999))
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
