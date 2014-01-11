@@ -22,6 +22,9 @@ from __future__ import unicode_literals, division
 __all__ = [
         'time_ascending',
         'time_descending',
+        'time_ascending_suffixed',
+        'time_descending_suffixed',
+        'ascending_ts',
         'descending_ts',
         ]
 
@@ -44,22 +47,41 @@ PRNG = random.SystemRandom()
 def time_ascending(timestamp=None):
     '''生成一个随时间推移而比较顺序递增的字符串.'''
 
-    ts = timestamp if timestamp is not None else int(time.time())
-    return to36(ts) + ('%04d' % PRNG.randint(0, 9999))
+    ts_actual = timestamp if timestamp is not None else int(time.time())
+    return to36(ts_actual)
 
 
 def time_descending(timestamp=None):
     '''生成一个随时间推移而比较顺序递减的字符串.'''
 
-    ts = timestamp if timestamp is not None else int(time.time())
-    return to36(TIMESTAMP_LIMIT - ts) + ('%04d' % PRNG.randint(0, 9999))
+    ts_actual = timestamp if timestamp is not None else int(time.time())
+    return to36(TIMESTAMP_LIMIT - ts_actual)
+
+
+def time_ascending_suffixed(timestamp=None):
+    '''生成一个随时间推移而比较顺序递增的字符串, 带上一个随机后缀.'''
+
+    return time_ascending(timestamp) + ('%04d' % PRNG.randint(0, 9999))
+
+
+def time_descending_suffixed(timestamp=None):
+    '''生成一个随时间推移而比较顺序递减的字符串, 带上一个随机后缀.'''
+
+    return time_descending(timestamp) + ('%04d' % PRNG.randint(0, 9999))
+
+
+def ascending_ts(timestamp=None):
+    '''生成一个随时间推移递增的时间戳整数.'''
+
+    return timestamp if timestamp is not None else int(time.time())
 
 
 def descending_ts(timestamp=None):
     '''生成一个随时间推移递减的时间戳整数.'''
 
-    ts = timestamp if timestamp is not None else int(time.time())
-    return TIMESTAMP_LIMIT - ts
+    return TIMESTAMP_LIMIT - (
+            timestamp if timestamp is not None else int(time.time())
+            )
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
