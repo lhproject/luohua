@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # 落花 / 应用 / API v1 / 虚线索池
 #
-# Copyright (C) 2013 JNRain
+# Copyright (C) 2013-2014 JNRain
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

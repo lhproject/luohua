@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # 落花 / 认证 / 密码
 #
-# Copyright (C) 2013 JNRain
+# Copyright (C) 2013-2014 JNRain
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
