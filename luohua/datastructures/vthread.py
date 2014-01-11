@@ -242,29 +242,22 @@ class VThread(RiakDocument):
         # 虚线索池
         obj.set_index(VTH_VTP_INDEX, self['vtpid'])
 
-        # 虚标签
-        # 这个可能比较麻烦, 因为涉及的虚标签可能比较多.
-        # 那么先检查下变化吧
-        curr_vtags_set = set(
-                idx[1]
-                for idx in obj.indexes if
-                idx[0] == VTH_VTAG_INDEX
-                )
+        # 虚标签, 虚标签-时间复合检索索引
+        # 这里根本没必要计算差异, 因为实际存储的时候本来就是全部替换掉的
+        # 直接扔掉旧索引创建新索引就行了
         new_vtags_set = set(self['vtags'])
-        if curr_vtags_set != new_vtags_set:
-            # 干掉当前的虚标签索引
-            obj.remove_index(VTH_VTAG_INDEX)
-            # 重设虚标签索引
-            for vtag in new_vtags_set:
-                obj.add_index(VTH_VTAG_INDEX, vtag)
 
-        # 虚标签-时间复合检索索引
+        obj.remove_index(VTH_VTAG_INDEX)
+        obj.remove_index(VTH_VTAG_CTIME_COMPOSITE_INDEX)
+        obj.remove_index(VTH_VTAG_MTIME_COMPOSITE_INDEX)
+
         # 递减时间戳字符串
         descending_ctime = time_descending(ctime)
         descending_mtime = time_descending(mtime)
-        obj.remove_index(VTH_VTAG_CTIME_COMPOSITE_INDEX)
-        obj.remove_index(VTH_VTAG_MTIME_COMPOSITE_INDEX)
+
         for vtag in new_vtags_set:
+            obj.add_index(VTH_VTAG_INDEX, vtag)
+
             ctime_idx_val = '%s_%s' % (vtag, descending_ctime, )
             mtime_idx_val = '%s_%s' % (vtag, descending_mtime, )
             obj.add_index(VTH_VTAG_CTIME_COMPOSITE_INDEX, ctime_idx_val)
