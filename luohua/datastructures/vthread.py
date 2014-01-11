@@ -31,6 +31,8 @@ mapper_hub.register_struct(VTH_STRUCT_ID)
 
 VTH_VTP_INDEX = 'vtp_bin'
 VTH_VTAG_INDEX = 'vtag_bin'
+VTH_CTIME_INDEX = 'ctime_int'
+VTH_MTIME_INDEX = 'mtime_int'
 
 
 class VThreadTree(object):
@@ -231,6 +233,10 @@ class VThread(RiakDocument):
 
     def _do_sync_2i(self, obj):
         # 同步 2i 索引
+        # 时间
+        obj.set_index(VTH_CTIME_INDEX, self['ctime'])
+        obj.set_index(VTH_MTIME_INDEX, self['mtime'])
+
         # 虚线索池
         obj.set_index(VTH_VTP_INDEX, self['vtpid'])
 
@@ -258,6 +264,8 @@ def vth_dec_v1(data):
     return {
             'title': data['t'],
             'owner': data['o'],
+            'ctime': data['c'],
+            'mtime': data['m'],
             'tree': VThreadTree(data['r']),
             'vtags': data['g'],
             'vtpid': data['p'],
@@ -270,6 +278,10 @@ def vth_enc_v1(vth):
     assert 'title' in vth
     assert isinstance(vth['title'], six.text_type)
     assert 'owner' in vth
+    assert 'ctime' in vth
+    assert isinstance(vth['ctime'], six.integer_types)
+    assert 'mtime' in vth
+    assert isinstance(vth['mtime'], six.integer_types)
     assert 'tree' in vth
     assert isinstance(vth['tree'], VThreadTree)
     assert 'vtags' in vth
@@ -281,6 +293,8 @@ def vth_enc_v1(vth):
     return {
             't': vth['title'],
             'o': vth['owner'],
+            'c': vth['ctime'],
+            'm': vth['mtime'],
             'r': vth['tree'].tree,
             'g': vth['vtags'],
             'p': vth['vtpid'],
