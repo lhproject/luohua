@@ -49,33 +49,20 @@ class RiakDocument(Document):
         return cls(obj.data, obj.key, obj) if obj.exists else None
 
     @classmethod
-    def _do_fetch_by_index(
-            cls,
-            idx,
-            key,
-            max_results,
-            continuation,
-            continuation_callback=None,
-            ):
+    def _do_fetch_by_index(cls, idx, key):
         with cls.storage as conn:
-            page = conn.get_index(
-                    idx,
-                    key,
-                    max_results=max_results,
-                    continuation=continuation,
-                    )
-            for vthid in page.results:
-                obj = conn.get(vthid)
+            page = conn.get_index(idx, key)
+            for obj_key in page.results:
+                obj = conn.get(obj_key)
                 yield cls._from_obj(obj)
 
-            # XXX: 有时候需要同时回传 continuation, 只好先这么 hack 了
-            # 有机会重构的话这个一定要解决掉
-            if continuation_callback is not None:
-                continuation_callback(
-                        page.continuation
-                        if page.has_next_page()
-                        else ''
-                        )
+    @classmethod
+    def _do_fetch_range_by_index(cls, idx, start, end):
+        with cls.storage as conn:
+            page = conn.get_index(idx, start, end)
+            for obj_key in page.results:
+                obj = conn.get(obj_key)
+                yield cls._from_obj(obj)
 
     @classmethod
     def get(cls, key):
