@@ -24,6 +24,7 @@ import six
 from weiyu.db.mapper import mapper_hub
 
 from ..utils.dblayer import RiakDocument
+from ..utils.sequences import time_descending
 from .vfile import VFile
 
 VTH_STRUCT_ID = 'luohua.vth'
@@ -33,6 +34,8 @@ VTH_VTP_INDEX = 'vtp_bin'
 VTH_VTAG_INDEX = 'vtag_bin'
 VTH_CTIME_INDEX = 'ctime_int'
 VTH_MTIME_INDEX = 'mtime_int'
+VTH_VTAG_CTIME_COMPOSITE_INDEX = 'vtagctime_bin'
+VTH_VTAG_MTIME_COMPOSITE_INDEX = 'vtagmtime_bin'
 
 
 class VThreadTree(object):
@@ -200,42 +203,41 @@ class VThread(RiakDocument):
         super(VThread, self).__init__(data, vthid, rawobj)
 
     @classmethod
-    def from_vpool(
-            cls,
-            vtpid,
-            max_results=10,
-            continuation=None,
-            continuation_callback=None,
-            ):
-        return cls._do_fetch_by_index(
-                VTH_VTP_INDEX,
-                vtpid,
-                max_results,
-                continuation,
-                continuation_callback,
+    def _from_vtag(cls, idx, vtagid, time_start, time_end):
+        # 复合索引 key
+        key_start = '%s_%s' % (vtagid, time_descending(time_start), )
+        key_end = '%s_%s' % (vtagid, time_descending(time_end), )
+        return cls._do_fetch_range_by_index(
+                VTH_VTAG_INDEX,
+                key_start,
+                key_end,
                 )
 
     @classmethod
-    def from_vtag(
-            cls,
-            vtagid,
-            max_results=10,
-            continuation=None,
-            continuation_callback=None,
-            ):
-        return cls._do_fetch_by_index(
-                VTH_VTAG_INDEX,
+    def from_vtag_ctime(cls, vtagid, time_start, time_end):
+        return cls._from_vtag(
+                VTH_VTAG_CTIME_COMPOSITE_INDEX,
                 vtagid,
-                max_results,
-                continuation,
-                continuation_callback,
+                time_start,
+                time_end,
+                )
+
+    @classmethod
+    def from_vtag_mtime(cls, vtagid, time_start, time_end):
+        return cls._from_vtag(
+                VTH_VTAG_MTIME_COMPOSITE_INDEX,
+                vtagid,
+                time_start,
+                time_end,
                 )
 
     def _do_sync_2i(self, obj):
         # 同步 2i 索引
         # 时间
-        obj.set_index(VTH_CTIME_INDEX, self['ctime'])
-        obj.set_index(VTH_MTIME_INDEX, self['mtime'])
+        # 时间值在接下来同步复合检索索引的时候会用到, 先留下来
+        ctime, mtime = self['ctime'], self['mtime']
+        obj.set_index(VTH_CTIME_INDEX, ctime)
+        obj.set_index(VTH_MTIME_INDEX, mtime)
 
         # 虚线索池
         obj.set_index(VTH_VTP_INDEX, self['vtpid'])
@@ -255,6 +257,18 @@ class VThread(RiakDocument):
             # 重设虚标签索引
             for vtag in new_vtags_set:
                 obj.add_index(VTH_VTAG_INDEX, vtag)
+
+        # 虚标签-时间复合检索索引
+        # 递减时间戳字符串
+        descending_ctime = time_descending(ctime)
+        descending_mtime = time_descending(mtime)
+        obj.remove_index(VTH_VTAG_CTIME_COMPOSITE_INDEX)
+        obj.remove_index(VTH_VTAG_MTIME_COMPOSITE_INDEX)
+        for vtag in new_vtags_set:
+            ctime_idx_val = '%s_%s' % (vtag, descending_ctime, )
+            mtime_idx_val = '%s_%s' % (vtag, descending_mtime, )
+            obj.add_index(VTH_VTAG_CTIME_COMPOSITE_INDEX, ctime_idx_val)
+            obj.add_index(VTH_VTAG_MTIME_COMPOSITE_INDEX, mtime_idx_val)
 
         return obj
 
