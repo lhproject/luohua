@@ -50,6 +50,8 @@ def vthread_stat_v1_view(request, vthid):
             ====== ======== ===============================================
              t      unicode  虚线索标题
              o      unicode  虚线索所有者 ID
+             c      int      创建时间的 Unix 时间戳
+             m      int      最近一次变化时间的 Unix 时间戳
              g      list     所属虚标签 ID 的列表
              p      unicode  所属虚线索池 ID
              x      dict     虚线索上附着的扩展属性
@@ -66,6 +68,8 @@ def vthread_stat_v1_view(request, vthid):
     stat_obj = {
             't': vth['title'],
             'o': vth['owner'],
+            'c': vth['ctime'],
+            'm': vth['mtime'],
             'g': vth['vtags'],
             'p': vth['vtpid'],
             'x': vth['xattr'],
