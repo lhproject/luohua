@@ -223,7 +223,8 @@ def vfile_creat_v1_view(request):
     is_new_vth = vthid is None
 
     # 预先把 UTF-8 编码解开
-    title_str, content_str = smartstr(title), smartstr(content)
+    title_str = smartstr(title) if title is not None else None
+    content_str = smartstr(content)
 
     if is_new_vth:
         return _do_creat_vf_with_vth(
