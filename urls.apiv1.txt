@@ -24,7 +24,7 @@ vtp/:
             ^creat/$ vtag-creat-v1
             ^(?P<vtagid>[^/]+)/:
                 ^stat/$ vtag-stat-v1
-                ^readdir/$ vtag-getdents-v1
+                ^readdir/(?P<time_start>\d+)/(?P<time_end>\d+)/$ vtag-getdents-v1
                 ^fcntl/$ vtag-fcntl-v1
                 ^unlink/$ vtag-unlink-v1
 

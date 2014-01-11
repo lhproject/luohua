@@ -148,21 +148,13 @@ def vtag_stat_v1_view(request, vtpid, vtagid):
 
 @http
 @jsonview
-@only_methods(['POST', ])
-def vtag_getdents_v1_view(request, vtpid, vtagid):
+@only_methods(['GET', ])
+def vtag_getdents_v1_view(request, vtpid, vtagid, time_start, time_end):
     '''v1 虚线索列表接口.
 
-    :Allow:  POST
-    :URL 格式: ``vtp/<虚线索池 ID>/vtag/<虚标签 ID>/readdir/``
-    :POST 参数:
-            ======== ======== =============================================
-             字段     类型     说明
-            ======== ======== =============================================
-             pagesz   int      **必须** 每页结果数, 最小 20, 最大 100
-             cont     unicode  **可选** 上一页结果链接指针, 用它查询下一页.
-                               如果省略则为查询第一页.
-            ======== ======== =============================================
-
+    :Allow: GET
+    :URL 格式: ``vtp/<虚线索池 ID>/vtag/<虚标签 ID>/readdir/<起始时间戳>/<结束时间戳>``
+    :POST 参数: 无
     :返回:
         :r:
             ==== ==========================================================
@@ -172,7 +164,8 @@ def vtag_getdents_v1_view(request, vtpid, vtagid):
             ==== ==========================================================
 
         :l:
-            一页虚线索的列表. 如果查询不成功, 此属性为空列表.
+            最后变化时间在所查询时间段内虚线索的列表. 如果查询不成功,
+            此属性为空列表.
 
             列表中每个虚线索的形式如下.
 
@@ -180,51 +173,36 @@ def vtag_getdents_v1_view(request, vtpid, vtagid):
              字段    类型     说明
             ======= ======== ==============================================
              i       unicode  虚线索 ID
-             t       unicode  虚线索标题
-             o       unicode  虚线索所有者 ID
+             t       unicode  标题
+             o       unicode  所有者 ID
+             c       int      创建时间戳
+             m       int      最后变化时间戳
             ======= ======== ==============================================
-
-        :c:
-            下一页结果的链接指针, 将它再次传入此接口可以查询下一页的结果.
-            如果当前页为最后一页, 此属性为空字符串.
-
-            如果查询不成功, 此属性不存在.
 
     :副作用: 无
 
     '''
 
-    try:
-        pagesz, cont = parse_form(
-                request,
-                'pagesz',
-                'cont',
-                cont=None,
-                )
-    except KeyError:
+    if not time_start.isdigit() or not time_end.isdigit():
         return jsonreply(r=22, l=[])
 
-    if not pagesz.isdigit():
-        return jsonreply(r=22, l=[])
-
-    pagesz = int(pagesz)
-    if not 20 <= pagesz <= 100:
-        return jsonreply(r=22, l=[])
+    time_start, time_end = int(time_start), int(time_end)
 
     vtag = VTag.get(vtagid)
     if vtag is None or vtag['vtpid'] != vtpid:
         return jsonreply(r=2, l=[])
 
-    result, continuation_box = [], []
-    cont_receiver = lambda x: continuation_box.append(x)
-    for vth in VThread.from_vtag(vtag['id'], pagesz, cont, cont_receiver):
+    result = []
+    for vth in VThread.from_vtag_mtime(vtag['id'], time_start, time_end):
         result.append({
                 'i': vth['id'],
                 't': vth['title'],
                 'o': vth['owner'],
+                'c': vth['ctime'],
+                'm': vth['mtime'],
                 })
 
-    return jsonreply(r=0, l=result, c=continuation_box[0])
+    return jsonreply(r=0, l=result)
 
 
 @http
