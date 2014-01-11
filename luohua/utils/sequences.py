@@ -30,7 +30,13 @@ import random
 
 from .radices import to36
 
-TIMESTAMP_LIMIT = 0x7fffffffffffffff
+# 这是 UTC 时间 3058/10/26 03:46:08, 一千多年之后还会有人在用这个软件么...
+# 抛开感伤, 这只是实现递减时间戳必须给定的一个 "时间尽头" 而已, 给到这个程度
+# 既不会在可预见的未来撞上, 又不会让当下的递减时间戳数值太大, 那么差不多了
+#
+# 其实这里直接用 0x7fffffff 这个 Y2038 时间点貌似都可以= =! (前提是我们这软件
+# 在 Y2038 之前就会废弃, oh no...)
+TIMESTAMP_LIMIT = 1 << 35
 
 PRNG = random.SystemRandom()
 
