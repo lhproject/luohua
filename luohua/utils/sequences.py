@@ -22,6 +22,7 @@ from __future__ import unicode_literals, division
 __all__ = [
         'time_ascending',
         'time_descending',
+        'descending_ts',
         ]
 
 import time
@@ -35,17 +36,24 @@ PRNG = random.SystemRandom()
 
 
 def time_ascending(timestamp=None):
-    '''生成一个随时间推移而比较顺序上增大的字符串.'''
+    '''生成一个随时间推移而比较顺序递增的字符串.'''
 
     ts = timestamp if timestamp is not None else int(time.time())
     return to36(ts) + ('%04d' % PRNG.randint(0, 9999))
 
 
 def time_descending(timestamp=None):
-    '''生成一个随时间推移而比较顺序上减小的字符串.'''
+    '''生成一个随时间推移而比较顺序递减的字符串.'''
 
     ts = timestamp if timestamp is not None else int(time.time())
     return to36(TIMESTAMP_LIMIT - ts) + ('%04d' % PRNG.randint(0, 9999))
+
+
+def descending_ts(timestamp=None):
+    '''生成一个随时间推移递减的时间戳整数.'''
+
+    ts = timestamp if timestamp is not None else int(time.time())
+    return TIMESTAMP_LIMIT - ts
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
