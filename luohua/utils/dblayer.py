@@ -67,7 +67,15 @@ class RiakDocument(Document):
 
     @classmethod
     def fetch(cls, key):
-        '''按文档 ID 获取一个被包装对象.'''
+        '''按文档 ID 获取一个被包装对象.
+
+        :param key: 要获取对象的文档 ID.
+        :type key: :data:`six.text_type`
+        :return: 指定的对象; 如果指定对象不存在则返回 :const:`None`.
+        :rtype: :class:`RiakDocument <luohua.utils.dblayer.RiakDocument>`
+                或 :data:`types.NoneType`
+
+        '''
 
         # XXX 这个方法不能叫 get, 因为那样会覆盖掉 dict 的 get 方法!
         with cls.storage as conn:
@@ -76,7 +84,14 @@ class RiakDocument(Document):
 
     @classmethod
     def fetch_multiple(cls, keys):
-        '''按文档 ID 列表一次性获取多个被包装对象.'''
+        '''按文档 ID 列表一次性获取多个被包装对象.
+
+        :param keys: 要获取对象的文档 ID 列表.
+        :type keys: list
+        :return: 按顺序返回指定对象的迭代器.
+        :rtype: :data:`types.GeneratorType`
+
+        '''
 
         with cls.storage as conn:
             for key in keys:
@@ -84,7 +99,12 @@ class RiakDocument(Document):
 
     @classmethod
     def find_all(cls):
-        '''一次性获取所有被包装对象.'''
+        '''一次性获取所有被包装对象.
+
+        :return: 按顺序返回对象的迭代器.
+        :rtype: :data:`types.GeneratorType`
+
+        '''
 
         with cls.storage as conn:
             for key in conn.get_keys():
@@ -97,8 +117,10 @@ class RiakDocument(Document):
         如果没有符合条件的对象, 则抛 :exc:`KeyError` 异常;
         如果符合条件的对象多于一个, 则抛 :exc:`ValueError` 异常.
 
-        :param expression: Riak 全文搜索查询表达式. 需要自行 escape 处理.
-        :type expression: :class:`six.text_type`
+        :param expression: Riak 全文搜索查询表达式, 用法和
+                :meth:`RiakBucket.search() <riak.bucket.RiakBucket.search>`
+                一致. 需要自行 escape 处理.
+        :type expression: :data:`six.text_type`
         :rtype: :class:`RiakDocument <luohua.utils.dblayer.RiakDocument>`
 
         '''
@@ -122,15 +144,25 @@ class RiakDocument(Document):
     def _do_sync_2i(self, obj):
         '''保存对象时同步 2i 索引.
 
-        如果使用到 2i 索引, 请在子类设置 ``have_2i`` 为 ``True``,
-        并为此方法提供实现. 此方法应返回一个设置好的 RiakObject 对象.
+        如果使用到 2i 索引, 请在子类设置 :attr:`uses_2i` 为 :const:`True`,
+        并为此方法提供实现. 此方法应返回一个设置好的 :class:`RiakObject
+        <riak.riak_object.RiakObject>` 对象.
+
+        :param obj: 准备同步 2i 索引的 Riak 对象.
+        :type obj: :class:`RiakObject <riak.riak_object.RiakObject>`
+        :return: 设置好 2i 索引的 Riak 对象.
+        :rtype: :class:`RiakObject <riak.riak_object.RiakObject>`
 
         '''
 
         return obj
 
     def save(self):
-        '''保存对象到数据库.'''
+        '''保存对象到数据库.
+
+        :return: :const:`None`
+
+        '''
 
         with self.storage as conn:
             obj = self._rawobj if self._rawobj is not None else conn.new()
@@ -146,7 +178,11 @@ class RiakDocument(Document):
             self['id'], self._rawobj = obj.key, obj
 
     def purge(self):
-        '''从数据库中彻底删除被包装对象.'''
+        '''从数据库中彻底删除被包装对象.
+
+        :return: :const:`None`
+
+        '''
 
         with self.storage as conn:
             if self._rawobj is None:
