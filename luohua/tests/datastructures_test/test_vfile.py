@@ -72,7 +72,7 @@ class TestVFile(Case):
         assert vf1['id'] is not None
         vfid = vf1['id']
 
-        vf2 = vfile.VFile.get(vfid)
+        vf2 = vfile.VFile.fetch(vfid)
         assert vf2['id'] == vf1['id']
         assert vf2['owner'] == vf1['owner']
         assert vf2['ctime'] == vf1['ctime']
@@ -80,9 +80,9 @@ class TestVFile(Case):
         assert vf2['content'] == vf1['content']
         assert vf2['xattr'] == vf1['xattr']
 
-        assert vfile.VFile.get('this-does-not-exist-does-it') is None
+        assert vfile.VFile.fetch('this-does-not-exist-does-it') is None
 
-        vfgen = vfile.VFile.get_multiple([vfid, 'this-does-not-exist-too', ])
+        vfgen = vfile.VFile.fetch_multiple([vfid, 'this-does-not-exist-too', ])
         assert isinstance(vfgen, types.GeneratorType)
 
         vfl = list(vfgen)
@@ -95,7 +95,7 @@ class TestVFile(Case):
         vf2.purge()
         assert 'id' not in vf2
 
-        assert vfile.VFile.get(vfid) is None
+        assert vfile.VFile.fetch(vfid) is None
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
