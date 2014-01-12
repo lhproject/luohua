@@ -126,6 +126,8 @@ class RiakDocument(Document):
         '''
 
         with cls.storage as conn:
+            # protobuf 协议要求查询字串必须是字节流, 所以编个码
+            # HTTP 协议无所谓, unicode 或者 bytes 都可以
             r = conn.search(smartbytes(expression))
 
             num, docs = r['num_found'], r['docs']
@@ -138,8 +140,8 @@ class RiakDocument(Document):
                         )
 
             # 拿出 ID, 生成对象返回
-            rid = docs[0]['id']
-            return cls._from_obj(conn.get(rid))
+            key = docs[0]['id']
+            return cls._from_obj(conn.get(key))
 
     def _do_sync_2i(self, obj):
         '''保存对象时同步 2i 索引.
