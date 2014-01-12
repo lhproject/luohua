@@ -19,6 +19,7 @@
 
 from __future__ import unicode_literals, division
 
+from weiyu.helpers.misc import smartbytes
 from weiyu.db.mapper.base import Document
 
 
@@ -88,6 +89,35 @@ class RiakDocument(Document):
         with cls.storage as conn:
             for key in conn.get_keys():
                 yield cls._from_obj(conn.get(key))
+
+    @classmethod
+    def fetch_fts(cls, expression):
+        '''利用全文搜索索引查找符合条件的一个对象。
+
+        如果没有符合条件的对象, 则抛 :exc:`KeyError` 异常;
+        如果符合条件的对象多于一个, 则抛 :exc:`ValueError` 异常.
+
+        :param expression: Riak 全文搜索查询表达式. 需要自行 escape 处理.
+        :type expression: :class:`six.text_type`
+        :rtype: :class:`RiakDocument <luohua.utils.dblayer.RiakDocument>`
+
+        '''
+
+        with cls.storage as conn:
+            r = conn.search(smartbytes(expression))
+
+            num, docs = r['num_found'], r['docs']
+            if num == 0:
+                raise KeyError(expression)
+            elif num > 1:
+                raise ValueError(
+                        'Multiple results returned for expression %s'
+                        % repr(expression)
+                        )
+
+            # 拿出 ID, 生成对象返回
+            rid = docs[0]['id']
+            return cls._from_obj(conn.get(rid))
 
     def _do_sync_2i(self, obj):
         '''保存对象时同步 2i 索引.
