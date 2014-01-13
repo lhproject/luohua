@@ -24,7 +24,7 @@ from nose.tools import assert_raises
 from ..utils import Case
 from ..shortcuts import *
 
-from luohua.auth.role import Role, combine_caps
+from luohua.auth.role import combine_caps, has_cap, Role
 
 
 class TestRole(Case):
@@ -47,7 +47,11 @@ class TestRole(Case):
         assert isinstance(caps, set)
         assert caps == {'c1', 'c2', }
 
-    def test_hascap(self):
+    def test_simple_cap(self):
+        assert not has_cap([], '')
+        assert has_cap({'a', 'b', }, 'b')
+
+    def test_role_hascap(self):
         r = Role.fetch('user')
 
         assert r.hascap('c1')
@@ -93,27 +97,15 @@ class TestRole(Case):
         assert r['caps'] == {'-1', '-2', }
 
     def test_omni_cap(self):
-        r = Role()
-        r['name'] = 'root'
-        r['caps'] = {'*', }
-        assert r.hascap('random')
-        assert r.hascap('things')
+        assert has_cap({'*', }, 'random')
+        assert has_cap({'*', }, 'things')
 
     def test_exclude_cap(self):
-        r = Role()
-        r['name'] = 'restricted-foo'
-        r['caps'] = {'c1', '-c1', }
-
-        # 拒绝权限优先授予权限
-        assert not r.hascap('c1')
+        assert not has_cap({'c1', '-c1', }, 'c1')
 
     def test_omni_cap_exclude(self):
-        r = Role()
-        r['name'] = 'restricted-root'
-        r['caps'] = {'*', '-foo', }
-
-        assert not r.hascap('foo')
-        assert r.hascap('bar')
+        assert not has_cap({'*', '-foo', }, 'foo')
+        assert has_cap({'*', '-foo', }, 'bar')
 
     def test_allcaps_exclude_cap(self):
         caps = Role.allcaps(['user', 'restricted-user', ])
