@@ -60,7 +60,7 @@ class TestRole(Case):
         assert 'c200' not in r
 
     def test_allcaps(self):
-        caps = Role.allcaps('user', 'adm', )
+        caps = Role.allcaps(['user', 'adm', ])
 
         assert isinstance(caps, set)
         assert caps == {'c1', 'c2', 'c3', 'c5', }
