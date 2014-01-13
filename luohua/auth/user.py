@@ -28,7 +28,6 @@ from ..utils.stringop import escape_lucene
 from .passwd import Password
 
 USER_STRUCT_ID = 'luohua.user'
-mapper_hub.register_struct(USER_STRUCT_ID)
 
 
 class User(RiakDocument):

@@ -25,7 +25,6 @@ from ..utils.dblayer import RiakDocument
 from ..utils.stringop import escape_lucene
 
 ROLE_STRUCT_ID = 'luohua.role'
-mapper_hub.register_struct(ROLE_STRUCT_ID)
 
 
 class Role(RiakDocument):

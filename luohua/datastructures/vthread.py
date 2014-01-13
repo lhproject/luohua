@@ -28,7 +28,6 @@ from ..utils.sequences import time_descending
 from .vfile import VFile
 
 VTH_STRUCT_ID = 'luohua.vth'
-mapper_hub.register_struct(VTH_STRUCT_ID)
 
 VTH_VTP_INDEX = 'vtp_bin'
 VTH_VTAG_INDEX = 'vtag_bin'

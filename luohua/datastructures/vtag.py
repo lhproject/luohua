@@ -26,7 +26,6 @@ from weiyu.db.mapper import mapper_hub
 from ..utils.dblayer import RiakDocument
 
 VTAG_STRUCT_ID = 'luohua.vtag'
-mapper_hub.register_struct(VTAG_STRUCT_ID)
 
 VTAG_VTP_INDEX = 'vtp_bin'
 

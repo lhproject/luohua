@@ -26,7 +26,6 @@ from weiyu.db.mapper import mapper_hub
 from ..utils.dblayer import RiakDocument
 
 VTP_STRUCT_ID = 'luohua.vtp'
-mapper_hub.register_struct(VTP_STRUCT_ID)
 
 
 class VPool(RiakDocument):

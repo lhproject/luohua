@@ -28,7 +28,6 @@ from weiyu.db.mapper import mapper_hub
 from ..utils.dblayer import RiakDocument
 
 VF_STRUCT_ID = 'luohua.vf'
-mapper_hub.register_struct(VF_STRUCT_ID)
 
 
 @functools.total_ordering
