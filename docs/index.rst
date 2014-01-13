@@ -13,6 +13,7 @@
 
     app/index
     datastructures/index
+    auth/index
     utils/index
 
 
