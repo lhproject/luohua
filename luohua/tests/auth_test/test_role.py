@@ -104,7 +104,7 @@ class TestRole(Case):
         r.ban_cap('1')
         r.ban_cap('2')
 
-        assert r['caps'] == {'-1', '-2', }
+        assert r['caps'] == {'1', '-1', '-2', }
 
         # 不能 ban 掉全能权限和非法的权限名
         assert_raises(ValueError, r.ban_cap, '')
@@ -125,7 +125,7 @@ class TestRole(Case):
 
     def test_allcaps_exclude_cap(self):
         caps = Role.allcaps(['user', 'restricted-user', ])
-        assert caps == {'c2', }
+        assert caps == {'c1', 'c2', '-c1', }
 
     def test_combine_caps(self):
         def combine_case(*args):
