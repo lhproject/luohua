@@ -24,7 +24,7 @@ from nose.tools import assert_raises
 from ..utils import Case
 from ..shortcuts import *
 
-from luohua.auth.role import combine_caps, has_cap, Role
+from luohua.auth.role import has_cap, combine_caps, canonicalize_caps, Role
 
 
 class TestRole(Case):
@@ -142,10 +142,23 @@ class TestRole(Case):
         assert case_0 == set([])
         assert case_1 == {'a', 'b', 'c', }
         assert case_2 == {'a', 'b', 'c', 'd', }
-        assert case_3 == {'a', 'c', '-b', }
-        assert case_4 == {'*', }
-        assert case_5 == {'*', }
-        assert case_6 == {'*', '-b', }
+        assert case_3 == {'a', 'b', 'c', '-b', }
+        assert case_4 == {'*', 'a', }
+        assert case_5 == {'*', 'a', }
+        assert case_6 == {'*', 'a', '-b', }
+
+    def test_canonicalize_caps(self):
+        case_0 = canonicalize_caps(set([]))
+        case_1 = canonicalize_caps({'a', 'b', 'c', })
+        case_2 = canonicalize_caps({'a', 'b', 'c', '-b', })
+        case_3 = canonicalize_caps({'*', 'a', })
+        case_4 = canonicalize_caps({'*', 'a', '-b', })
+
+        assert case_0 == set([])
+        assert case_1 == {'a', 'b', 'c', }
+        assert case_2 == {'a', 'c', '-b', }
+        assert case_3 == {'*', }
+        assert case_4 == {'*', '-b', }
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
