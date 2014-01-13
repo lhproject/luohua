@@ -24,7 +24,7 @@ from nose.tools import assert_raises
 from ..utils import Case
 from ..shortcuts import *
 
-from luohua.auth.role import Role
+from luohua.auth.role import Role, combine_caps
 
 
 class TestRole(Case):
@@ -36,7 +36,7 @@ class TestRole(Case):
     def teardown_class(cls):
         pass
 
-    def test_find(self):
+    def test_fetch(self):
         assert Role.fetch('user')
         assert Role.fetch('nonexist') is None
 
@@ -44,9 +44,8 @@ class TestRole(Case):
         r = Role.fetch('user')
 
         caps = r['caps']
-        caps.sort()
-
-        assert tuple(caps) == ('c1', 'c2', )
+        assert isinstance(caps, set)
+        assert caps == {'c1', 'c2', }
 
     def test_hascap(self):
         r = Role.fetch('user')
@@ -57,10 +56,88 @@ class TestRole(Case):
         assert 'c200' not in r
 
     def test_allcaps(self):
-        caps = list(Role.allcaps('user', 'adm', ))
-        caps.sort()
+        caps = Role.allcaps('user', 'adm', )
 
-        assert tuple(caps) == ('c1', 'c2', 'c3', 'c5', )
+        assert isinstance(caps, set)
+        assert caps == {'c1', 'c2', 'c3', 'c5', }
+
+    def test_grant_cap(self):
+        r = Role()
+        r['name'] = 'test'
+        r['caps'] = {'1', }
+
+        r.grant_cap('test')
+
+        # 不能授予名字以减号开头的权限 (因为有歧义)
+        assert_raises(ValueError, r.grant_cap, '-foo')
+        assert r['caps'] == {'1', 'test', }
+
+    def test_remove_cap(self):
+        r = Role()
+        r['name'] = 'test'
+        r['caps'] = {'1', '2', }
+
+        r.remove_cap('1')
+        r.remove_cap('3')
+
+        assert r['caps'] == {'2', }
+
+    def test_ban_cap(self):
+        r = Role()
+        r['name'] = 'test'
+        r['caps'] = {'1', }
+
+        r.ban_cap('1')
+        r.ban_cap('2')
+
+        assert r['caps'] == {'-1', '-2', }
+
+    def test_omni_cap(self):
+        r = Role()
+        r['name'] = 'root'
+        r['caps'] = {'*', }
+        assert r.hascap('random')
+        assert r.hascap('things')
+
+    def test_exclude_cap(self):
+        r = Role()
+        r['name'] = 'restricted-foo'
+        r['caps'] = {'c1', '-c1', }
+
+        # 拒绝权限优先授予权限
+        assert not r.hascap('c1')
+
+    def test_omni_cap_exclude(self):
+        r = Role()
+        r['name'] = 'restricted-root'
+        r['caps'] = {'*', '-foo', }
+
+        assert not r.hascap('foo')
+        assert r.hascap('bar')
+
+    def test_allcaps_exclude_cap(self):
+        caps = Role.allcaps(['user', 'restricted-user', ])
+        assert caps == {'c2', }
+
+    def test_combine_caps(self):
+        def combine_case(*args):
+            return set(combine_caps(*args))
+
+        case_0 = combine_case()
+        case_1 = combine_case(['a', ], ['b', ], ['c', ], [], )
+        case_2 = combine_case(['a', 'c', ], ['b', 'd', ], )
+        case_3 = combine_case(['a', 'b', ], ['c', '-b', ], )
+        case_4 = combine_case(['*', ], ['a', ], )
+        case_5 = combine_case(['*', 'a', ], )
+        case_6 = combine_case(['*', ], ['a', '-b', ], )
+
+        assert case_0 == set([])
+        assert case_1 == {'a', 'b', 'c', }
+        assert case_2 == {'a', 'b', 'c', 'd', }
+        assert case_3 == {'a', 'c', '-b', }
+        assert case_4 == {'*', }
+        assert case_5 == {'*', }
+        assert case_6 == {'*', '-b', }
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
