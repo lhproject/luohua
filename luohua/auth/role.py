@@ -19,6 +19,8 @@
 
 from __future__ import unicode_literals, division
 
+import six
+
 from weiyu.db.mapper import mapper_hub
 
 from ..utils.dblayer import RiakDocument
@@ -54,15 +56,21 @@ class Role(RiakDocument):
 def role_dec_v1(data):
     return {
             'name': data['n'],
-            'caps': data['c'].split(' '),
+            'caps': data['c'],
             }
 
 
 @mapper_hub.encoder_for(ROLE_STRUCT_ID, 1)
 def role_enc_v1(role):
+    assert 'name' in role
+    assert isinstance(role['name'], six.text_type)
+    assert 'caps' in role
+    assert isinstance(role['caps'], (list, tuple,  ))
+    assert all(isinstance(cap, six.text_type) for cap in role['caps'])
+
     return {
             'n': role['name'],
-            'c': ' '.join(role['caps']),
+            'c': role['caps'],
             }
 
 
