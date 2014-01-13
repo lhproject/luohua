@@ -48,8 +48,10 @@ class TestRole(Case):
         assert caps == {'c1', 'c2', }
 
     def test_simple_cap(self):
-        assert not has_cap([], '')
+        assert_raises(ValueError, has_cap, [], '')
+        assert_raises(ValueError, has_cap, [], '-a')
         assert has_cap({'a', 'b', }, 'b')
+        assert not has_cap({'a', 'b', }, 'c')
 
     def test_role_hascap(self):
         r = Role.fetch('user')
@@ -71,20 +73,28 @@ class TestRole(Case):
         r['caps'] = {'1', }
 
         r.grant_cap('test')
+        assert r['caps'] == {'1', 'test', }
 
         # 不能授予名字以减号开头的权限 (因为有歧义)
         assert_raises(ValueError, r.grant_cap, '-foo')
-        assert r['caps'] == {'1', 'test', }
+
+        # 可以授予全能权限
+        r.grant_cap('*')
+        assert r['caps'] == {'*', '1', 'test', }
 
     def test_remove_cap(self):
         r = Role()
         r['name'] = 'test'
-        r['caps'] = {'1', '2', }
+        r['caps'] = {'*', '1', '2', }
 
         r.remove_cap('1')
         r.remove_cap('3')
-
+        r.remove_cap('*')
         assert r['caps'] == {'2', }
+
+        # 这是不能这么用的
+        assert_raises(ValueError, r.remove_cap, '')
+        assert_raises(ValueError, r.remove_cap, '-123')
 
     def test_ban_cap(self):
         r = Role()
@@ -96,7 +106,13 @@ class TestRole(Case):
 
         assert r['caps'] == {'-1', '-2', }
 
+        # 不能 ban 掉全能权限和非法的权限名
+        assert_raises(ValueError, r.ban_cap, '')
+        assert_raises(ValueError, r.ban_cap, '-hehe')
+        assert_raises(ValueError, r.ban_cap, '*')
+
     def test_omni_cap(self):
+        assert has_cap({'*', }, '*')
         assert has_cap({'*', }, 'random')
         assert has_cap({'*', }, 'things')
 
