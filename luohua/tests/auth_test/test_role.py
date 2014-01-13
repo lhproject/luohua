@@ -37,11 +37,11 @@ class TestRole(Case):
         pass
 
     def test_find(self):
-        assert Role.find('用户')
-        assert_raises(KeyError, Role.find, '不存在')
+        assert Role.fetch('user')
+        assert Role.fetch('nonexist') is None
 
     def test_caps(self):
-        r = Role.find('用户')
+        r = Role.fetch('user')
 
         caps = r['caps']
         caps.sort()
@@ -49,7 +49,7 @@ class TestRole(Case):
         assert tuple(caps) == ('c1', 'c2', )
 
     def test_hascap(self):
-        r = Role.find('用户')
+        r = Role.fetch('user')
 
         assert r.hascap('c1')
         assert not r.hascap('c100')
@@ -57,7 +57,7 @@ class TestRole(Case):
         assert 'c200' not in r
 
     def test_allcaps(self):
-        caps = list(Role.allcaps('用户', '鹳狸猿', ))
+        caps = list(Role.allcaps('user', 'adm', ))
         caps.sort()
 
         assert tuple(caps) == ('c1', 'c2', 'c3', 'c5', )
