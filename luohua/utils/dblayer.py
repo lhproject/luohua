@@ -128,9 +128,9 @@ class RiakDocument(Document):
         with cls.storage as conn:
             # protobuf 协议要求查询字串必须是字节流, 所以编个码
             # HTTP 协议无所谓, unicode 或者 bytes 都可以
-            r = conn.search(smartbytes(expression))
+            result = conn.search(smartbytes(expression))
 
-            num, docs = r['num_found'], r['docs']
+            num, docs = result['num_found'], result['docs']
             if num == 0:
                 raise KeyError(expression)
             elif num > 1:
