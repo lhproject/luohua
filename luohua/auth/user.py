@@ -67,8 +67,11 @@ def user_dec_v1(data):
     # KBS 兼容性...
     alias = data.get('a', None)
 
+    # NOTE: 密码的 uid 字段只有 KBS 的 hash 算法用到, 而只有 KBS 导入的用户
+    # 才有 KBS 格式的 hash, 所以这里对没有设置别名的用户传入空字符串是完全
+    # 没有问题的
     return {
-            'password': Password(alias or uid, data['p']),
+            'password': Password(alias or '', data['p']),
             'alias': alias,
             'email': data['e'],
             'roles': data['r'].split(' '),
