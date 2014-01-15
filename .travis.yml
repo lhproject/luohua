@@ -17,6 +17,7 @@ install:
   # This is inspired by what the pip project has done.
   - "[[ ${TRAVIS_PYTHON_VERSION} == 'pypy' ]] && sudo apt-get install -y pypy"
   - "[[ ${TRAVIS_PYTHON_VERSION} == 'pypy' ]] && sudo rm -rf /usr/local/pypy/bin"
+  - "[[ ${TRAVIS_PYTHON_VERSION} == 'pypy' ]] && python --version"
 
   # Prepare Python environment
   - pip install -U setuptools pip --use-mirrors
