@@ -9,12 +9,12 @@ services:
   - redis-server
 
 install:
+  - "[[ ${TRAVIS_PYTHON_VERSION} == 'pypy' ]] && sudo add-apt-repository -y ppa:pypy/ppa"
   - sudo apt-get update -qq
   - sudo apt-get install protobuf-compiler
 
   # Use official PyPy package
   # This is inspired by what the pip project has done.
-  - "[[ ${TRAVIS_PYTHON_VERSION} == 'pypy' ]] && sudo add-apt-repository -y ppa:pypy/ppa"
   - "[[ ${TRAVIS_PYTHON_VERSION} == 'pypy' ]] && sudo apt-get install -y pypy"
   - "[[ ${TRAVIS_PYTHON_VERSION} == 'pypy' ]] && sudo rm -rf /usr/local/pypy/bin"
 
