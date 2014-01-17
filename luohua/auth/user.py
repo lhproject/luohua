@@ -26,6 +26,7 @@ from weiyu.db.mapper import mapper_hub
 from ..utils.dblayer import RiakDocument
 from ..utils.stringop import escape_lucene
 from .passwd import Password
+from .role import Role
 
 USER_STRUCT_ID = 'luohua.user'
 
@@ -58,6 +59,10 @@ class User(RiakDocument):
         # TODO: 根据 name 的形式 (含 '@', 全数字等) 在这里就定下查询字段
         query_expr = 'a:"%s" e:"%s"' % (name_escaped, name_escaped, )
         return cls.fetch_fts(query_expr)
+
+    @property
+    def caps(self):
+        return Role.allcaps(self['roles'])
 
 
 # 数据库序列化/反序列化
