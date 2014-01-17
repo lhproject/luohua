@@ -73,7 +73,7 @@ def user_dec_v1(data):
             'password': Password(alias or '', data['p']),
             'alias': alias,
             'email': data['e'],
-            'roles': data['r'].split(' '),
+            'roles': set(data['r']),
             'xattr': data['x'],
             }
 
@@ -86,7 +86,7 @@ def user_enc_v1(user):
     assert 'email' in user
     assert isinstance(user['email'], six.text_type)
     assert 'roles' in user
-    assert isinstance(user['roles'], list)
+    assert isinstance(user['roles'], set)
     assert 'xattr' in user
     assert isinstance(user['xattr'], dict)
 
@@ -94,7 +94,7 @@ def user_enc_v1(user):
             'p': user['password'].make_hash(),
             'a': user['alias'],
             'e': user['email'],
-            'r': ' '.join(user['roles']),
+            'r': list(user['roles']),
             'x': user['xattr'],
             }
 
