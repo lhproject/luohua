@@ -96,7 +96,7 @@ def user_enc_v1(user):
     assert isinstance(user['xattr'], dict)
 
     return {
-            'p': user['password'].make_hash(),
+            'p': user['password'].psw_hash,
             'a': user['alias'],
             'e': user['email'],
             'r': list(user['roles']),
