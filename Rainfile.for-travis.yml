@@ -15,18 +15,24 @@ site:
   middlewares:
     pre:
       - session
+      - luohua.metrics
     post:
+      - luohua.metrics
       - session
 
   views:
     package: luohua.app
     modules:
+      # API 界面
       - .v1.session
       - .v1.account
       - .v1.vpool
       - .v1.vtag
       - .v1.vthread
       - .v1.vfile
+
+      # 中间件
+      - .metrics.middleware
 
 
 # 数据库配置
