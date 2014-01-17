@@ -19,6 +19,8 @@
 
 from __future__ import unicode_literals, division, print_function
 
+import time
+
 from weiyu.adapters import adapter_hub
 from weiyu.helpers.misc import smartbytes
 
@@ -36,6 +38,9 @@ def get_req_prefixed_logger(request):
 @adapter_hub.declare_middleware('luohua.metrics')
 class LHMetricsMiddleware(object):
     def do_pre(self, request):
+        start_time = time.time()
+        request._metrics_start_time = start_time
+
         log = get_req_prefixed_logger(request)
 
         log('Path=' + request.path)
@@ -47,9 +52,13 @@ class LHMetricsMiddleware(object):
             log('UA n/a')
 
     def do_post(self, response):
+        end_time = time.time()
+        elapsed_time = end_time - response.request._metrics_start_time
+
         log = get_req_prefixed_logger(response.request)
 
         log('Status=%d' % (response.status, ))
+        log('t=%.3fms' % (elapsed_time * 1000, ))
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
