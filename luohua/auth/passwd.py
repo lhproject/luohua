@@ -53,6 +53,10 @@ class Password(object):
     def check(self, psw):
         return self.alg.check(psw)
 
+    @property
+    def psw_hash(self):
+        return unicode(self.alg)
+
 
 class BaseHashAlgorithm(object):
     __metaclass__ = abc.ABCMeta
