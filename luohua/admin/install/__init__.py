@@ -54,7 +54,7 @@ def init_sysop_user(email, psw):
     sysop['password'] = new_password(psw)
     sysop['alias'] = ''
     sysop['email'] = email
-    sysop['roles'] = set(SYSOP_ROLE_ID)
+    sysop['roles'] = {SYSOP_ROLE_ID, }
     sysop['xattr'] = {}
     sysop.save()
 
