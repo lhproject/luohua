@@ -21,8 +21,6 @@ from __future__ import unicode_literals, division
 
 import six
 
-from weiyu.db.mapper import mapper_hub
-
 from ..utils.dblayer import RiakDocument
 from ..utils.stringop import escape_lucene
 from .passwd import Password
@@ -66,7 +64,7 @@ class User(RiakDocument):
 
 
 # 数据库序列化/反序列化
-@mapper_hub.decoder_for(USER_STRUCT_ID, 1)
+@User.decoder(1)
 def user_dec_v1(data):
     # KBS 兼容性...
     alias = data.get('a', None)
@@ -83,7 +81,7 @@ def user_dec_v1(data):
             }
 
 
-@mapper_hub.encoder_for(USER_STRUCT_ID, 1)
+@User.encoder(1)
 def user_enc_v1(user):
     assert 'password' in user
     assert isinstance(user['password'], Password)

@@ -23,8 +23,6 @@ import functools
 
 import six
 
-from weiyu.db.mapper import mapper_hub
-
 from ..utils.dblayer import RiakDocument
 
 VF_STRUCT_ID = 'luohua.vf'
@@ -51,7 +49,7 @@ class VFile(RiakDocument):
         return (self['ctime'], self['id']) < (other['ctime'], other['id'])
 
 
-@mapper_hub.decoder_for(VF_STRUCT_ID, 1)
+@VFile.decoder(1)
 def vf_dec_v1(data):
     return {
             'owner': data['o'],
@@ -62,7 +60,7 @@ def vf_dec_v1(data):
             }
 
 
-@mapper_hub.encoder_for(VF_STRUCT_ID, 1)
+@VFile.encoder(1)
 def vf_enc_v1(vf):
     assert 'owner' in vf
     assert 'ctime' in vf
