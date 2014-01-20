@@ -28,6 +28,9 @@ class RiakDocument(Document):
 
     '''
 
+    # 框架需要, 跳过 struct_id 非 None 检查
+    _abstract_ = True
+
     # 是否使用到 2i 索引, 子类如果使用到 2i 需要把这里设置成 True,
     # 并实现 _do_sync_2i 方法
     uses_2i = False
