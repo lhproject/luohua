@@ -17,12 +17,20 @@ install:
   - sudo apt-get update -qq
   - sudo apt-get install protobuf-compiler
   - pip install -r requirements.travis.txt --use-mirrors
+  - pip install coveralls
 
 before_script:
   - search-cmd install users
   - search-cmd set-schema users ${TRAVIS_BUILD_DIR}/install/rs-schema/users.config
+  # replace with the correct version of .coveragerc, when run under Python 3
+  - "[ \"x${TRAVIS_PYTHON_VERSION%.?}\" == \"x3\" ] && ( echo Switching .coveragerc to Python 3 version. ; rm .coveragerc && ln -s .coveragerc.py3 .coveragerc ) ; true"
+  - ls -l .coveragerc
 
-script: nosetests
+
+script: nosetests --with-coverage
+
+after_success:
+  - coveralls
 
 notifications:
   email: false
