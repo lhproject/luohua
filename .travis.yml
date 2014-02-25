@@ -16,7 +16,7 @@ services:
 install:
   - sudo apt-get update -qq
   - sudo apt-get install protobuf-compiler
-  - pip install -r requirements.travis.txt --use-mirrors
+  - pip install -r requirements.travis.txt
   - pip install coveralls
 
 before_script:
