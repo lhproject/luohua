@@ -19,6 +19,8 @@
 
 from __future__ import unicode_literals, division
 
+from nose.tools import assert_raises
+
 from ..utils import Case
 
 from luohua.utils import radices
@@ -71,6 +73,9 @@ class TestRadices(Case):
         assert to62(62) == '10'
         assert to62(18446744073709551616) == 'LygHa16AHYG'
         assert to62(-18446744073709551616) == '-LygHa16AHYG'
+
+    def test_base62_from62_invalid_input(self):
+        assert_raises(ValueError, radices.from62, '10.0')
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
