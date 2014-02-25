@@ -21,8 +21,6 @@ from __future__ import unicode_literals, division
 
 import six
 
-from weiyu.db.mapper import mapper_hub
-
 from ..utils.dblayer import RiakDocument
 
 VTP_STRUCT_ID = 'luohua.vtp'
@@ -45,7 +43,7 @@ class VPool(RiakDocument):
         super(VPool, self).__init__(data, vtpid, rawobj)
 
 
-@mapper_hub.decoder_for(VTP_STRUCT_ID, 1)
+@VPool.decoder(1)
 def vtp_dec_v1(data):
     return {
             'name': data['n'],
@@ -54,7 +52,7 @@ def vtp_dec_v1(data):
             }
 
 
-@mapper_hub.encoder_for(VTP_STRUCT_ID, 1)
+@VPool.encoder(1)
 def vtp_enc_v1(vtp):
     assert 'name' in vtp
     assert isinstance(vtp['name'], six.text_type)

@@ -29,8 +29,6 @@ __all__ = [
 import six
 import itertools
 
-from weiyu.db.mapper import mapper_hub
-
 from ..utils.dblayer import RiakDocument
 from ..utils.stringop import escape_lucene
 
@@ -214,7 +212,7 @@ class Role(RiakDocument):
 
 
 # 数据库序列化/反序列化
-@mapper_hub.decoder_for(ROLE_STRUCT_ID, 1)
+@Role.decoder(1)
 def role_dec_v1(data):
     return {
             'name': data['n'],
@@ -222,7 +220,7 @@ def role_dec_v1(data):
             }
 
 
-@mapper_hub.encoder_for(ROLE_STRUCT_ID, 1)
+@Role.encoder(1)
 def role_enc_v1(role):
     assert 'name' in role
     assert isinstance(role['name'], six.text_type)

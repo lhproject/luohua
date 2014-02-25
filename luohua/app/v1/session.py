@@ -105,6 +105,7 @@ def session_login_v1_view(request):
 
     # 密码验证通过, 设置会话
     request.session['uid'] = usr['id']
+    request.session['logged_in'] = True
     if lease:
         request.session.set_cookie_prop(86400 * lease)
     # TODO: 在全局用户状态里做相应设置
@@ -138,6 +139,7 @@ def session_logout_v1_view(request):
         return jsonreply(r=1)
 
     del request.session['uid']
+    request.session['logged_in'] = False
     request.session.new_id()
 
     return jsonreply(r=0)

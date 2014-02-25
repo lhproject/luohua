@@ -1,8 +1,10 @@
 # 落花项目
 
-## 简介
-
 [![Build Status](https://travis-ci.org/jnrainerds/luohua.png)](https://travis-ci.org/jnrainerds/luohua)
+[![Coverage Status](https://coveralls.io/repos/jnrainerds/luohua/badge.png?branch=master)](https://coveralls.io/r/jnrainerds/luohua?branch=master)
+
+
+## 简介
 
 下一代江南听雨网站的后端项目。很快这里会有不少东西的...
 

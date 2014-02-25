@@ -21,8 +21,6 @@ from __future__ import unicode_literals, division
 
 import six
 
-from weiyu.db.mapper import mapper_hub
-
 from ..utils.dblayer import RiakDocument
 from ..utils.sequences import time_descending
 from .vfile import VFile
@@ -265,7 +263,7 @@ class VThread(RiakDocument):
         return obj
 
 
-@mapper_hub.decoder_for(VTH_STRUCT_ID, 1)
+@VThread.decoder(1)
 def vth_dec_v1(data):
     return {
             'title': data['t'],
@@ -279,7 +277,7 @@ def vth_dec_v1(data):
             }
 
 
-@mapper_hub.encoder_for(VTH_STRUCT_ID, 1)
+@VThread.encoder(1)
 def vth_enc_v1(vth):
     assert 'title' in vth
     assert isinstance(vth['title'], six.text_type)

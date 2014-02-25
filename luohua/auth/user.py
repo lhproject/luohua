@@ -21,11 +21,10 @@ from __future__ import unicode_literals, division
 
 import six
 
-from weiyu.db.mapper import mapper_hub
-
 from ..utils.dblayer import RiakDocument
 from ..utils.stringop import escape_lucene
 from .passwd import Password
+from .role import Role
 
 USER_STRUCT_ID = 'luohua.user'
 
@@ -59,9 +58,13 @@ class User(RiakDocument):
         query_expr = 'a:"%s" e:"%s"' % (name_escaped, name_escaped, )
         return cls.fetch_fts(query_expr)
 
+    @property
+    def caps(self):
+        return Role.allcaps(self['roles'])
+
 
 # 数据库序列化/反序列化
-@mapper_hub.decoder_for(USER_STRUCT_ID, 1)
+@User.decoder(1)
 def user_dec_v1(data):
     # KBS 兼容性...
     alias = data.get('a', None)
@@ -73,12 +76,12 @@ def user_dec_v1(data):
             'password': Password(alias or '', data['p']),
             'alias': alias,
             'email': data['e'],
-            'roles': data['r'].split(' '),
+            'roles': set(data['r']),
             'xattr': data['x'],
             }
 
 
-@mapper_hub.encoder_for(USER_STRUCT_ID, 1)
+@User.encoder(1)
 def user_enc_v1(user):
     assert 'password' in user
     assert isinstance(user['password'], Password)
@@ -86,15 +89,15 @@ def user_enc_v1(user):
     assert 'email' in user
     assert isinstance(user['email'], six.text_type)
     assert 'roles' in user
-    assert isinstance(user['roles'], list)
+    assert isinstance(user['roles'], set)
     assert 'xattr' in user
     assert isinstance(user['xattr'], dict)
 
     return {
-            'p': user['password'].make_hash(),
+            'p': user['password'].psw_hash,
             'a': user['alias'],
             'e': user['email'],
-            'r': ' '.join(user['roles']),
+            'r': list(user['roles']),
             'x': user['xattr'],
             }
 

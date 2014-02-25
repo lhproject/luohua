@@ -19,6 +19,11 @@
 
 from __future__ import unicode_literals, division
 
+__all__ = [
+        'new_password',
+        'Password',
+        ]
+
 import abc
 import hashlib
 
@@ -33,6 +38,12 @@ def hash_alg(thing):
     return thing
 
 
+def new_password(psw):
+    # NOTE: 这个写死到 lh1 hash 方案就行了, 没什么必要在这里也用动态特性
+    # 不传入 uid 也是因为我们知道 KBS hash 再也不会被生成了
+    return Luohua1HashAlgorithm.create('', psw)
+
+
 class Password(object):
     def __init__(self, uid, alghash):
         self.uid = uid
@@ -41,6 +52,10 @@ class Password(object):
 
     def check(self, psw):
         return self.alg.check(psw)
+
+    @property
+    def psw_hash(self):
+        return unicode(self.alg)
 
 
 class BaseHashAlgorithm(object):

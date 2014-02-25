@@ -21,8 +21,6 @@ from __future__ import unicode_literals, division
 
 import six
 
-from weiyu.db.mapper import mapper_hub
-
 from ..utils.dblayer import RiakDocument
 
 VTAG_STRUCT_ID = 'luohua.vtag'
@@ -58,7 +56,7 @@ class VTag(RiakDocument):
         return obj
 
 
-@mapper_hub.decoder_for(VTAG_STRUCT_ID, 1)
+@VTag.decoder(1)
 def vtag_dec_v1(data):
     return {
             'name': data['n'],
@@ -68,7 +66,7 @@ def vtag_dec_v1(data):
             }
 
 
-@mapper_hub.encoder_for(VTAG_STRUCT_ID, 1)
+@VTag.encoder(1)
 def vtag_enc_v1(vtag):
     assert 'name' in vtag
     assert isinstance(vtag['name'], six.text_type)
