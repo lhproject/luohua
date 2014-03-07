@@ -63,8 +63,7 @@ class User(RiakDocument):
             if len(by_ident) > 1:
                 raise ValueError('>1 user with the same ident: %s' % (name, ))
 
-            uid = by_ident[0]
-            return cls.fetch(uid)
+            return by_ident[0]
 
         # 按 KBS 帐户名索引检索
         by_alias = list(cls._do_fetch_by_index(USER_ALIAS_IDX, name))
@@ -73,8 +72,7 @@ class User(RiakDocument):
             if len(by_alias) > 1:
                 raise ValueError('>1 user with the same alias: %s' % (name, ))
 
-            uid = by_alias[0]
-            return cls.fetch(uid)
+            return by_alias[0]
 
         return None
 

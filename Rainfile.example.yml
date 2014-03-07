@@ -54,6 +54,8 @@ weiyu.db:
   storage:
     luohua.user: main-kv/users
     luohua.role: main-kv/roles
+    luohua.ident.frozen: main-kv/ident.frozen
+    luohua.ident.entry: main-kv/ident.entry
     luohua.session: mem-kv/(int)0
 
     luohua.vf: main-kv/vf
