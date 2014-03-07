@@ -17,7 +17,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals, division
+from __future__ import unicode_literals, division, print_function
+
+import six
 
 from luohua.auth.user import User
 from luohua.auth.role import Role
@@ -73,9 +75,9 @@ TEST_ROLES = {
 def users_setup():
     # 设置几个测试用户, 权限之类的数据
     with User.storage as conn:
-        for uid, data in TEST_USERS.iteritems():
+        for uid, data in six.iteritems(TEST_USERS):
             conn.new(uid, data).store()
-            print '[+User] %s' % uid
+            print('[+User] %s' % uid)
 
 
 def users_teardown():
@@ -83,21 +85,21 @@ def users_teardown():
     with User.storage as conn:
         for uid in TEST_USERS:
             conn.get(uid).delete()
-            print '[-User] %s' % uid
+            print('[-User] %s' % uid)
 
 
 def roles_setup():
     with Role.storage as conn:
-        for rid, data in TEST_ROLES.iteritems():
+        for rid, data in six.iteritems(TEST_ROLES):
             conn.new(rid, data).store()
-            print '[+Role] %s' % rid
+            print('[+Role] %s' % rid)
 
 
 def roles_teardown():
     with Role.storage as conn:
         for rid in TEST_ROLES:
             conn.get(rid).delete()
-            print '[-Role] %s' % rid
+            print('[-Role] %s' % rid)
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
