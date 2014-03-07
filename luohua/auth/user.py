@@ -28,9 +28,13 @@ from .role import Role
 
 USER_STRUCT_ID = 'luohua.user'
 
+USER_ALIAS_IDX = 'user_alias_bin'
+USER_IDENT_IDX = 'user_ident_bin'
+
 
 class User(RiakDocument):
     struct_id = USER_STRUCT_ID
+    uses_2i = True
 
     def __init__(self, data=None, uid=None, rawobj=None):
         super(User, self).__init__(data, uid, rawobj)
@@ -43,24 +47,48 @@ class User(RiakDocument):
 
     @classmethod
     def find_by_name(cls, name):
-        '''寻找登陆身份符合 name 的用户。'''
+        '''寻找登陆身份符合 name 的用户.
 
-        name_escaped = escape_lucene(name)
-        # 这里假设存放用户数据的 bucket 上已经启用了 Riak Search
-        # 并且定义了项目自带的 schema. 不启用 schema 在这里虽说没什么问题
-        # 但也许会导致返回结果多出几个用不着的字段 (我没试),
-        # 所以最好还是加上.
-        #
-        # Riak Search 的相关页面
-        # http://docs.basho.com/riak/latest/dev/advanced/search/
-        # 和 Search Schema 的内容
-        # TODO: 根据 name 的形式 (含 '@', 全数字等) 在这里就定下查询字段
-        query_expr = 'a:"%s" e:"%s"' % (name_escaped, name_escaped, )
-        return cls.fetch_fts(query_expr)
+        将按照以下顺序检测 ``name``:
+
+        1. 学号/工号
+        2. KBS 帐户名
+
+        '''
+
+        # 按实名身份索引检索
+        by_ident = list(cls._do_fetch_by_index(USER_IDENT_IDX, name))
+        if by_ident:
+            # 当前情况下, 多于一个就报错
+            if len(by_ident) > 1:
+                raise ValueError('>1 user with the same ident: %s' % (name, ))
+
+            uid = by_ident[0]
+            return cls.fetch(uid)
+
+        # 按 KBS 帐户名索引检索
+        by_alias = list(cls._do_fetch_by_index(USER_ALIAS_IDX, name))
+        if by_alias:
+            # 同上
+            if len(by_alias) > 1:
+                raise ValueError('>1 user with the same alias: %s' % (name, ))
+
+            uid = by_alias[0]
+            return cls.fetch(uid)
+
+        return None
 
     @property
     def caps(self):
         return Role.allcaps(self['roles'])
+
+    def _do_sync_2i(self, obj):
+        obj.set_index(USER_IDENT_IDX, self['ident'])
+
+        if 'alias' in self:
+            obj.set_index(USER_ALIAS_IDX, self['alias'])
+
+        return obj
 
 
 # 数据库序列化/反序列化
@@ -75,7 +103,7 @@ def user_dec_v1(data):
     return {
             'password': Password(alias or '', data['p']),
             'alias': alias,
-            'email': data['e'],
+            'ident': data['i'],
             'roles': set(data['r']),
             'xattr': data['x'],
             }
@@ -86,8 +114,8 @@ def user_enc_v1(user):
     assert 'password' in user
     assert isinstance(user['password'], Password)
     assert 'alias' in user
-    assert 'email' in user
-    assert isinstance(user['email'], six.text_type)
+    assert 'ident' in user
+    assert isinstance(user['ident'], six.text_type)
     assert 'roles' in user
     assert isinstance(user['roles'], set)
     assert 'xattr' in user
@@ -96,7 +124,7 @@ def user_enc_v1(user):
     return {
             'p': user['password'].psw_hash,
             'a': user['alias'],
-            'e': user['email'],
+            'i': user['ident'],
             'r': list(user['roles']),
             'x': user['xattr'],
             }
