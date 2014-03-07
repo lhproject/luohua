@@ -21,15 +21,15 @@ from __future__ import unicode_literals, division, print_function
 
 import six
 
+from luohua.auth.ident import FrozenIdent, Ident
 from luohua.auth.user import User
 from luohua.auth.role import Role
-
 
 TEST_USERS = {
         '9fabe73980ff48aba62303812aa93765': {
             '_V': 1,
             'a': 'test0',
-            'e': 'test0@example.com',
+            'i': '1030513101',
             'p': (
                 'lh1$ZcMloWnpTCDoCwXI|f9b2fcb14e85afd8333cc969275f27ab1343e7'
                 '8a414c9c7f52507d5e53436df62f8f16f55fb383a1a9a88971b3f152566'
@@ -41,10 +41,21 @@ TEST_USERS = {
         '0012cdf931a64c01ab97cb26f5f84bf0': {
             '_V': 1,
             'a': 'test2',
-            'e': 'fsck+qq@youknow.com',
+            'i': '1030512202',
             'p': 'kbs$0b84f4bb2b3c572572015dd1050b3232',
             'r': 'user adm',
             'x': {},
+            },
+        }
+
+TEST_USERS_2I = {
+        '9fabe73980ff48aba62303812aa93765': {
+            'user_alias_bin': 'test0',
+            'user_ident_bin': '1030513101',
+            },
+        '0012cdf931a64c01ab97cb26f5f84bf0': {
+            'user_alias_bin': 'test2',
+            'user_ident_bin': '1030512202',
             },
         }
 
@@ -71,12 +82,61 @@ TEST_ROLES = {
             },
         }
 
+TEST_FROZEN_IDENTS = {
+        '1030513101': {
+            '_V': 1,
+            'g': 0,
+            'it': 0,
+            'in': '12345X',
+            },
+        '1030512202': {
+            '_V': 1,
+            'g': 0,
+            'it': 0,
+            'in': '543210',
+            },
+        }
+
+TEST_IDENTS = {
+        '1030513101': {
+            '_V': 1,
+            't': 0,
+            'e': 'test0@example.com',
+            'm': '12345671234',
+            'ss': '数字媒体学院',
+            'sm': '0305',
+            'sc': 1,
+            'sdb': '清苑',
+            'sdr': '123',
+            'ts': '',
+            'oa': '',
+            },
+        '1030512202': {
+            '_V': 1,
+            't': 0,
+            'e': 'fsck+qq@youknow.com',
+            'm': '98765434321',
+            'ss': '数字媒体学院',
+            'sm': '0305',
+            'sc': 2,
+            'sdb': '清苑',
+            'sdr': '321',
+            'ts': '',
+            'oa': '',
+            },
+        }
+
 
 def users_setup():
     # 设置几个测试用户, 权限之类的数据
     with User.storage as conn:
         for uid, data in six.iteritems(TEST_USERS):
-            conn.new(uid, data).store()
+            obj = conn.new(uid, data)
+            for idx_k, idx_v in six.iteritems(TEST_USERS_2I[uid]):
+                obj.set_index(idx_k, idx_v)
+
+            obj.store()
+
             print('[+User] %s' % uid)
 
 
@@ -100,6 +160,34 @@ def roles_teardown():
         for rid in TEST_ROLES:
             conn.get(rid).delete()
             print('[-Role] %s' % rid)
+
+
+def frozen_ident_setup():
+    with FrozenIdent.storage as conn:
+        for number, data in six.iteritems(TEST_FROZEN_IDENTS):
+            conn.new(number, data).store()
+            print('[+FIdent] %s' % number)
+
+
+def frozen_ident_teardown():
+    with FrozenIdent.storage as conn:
+        for number in TEST_FROZEN_IDENTS:
+            conn.get(number).delete()
+            print('[-FIdent] %s' % number)
+
+
+def ident_setup():
+    with Ident.storage as conn:
+        for number, data in six.iteritems(TEST_IDENTS):
+            conn.new(number, data).store()
+            print('[+Ident] %s' % number)
+
+
+def ident_teardown():
+    with Ident.storage as conn:
+        for number in TEST_IDENTS:
+            conn.get(number).delete()
+            print('[-Ident] %s' % number)
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:

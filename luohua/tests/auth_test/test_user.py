@@ -40,12 +40,13 @@ class TestUser(Case):
 
     # 匹配登陆身份测试
     def test_find_by_name(self):
-        email1 = 'fsck+qq@youknow.com'
-        email2 = 'nonexistent@in.testsuite.my'
+        number1, number2 = '1030512202', '0123456789'
+        alias1, alias2 = 'test0', 'nonexistent'
 
-        assert User.find_by_name('test0')['alias'] == 'test0'
-        assert User.find_by_name(email1)['email'] == email1
-        assert_raises(KeyError, User.find_by_name, email2, )
+        assert User.find_by_name(number1)['alias'] == 'test2'
+        assert User.find_by_name(alias1)['ident'] == '1030513101'
+        assert User.find_by_name(number2) is None
+        assert User.find_by_name(alias2) is None
 
     # 密码验证测试
     def test_chkpasswd(self):

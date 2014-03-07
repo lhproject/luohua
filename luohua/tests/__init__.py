@@ -44,6 +44,8 @@ def setup_package():
     load_all(conf_path=os.path.join(REPO_PATH, conf))
 
     # 设置数据库
+    fixtures.frozen_ident_setup()
+    fixtures.ident_setup()
     fixtures.users_setup()
     fixtures.roles_setup()
 
@@ -52,6 +54,8 @@ def teardown_package():
     # 还原数据库状态
     fixtures.roles_teardown()
     fixtures.users_teardown()
+    fixtures.ident_teardown()
+    fixtures.frozen_ident_teardown()
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
