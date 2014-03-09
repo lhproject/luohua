@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals, division
+from __future__ import unicode_literals, division, print_function
 
 __all__ = [
         'fetch_user_or_die',
@@ -39,7 +39,7 @@ def fetch_user_or_die(request):
     # 微雨的 Redis 会话后端对不存在的会话 key 请求不会抛异常, 而是直接返回
     # Redis 驱动库返回的 None, 那我们就适应一下
     uid = request.session['uid']
-    print uid
+    print(uid)
     if uid is None:
         raise ACLError(0)
 
