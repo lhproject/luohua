@@ -49,7 +49,7 @@ class VTag(RiakDocument):
     def from_vpool(cls, vtpid):
         '''返回指定虚线索池中所有虚标签.'''
 
-        return cls._do_fetch_by_index(VTAG_VTP_INDEX, vtpid, None, None)
+        return cls._do_fetch_by_index(VTAG_VTP_INDEX, vtpid)
 
     def _do_sync_2i(self, obj):
         obj.set_index(VTAG_VTP_INDEX, self['vtpid'])
