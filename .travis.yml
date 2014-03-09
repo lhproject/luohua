@@ -33,7 +33,7 @@ install:
   # riak depends on riak-pb which pulls in protobuf, which is not supported by
   # Python 3.x at the moment. So we have to exclude it from weiyu's deps, and
   # install it ourselves, ignoring deps.
-  - '${IS_PY3K} && pip install riak --no-deps'
+  - 'if ${IS_PY3K}; then pip install riak --no-deps ; fi'
 
   # coveralls.io integration
   - pip install coveralls
