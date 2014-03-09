@@ -40,6 +40,14 @@ GENDER_TYPES = frozenset(GENDER_TYPES)
 ID_NUMBER_TYPES = ID_NUMBER_TYPE_LAST6, = six.moves.range(1)
 ID_NUMBER_TYPES = frozenset(ID_NUMBER_TYPES)
 
+# 编号/身份信息匹配返回值
+(
+        CHECK_IDENT_OK,
+        CHECK_IDENT_NOTFOUND,
+        CHECK_IDENT_INVALID_INPUT,
+        CHECK_IDENT_WRONG,
+        ) = six.moves.range(4)
+
 
 def validate_id_number(id_number_type, id_number):
     if not isinstance(id_number, six.text_type):
@@ -63,6 +71,23 @@ class FrozenIdent(RiakDocument):
 
     def __init__(self, data=None, number=None, rawobj=None):
         super(FrozenIdent, self).__init__(data, number, rawobj)
+
+    @classmethod
+    def check_ident(cls, number, id_type, id_number):
+        obj = cls.fetch(number)
+        if obj is None:
+            return CHECK_IDENT_NOTFOUND
+
+        try:
+            validate_id_number(id_type, id_number)
+        except ValueError:
+            return CHECK_IDENT_INVALID_INPUT
+
+        obj_id_type, obj_id_number = obj['id_number_type'], obj['id_number']
+        if id_type != obj_id_type or id_number != obj_id_number:
+            return CHECK_IDENT_WRONG
+
+        return CHECK_IDENT_OK
 
 
 class Ident(RiakDocument):
