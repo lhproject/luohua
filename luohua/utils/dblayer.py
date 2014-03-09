@@ -55,7 +55,7 @@ class RiakDocument(Document):
     @classmethod
     def _do_fetch_by_index(cls, idx, key):
         with cls.storage as conn:
-            page = conn.get_index(idx, key)
+            page = conn.get_index(smartbytes(idx), smartbytes(key))
             for obj_key in page.results:
                 obj = conn.get(obj_key)
                 yield cls._from_obj(obj)
@@ -63,7 +63,7 @@ class RiakDocument(Document):
     @classmethod
     def _do_fetch_range_by_index(cls, idx, start, end):
         with cls.storage as conn:
-            page = conn.get_index(idx, start, end)
+            page = conn.get_index(smartbytes(idx), start, end)
             for obj_key in page.results:
                 obj = conn.get(obj_key)
                 yield cls._from_obj(obj)
