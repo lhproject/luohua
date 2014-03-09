@@ -137,7 +137,7 @@ def users_setup():
             # 2i
             for idx_k, idx_v in six.iteritems(TEST_USERS_2I[uid]):
                 # 采用 protobuf 协议连接 Riak 的话这里必须是 bytes 类型
-                obj.set_index(idx_k, smartbytes(idx_v))
+                obj.set_index(smartbytes(idx_k), smartbytes(idx_v))
 
             obj.store()
 
