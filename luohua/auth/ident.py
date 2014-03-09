@@ -19,6 +19,35 @@
 
 from __future__ import unicode_literals, division
 
+__all__ = [
+        # 结构 ID
+        'IDENT_FROZEN_STRUCT_ID',
+        'IDENT_ENTRY_STRUCT_ID',
+        # 实名记录类型
+        'IDENT_TYPES',
+        'IDENT_TYPE_UNDERGRAD',
+        'IDENT_TYPE_GRADUATE',
+        'IDENT_TYPE_STAFF',
+        'IDENT_TYPE_OTHER',
+        # 性别
+        'GENDER_TYPES',
+        'GENDER_NA',
+        'GENDER_FEMALE',
+        'GENDER_MALE',
+        # 身份信息种类
+        'ID_NUMBER_TYPES',
+        'ID_NUMBER_TYPE_LAST6',
+        # 编号/身份信息匹配返回值
+        'CHECK_IDENT_OK',
+        'CHECK_IDENT_NOTFOUND',
+        'CHECK_IDENT_INVALID_INPUT',
+        'CHECK_IDENT_WRONG',
+        # 模块
+        'validate_id_number',
+        'FrozenIdent',
+        'Ident',
+        ]
+
 import six
 
 from ..utils.dblayer import RiakDocument
