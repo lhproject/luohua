@@ -26,6 +26,7 @@ from ..utils.dblayer import RiakDocument
 IDENT_FROZEN_STRUCT_ID = 'luohua.ident.frozen'
 IDENT_ENTRY_STRUCT_ID = 'luohua.ident.entry'
 
+# 实名记录类型
 IDENT_TYPES = (
         IDENT_TYPE_UNDERGRAD,
         IDENT_TYPE_GRADUATE,
@@ -34,9 +35,11 @@ IDENT_TYPES = (
         ) = six.moves.range(4)
 IDENT_TYPES = frozenset(IDENT_TYPES)
 
+# 性别
 GENDER_TYPES = GENDER_NA, GENDER_FEMALE, GENDER_MALE = six.moves.range(3)
 GENDER_TYPES = frozenset(GENDER_TYPES)
 
+# 身份信息种类
 ID_NUMBER_TYPES = ID_NUMBER_TYPE_LAST6, = six.moves.range(1)
 ID_NUMBER_TYPES = frozenset(ID_NUMBER_TYPES)
 
