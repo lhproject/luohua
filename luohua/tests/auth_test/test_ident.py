@@ -93,6 +93,28 @@ class TestFrozenIdent(Case):
         assert isinstance(obj['id_number'], six.text_type)
         assert obj['id_number'] == '12345X'
 
+    def test_check_ident_constants(self):
+        assert ident.CHECK_IDENT_OK == 0
+        assert ident.CHECK_IDENT_NOTFOUND == 1
+        assert ident.CHECK_IDENT_INVALID_INPUT == 2
+        assert ident.CHECK_IDENT_WRONG == 3
+
+    def test_check_ident(self):
+        # 成功检查
+        assert ident.FrozenIdent.check_ident('1030513101', 0, '12345X') == 0
+        assert ident.FrozenIdent.check_ident('1030512202', 0, '543210') == 0
+
+        # 不存在的编号
+        assert ident.FrozenIdent.check_ident('1030513102', 0, '12345X') == 1
+
+        # 输入信息不合法
+        assert ident.FrozenIdent.check_ident('1030513101', 1, '12345X') == 2
+        assert ident.FrozenIdent.check_ident('1030513101', 0, '12345') == 2
+        assert ident.FrozenIdent.check_ident('1030513101', 0, '12345x') == 2
+
+        # 身份信息不匹配
+        assert ident.FrozenIdent.check_ident('1030513101', 0, '543210') == 3
+
 
 class TestIdent(Case):
     @classmethod
