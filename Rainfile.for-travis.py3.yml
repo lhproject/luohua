@@ -40,8 +40,7 @@ weiyu.db:
   databases:
     main-kv:
       driver: riak
-      # Protobuf used to mimic production settings
-      protocol: pbc
+      # Protobuf is not available for Python 3.x yet, HTTP instead
       nodes:
         -
           host: 127.0.0.1

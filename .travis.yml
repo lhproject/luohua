@@ -16,15 +16,29 @@ services:
   - redis-server
 
 install:
-  - sudo apt-get update -qq
-  - sudo apt-get install protobuf-compiler
-  - pip install -r requirements.travis.txt
+  - 'if [[ "x${TRAVIS_PYTHON_VERSION%.?}" == "x3" ]]; then export IS_PY3K=true ; else export IS_PY3K=false ; fi'
+
+  # Protobuf deps, only applicable if not running Python 3.x
+  - '${IS_PY3K} || sudo apt-get update -qq'
+  - '${IS_PY3K} || sudo apt-get install protobuf-compiler'
+
+  # Python deps
+  - 'if ${IS_PY3K}; then export REQ_FILE=requirements.py3.txt ; else export REQ_FILE=requirements.txt ; fi ; printf "\033[1;32m * \033[mUsing requirements file: ${REQ_FILE}\n"'
+  - pip install -r "${REQ_FILE}"
+  # riak depends on riak-pb which pulls in protobuf, which is not supported by
+  # Python 3.x at the moment. So we have to exclude it from weiyu's deps, and
+  # install it ourselves, ignoring deps.
+  - '${IS_PY3K} && pip install riak --no-deps'
+
+  # coveralls.io integration
   - pip install coveralls
 
 before_script:
   # replace with the correct version of .coveragerc, when run under Python 3
-  - "[ \"x${TRAVIS_PYTHON_VERSION%.?}\" == \"x3\" ] && ( echo Switching .coveragerc to Python 3 version. ; rm .coveragerc && ln -s .coveragerc.py3 .coveragerc ) ; true"
+  - 'if ${IS_PY3K}; then echo Switching .coveragerc to Python 3 version. ; rm .coveragerc && ln -s .coveragerc.py3 .coveragerc ; fi'
   - ls -l .coveragerc
+  # specify the proper Rainfile to use
+  - 'if ${IS_PY3K}; then export RAINFILE_TO_USE=Rainfile.for-travis.py3.yml ; else export RAINFILE_TO_USE=Rainfile.for-travis.yml ; fi ; printf "\033[1;32m * \033[mUsing Rainfile: ${RAINFILE_TO_USE}\n"'
 
 
 script: nosetests --with-coverage

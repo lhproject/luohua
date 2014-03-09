@@ -37,7 +37,8 @@ def setup_package():
     # 因为这个环境变量名字最长所以用了...
     # 这是怕不小心在本机设置导致用错配置文件, 不是恶趣味!
     if os.environ.get('HAS_JOSH_K_SEAL_OF_APPROVAL', None) == 'true':
-        conf = 'Rainfile.for-travis.yml'
+        # 允许在 .travis.yml 里设法指定其他配置
+        conf = os.environ.get('RAINFILE_TO_USE', 'Rainfile.for-travis.yml')
     else:
         conf = 'Rainfile.yml'
 
