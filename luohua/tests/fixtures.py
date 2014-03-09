@@ -21,6 +21,7 @@ from __future__ import unicode_literals, division, print_function
 
 import six
 
+from weiyu.helpers.misc import smartbytes
 from luohua.auth.ident import FrozenIdent, Ident
 from luohua.auth.user import User
 from luohua.auth.role import Role
@@ -132,8 +133,11 @@ def users_setup():
     with User.storage as conn:
         for uid, data in six.iteritems(TEST_USERS):
             obj = conn.new(uid, data)
+
+            # 2i
             for idx_k, idx_v in six.iteritems(TEST_USERS_2I[uid]):
-                obj.set_index(idx_k, idx_v)
+                # 采用 protobuf 协议连接 Riak 的话这里必须是 bytes 类型
+                obj.set_index(idx_k, smartbytes(idx_v))
 
             obj.store()
 
