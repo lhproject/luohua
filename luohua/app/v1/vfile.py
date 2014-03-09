@@ -31,6 +31,7 @@ from weiyu.helpers.misc import smartstr
 from weiyu.shortcuts import http, jsonview
 from weiyu.utils.decorators import only_methods
 
+from ..session.decorators import require_cap
 from ...utils.viewhelpers import jsonreply, parse_form
 from ...utils.sequences import time_ascending_suffixed
 from ...datastructures.vtag import VTag
@@ -154,6 +155,7 @@ def vfile_read_v1_view(request, vfid):
 
 @http
 @jsonview
+@require_cap('vf-creat')
 def vfile_creat_v1_view(request):
     '''v1 虚文件创建接口.
 
@@ -227,7 +229,9 @@ def vfile_creat_v1_view(request):
     content_str = smartstr(content)
 
     if is_new_vth:
+        # 传入请求是因为需要又一次验证权限
         return _do_creat_vf_with_vth(
+                request,
                 vtpid,
                 vtags_json,
                 inreply2,
@@ -245,7 +249,15 @@ def vfile_creat_v1_view(request):
             )
 
 
-def _do_creat_vf_with_vth(vtpid, vtags_json, inreply2, title, content):
+@require_cap('vth-creat')
+def _do_creat_vf_with_vth(
+            request,
+            vtpid,
+            vtags_json,
+            inreply2,
+            title,
+            content,
+            ):
     # 如果新建 VThread, title 必须, vtpid 必须, vtags 必须,
     # inreply2 不能传入 (无意义)
     if title is None or vtpid is None or vtags_json is None:
