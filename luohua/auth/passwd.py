@@ -57,6 +57,12 @@ class Password(object):
     def psw_hash(self):
         return unicode(self.alg)
 
+    def __repr__(self):
+        if self.uid is None:
+            return '<Password: {0}>'.format(repr(self.alg))
+
+        return '<Password: {0}, uid={1}>'.format(repr(self.alg), self.uid)
+
 
 class BaseHashAlgorithm(object):
     __metaclass__ = abc.ABCMeta
@@ -80,10 +86,13 @@ class BaseHashAlgorithm(object):
         return '%s$%s' % (self.algorithm, self.digest, )
 
     def __str__(self):
-        return unicode(self).encode('utf-8')
+        return self.__unicode__().encode('utf-8')
 
     def __repr__(self):
-        return b"<HashAlgorithm '%s': %s>" % (self.algorithm, str(self), )
+        return '<HashAlgorithm %s: %s>' % (
+                self.algorithm,
+                self.__unicode__(),
+                )
 
     @classmethod
     @abc.abstractmethod
