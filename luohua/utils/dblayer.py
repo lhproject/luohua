@@ -46,6 +46,13 @@ class RiakDocument(Document):
 
         self._rawobj = rawobj
 
+    def __repr__(self):
+        return '<RiakDocument {1} raw={2}>'.format(
+                self.struct_id,
+                super(RiakDocument, self).__repr__(),
+                repr(self._rawobj),
+                )
+
     @classmethod
     def _from_obj(cls, obj):
         '''从数据库对象生成 Python 对象. 这是内部方法, 外界不应直接使用.'''
