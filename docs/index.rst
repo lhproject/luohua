@@ -12,7 +12,7 @@
     :maxdepth: 2
 
     app/index
-    datastructures/index
+    datastructures
     auth/index
     utils/index
 
