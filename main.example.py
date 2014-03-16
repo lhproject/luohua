@@ -3,6 +3,9 @@
 
 from __future__ import unicode_literals, division
 
+from gevent import monkey
+monkey.patch_all()
+
 from weiyu.init import inject_app
 from weiyu.utils.server import cli_server
 
