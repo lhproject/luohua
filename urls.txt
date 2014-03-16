@@ -4,5 +4,7 @@
 /v1/:
     --include=urls.apiv1.txt
 
+/socket.io rt-gateway
+
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8 syn=weiyu-urls:
