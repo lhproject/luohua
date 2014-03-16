@@ -6,5 +6,8 @@
 
 /socket.io rt-gateway
 
+# fallback (兜底), 也就是 404 的意思
+"" http-404
+
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8 syn=weiyu-urls:

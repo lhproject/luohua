@@ -31,6 +31,9 @@ site:
       - .v1.vthread
       - .v1.vfile
 
+      # 杂项 API
+      - .misc
+
       # 中间件
       - .metrics.middleware
 
