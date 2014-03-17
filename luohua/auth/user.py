@@ -46,6 +46,36 @@ class User(RiakDocument):
         return psw_obj.check(psw)
 
     @classmethod
+    def find_by_ident(cls, ident):
+        '''寻找实名身份符合 ident 的用户.'''
+
+        # 按实名身份索引检索
+        by_ident = list(cls._do_fetch_by_index(USER_IDENT_IDX, ident))
+        if by_ident:
+            # 当前情况下, 多于一个就报错
+            if len(by_ident) > 1:
+                raise ValueError('>1 user with the same ident: %s' % (ident, ))
+
+            return by_ident[0]
+
+        return None
+
+    @classmethod
+    def find_by_alias(cls, alias):
+        '''寻找 KBS 帐户名符合 alias 的用户.'''
+
+        # 按 KBS 帐户名索引检索
+        by_alias = list(cls._do_fetch_by_index(USER_ALIAS_IDX, alias))
+        if by_alias:
+            # 同上
+            if len(by_alias) > 1:
+                raise ValueError('>1 user with the same alias: %s' % (alias, ))
+
+            return by_alias[0]
+
+        return None
+
+    @classmethod
     def find_by_name(cls, name):
         '''寻找登陆身份符合 name 的用户.
 
@@ -56,23 +86,13 @@ class User(RiakDocument):
 
         '''
 
-        # 按实名身份索引检索
-        by_ident = list(cls._do_fetch_by_index(USER_IDENT_IDX, name))
-        if by_ident:
-            # 当前情况下, 多于一个就报错
-            if len(by_ident) > 1:
-                raise ValueError('>1 user with the same ident: %s' % (name, ))
+        result_by_ident = cls.find_by_ident(name)
+        if result_by_ident is not None:
+            return result_by_ident
 
-            return by_ident[0]
-
-        # 按 KBS 帐户名索引检索
-        by_alias = list(cls._do_fetch_by_index(USER_ALIAS_IDX, name))
-        if by_alias:
-            # 同上
-            if len(by_alias) > 1:
-                raise ValueError('>1 user with the same alias: %s' % (name, ))
-
-            return by_alias[0]
+        result_by_alias = cls.find_by_alias(name)
+        if result_by_alias is not None:
+            return result_by_alias
 
         return None
 

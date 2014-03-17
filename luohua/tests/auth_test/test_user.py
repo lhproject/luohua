@@ -39,14 +39,21 @@ class TestUser(Case):
         pass
 
     # 匹配登陆身份测试
-    def test_find_by_name(self):
+    def test_find_by_ident(self):
         number1, number2 = '1030512202', '0123456789'
-        alias1, alias2 = 'test0', 'nonexistent'
 
         assert User.find_by_name(number1)['alias'] == 'test2'
-        assert User.find_by_name(alias1)['ident'] == '1030513101'
         assert User.find_by_name(number2) is None
+
+    def test_find_by_alias(self):
+        alias1, alias2 = 'test0', 'nonexistent'
+
+        assert User.find_by_name(alias1)['ident'] == '1030513101'
         assert User.find_by_name(alias2) is None
+
+    def test_find_by_name(self):
+        assert User.find_by_name('1030512202')['alias'] == 'test2'
+        assert User.find_by_name('test0')['ident'] == '1030513101'
 
     # 密码验证测试
     def test_chkpasswd(self):
