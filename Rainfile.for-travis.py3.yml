@@ -31,8 +31,15 @@ site:
       - .v1.vthread
       - .v1.vfile
 
+      # 杂项 API
+      - .misc
+
       # 中间件
       - .metrics.middleware
+
+      # 实时信道
+      - .rt
+      - luohua.rt.ns
 
 
 # 数据库配置
@@ -62,6 +69,8 @@ weiyu.db:
     luohua.vth: main-kv/vth
     luohua.vtp: main-kv/vtp
     luohua.vtag: main-kv/vtag
+
+    luohua.rt.state: mem-kv/(int)10
 
 
 # vim:set ai et ts=2 sw=2 sts=2 fenc=utf=8:
