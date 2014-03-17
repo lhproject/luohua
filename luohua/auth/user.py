@@ -112,6 +112,8 @@ def user_enc_v1(user):
     assert 'password' in user
     assert isinstance(user['password'], Password)
     assert 'alias' in user
+    if user['alias'] is not None:
+        assert isinstance(user['alias'], six.text_type)
     assert 'ident' in user
     assert isinstance(user['ident'], six.text_type)
     assert 'roles' in user
