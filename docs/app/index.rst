@@ -2,9 +2,9 @@ API 参考
 ========
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
 
-    v1/index
+    v1
 
 
 .. vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:

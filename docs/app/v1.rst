@@ -1,0 +1,44 @@
+API 版本 1
+==========
+
+会话管理 API
+------------
+
+.. automodule:: luohua.app.v1.session
+    :members:
+    :private-members:
+
+
+虚线索池 API
+------------
+
+.. automodule:: luohua.app.v1.vpool
+    :members:
+    :private-members:
+
+
+虚标签 API
+----------
+
+.. automodule:: luohua.app.v1.vtag
+    :members:
+    :private-members:
+
+
+虚线索 API
+----------
+
+.. automodule:: luohua.app.v1.vthread
+    :members:
+    :private-members:
+
+
+虚文件 API
+----------
+
+.. automodule:: luohua.app.v1.vfile
+    :members:
+    :private-members:
+
+ 
+.. vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
