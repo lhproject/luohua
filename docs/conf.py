@@ -28,6 +28,9 @@ if not on_rtd:
         _HAVE_RTD_THEME = True
     except ImportError:
         _HAVE_RTD_THEME = False
+else:
+    # RTD theme always available on its own site
+    _HAVE_RTD_THEME = True
 
 _USE_LOCAL_RTD_THEME = _HAVE_RTD_THEME and not on_rtd
 
