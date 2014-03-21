@@ -17,6 +17,20 @@ from __future__ import unicode_literals
 import sys
 import os
 
+# Use RTD theme if available, but only do the actual import if we are not
+# already running on readthedocs.org
+on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+
+if not on_rtd:
+    # Detect sphinx_rtd_theme package
+    try:
+        import sphinx_rtd_theme
+        _HAVE_RTD_THEME = True
+    except ImportError:
+        _HAVE_RTD_THEME = False
+
+_USE_LOCAL_RTD_THEME = _HAVE_RTD_THEME and not on_rtd
+
 # If extensions (or modules to document with autodoc) are in another
 # directory, add these directories to sys.path here. If the directory is
 # relative to the documentation root, use os.path.abspath to make it absolute,
@@ -104,48 +118,52 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'default'
+# Only explicitly request RTD theme if not on readthedocs.org.
+html_theme = 'sphinx_rtd_theme' if _USE_LOCAL_RTD_THEME else 'default'
 
-# Theme options are theme-specific and customize the look and feel of a theme
-# further.  For a list of options available for each theme, see the
-# documentation.
-html_theme_options = {
-        'bodyfont': (
-            'DejaVu Sans Light, '
-            '"WenQuanYi Micro Hei Light", '
-            '"WenQuanYi Micro Hei", '
-            '"Microsoft YaHei", '
-            'sans-serif'
-            ),
-        'headfont': (
-            'Fanwood, '
-            '"Palatino Linotype", '
-            'Georgia, '
-            '"文鼎ＰＬ简报宋", '
-            '"AR PL UMing CN", '
-            'sans-serif'
-            ),
+if _HAVE_RTD_THEME:
+    # RTD theme has almost no options, plus not all options supported by the
+    # default theme are supported by the RTD one (such as headbgcolor). So
+    # we have to differentiate between the two sets of options.
+    html_theme_options = {}
+    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+else:
+    # Styles for default theme, if RTD theme is not available.
+    html_theme_options = {
+            'bodyfont': (
+                'DejaVu Sans Light, '
+                '"WenQuanYi Micro Hei Light", '
+                '"WenQuanYi Micro Hei", '
+                '"Microsoft YaHei", '
+                'sans-serif'
+                ),
+            'headfont': (
+                'Fanwood, '
+                '"Palatino Linotype", '
+                'Georgia, '
+                '"文鼎ＰＬ简报宋", '
+                '"AR PL UMing CN", '
+                'sans-serif'
+                ),
 
-        'bgcolor': '#f8fcf3',
-        'textcolor': '#1f1f1f',
-        'linkcolor': '#3a8fc9',
+            'bgcolor': '#f8fcf3',
+            'textcolor': '#1f1f1f',
+            'linkcolor': '#3a8fc9',
 
-        'sidebarbgcolor': '#d8ecbd',  # same as actual color of headers
-        'sidebartextcolor': '#669a1f',
-        'sidebarlinkcolor': '#3a8fc9',
+            'sidebarbgcolor': '#d8ecbd',  # same as actual color of headers
+            'sidebartextcolor': '#669a1f',
+            'sidebarlinkcolor': '#3a8fc9',
 
-        'relbarbgcolor': '#93b861',  # #669a1f alpha=0.7 on #fff
-        'relbartextcolor': 'rgba(255, 255, 255, 0.75)',
+            'relbarbgcolor': '#93b861',  # #669a1f alpha=0.7 on #fff
+            'relbartextcolor': 'rgba(255, 255, 255, 0.75)',
 
-        'headbgcolor': 'rgba(169, 212, 109, 0.4)',  # #a9d46d
-        'headtextcolor': '#669a1f',
+            'headbgcolor': 'rgba(169, 212, 109, 0.4)',  # #a9d46d
+            'headtextcolor': '#669a1f',
 
-        'footerbgcolor': '#669a1f',
-        'footertextcolor': 'rgba(255, 255, 255, 0.75)',
-        }
-
-# Add any paths that contain custom themes here, relative to this directory.
-#html_theme_path = []
+            'footerbgcolor': '#669a1f',
+            'footertextcolor': 'rgba(255, 255, 255, 0.75)',
+            }
+    html_theme_path = []
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
