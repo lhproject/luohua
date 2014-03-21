@@ -129,7 +129,11 @@ if _HAVE_RTD_THEME:
     # default theme are supported by the RTD one (such as headbgcolor). So
     # we have to differentiate between the two sets of options.
     html_theme_options = {}
-    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+
+    if _USE_LOCAL_RTD_THEME:
+        html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+    else:
+        html_theme_path = []
 else:
     # Styles for default theme, if RTD theme is not available.
     html_theme_options = {
