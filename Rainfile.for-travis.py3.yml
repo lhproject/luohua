@@ -1,76 +1,14 @@
-site:
-  $$nodup: true
-
-  session:
-    backend: redis
-    options:
-      struct_id: luohua.session
-      cookie-key: lh_s
-      secret: '7h1z_must_13e_s3cr37'
-      ttl: 300
-
-  staticfile:
-    root: ../jnrain2/static/
-
-  middlewares:
-    pre:
-      - session
-      - luohua.metrics
-    post:
-      - luohua.metrics
-      - session
-
-  views:
-    package: luohua.app
-    modules:
-      # API 界面
-      - .v1.session
-      - .v1.account
-      - .v1.vpool
-      - .v1.vtag
-      - .v1.vthread
-      - .v1.vfile
-
-      # 杂项 API
-      - .misc
-
-      # 中间件
-      - .metrics.middleware
-
-      # 实时信道
-      - .rt
-      - luohua.rt.ns
+$$include:
+  - Rain.d/site.yml
 
 
 # 数据库配置
 weiyu.db:
   databases:
-    main-kv:
-      driver: riak
-      # Protobuf is not available for Python 3.x yet, HTTP instead
-      nodes:
-        -
-          host: 127.0.0.1
-          http_port: 8091
-          pb_port: 8087
-    mem-kv:
-      driver: redis
-      host: 127.0.0.1
-      port: 6379
+    $$include: Rain.d/db.databases.for-travis.py3.yml
 
   storage:
-    luohua.user: main-kv/users
-    luohua.role: main-kv/roles
-    luohua.ident.frozen: main-kv/ident.frozen
-    luohua.ident.entry: main-kv/ident.entry
-    luohua.session: mem-kv/(int)0
-
-    luohua.vf: main-kv/vf
-    luohua.vth: main-kv/vth
-    luohua.vtp: main-kv/vtp
-    luohua.vtag: main-kv/vtag
-
-    luohua.rt.state: mem-kv/(int)10
+    $$include: Rain.d/db.storage.yml
 
 
 # vim:set ai et ts=2 sw=2 sts=2 fenc=utf=8:
