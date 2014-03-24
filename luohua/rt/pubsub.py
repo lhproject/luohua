@@ -35,17 +35,18 @@ PUBSUB_STORAGE_ID = 'luohua.rt.pubsub'
 
 DATA_MESSAGE_TYPES = frozenset({'message', 'pmessage', })
 
-_PUBSUB_STORAGE_CACHE = []
+_PUBSUB_CLIENT_CACHE = []
 _PUBLISH_CONNECTION = []
 
 
 def _get_pubsub():
-    if _PUBSUB_STORAGE_CACHE:
-        return _PUBSUB_STORAGE_CACHE[0].pubsub()
+    if _PUBSUB_CLIENT_CACHE:
+        return _PUBSUB_CLIENT_CACHE[0].pubsub()
 
     storage = db_hub.get_storage(PUBSUB_STORAGE_ID)
-    _PUBSUB_STORAGE_CACHE.append(storage)
-    return storage.pubsub()
+    client = storage.raw()
+    _PUBSUB_CLIENT_CACHE.append(client)
+    return client.pubsub()
 
 
 def _get_publish_connection():
