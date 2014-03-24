@@ -1,0 +1,20 @@
+# 存储方案
+# Storage wirings
+
+luohua.user: main-kv/users
+luohua.role: main-kv/roles
+luohua.ident.frozen: main-kv/ident.frozen
+luohua.ident.entry: main-kv/ident.entry
+luohua.session: mem-kv/(int)0
+luohua.audit: main-kv/audit
+
+luohua.vf: main-kv/vf
+luohua.vth: main-kv/vth
+luohua.vtp: main-kv/vtp
+luohua.vtag: main-kv/vtag
+
+luohua.rt.state: mem-kv/(int)10
+luohua.rt.pubsub: mem-kv/(int)10  # db index is unused
+
+
+# vim:set ai et ts=2 sw=2 sts=2 fenc=utf=8:

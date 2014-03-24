@@ -1,0 +1,16 @@
+main-kv:
+  driver: riak
+  # Protobuf is not available for Python 3.x yet, HTTP instead
+  nodes:
+    -
+      host: 127.0.0.1
+      http_port: 8091
+      pb_port: 8087
+
+mem-kv:
+  driver: redis
+  host: 127.0.0.1
+  port: 6379
+
+
+# vim:set ai et ts=2 sw=2 sts=2 fenc=utf=8:
