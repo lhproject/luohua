@@ -48,6 +48,7 @@ venv/
 conf.json
 conf.yml
 Rainfile.yml
+Rain.d/lh.mail.yml
 
 # suggested name of entry point file
 # this may contain modifications to loader parameters

@@ -1,0 +1,182 @@
+## -*- coding: utf-8 -*-
+
+/* base styles */
+html {
+  background-color: #fff;
+  color: #262626;
+}
+
+body {
+  /* 抄自支付宝通知邮件样式, thx~ */
+  width: 760px;
+
+  margin: 0 auto;
+}
+
+
+/* 页面头 */
+.mail__hdr {
+  color: #fff;
+  background-color: #5bbc1b;
+  height: 50px;
+}
+
+.mail__hdr__logo {
+  width: 141px;
+  height: 50px;
+  background: url("//static.jnrain.com/common/img/logo-141x50-w.png") top left no-repeat;
+  margin: 0 0 0 24px;
+}
+
+.mail__hdr__title {
+  display: inline-block;
+  margin: 0 10px 0 0;
+  float: right;
+
+  font-size: 16px;
+  line-height: 50px;
+}
+
+
+/* 信件体 */
+.mail {
+  /* 其实是边框颜色, 同样 from 支付宝 */
+  background-color: #ebebeb;
+}
+
+
+/* 信件内容 */
+.mail__content {
+  margin: 0 10px;  /* 水平边距 from 支付宝 */
+  background-color: #fcfcfc;
+}
+
+
+/* 开头 */
+.mail__content__opening {
+  padding: 36px 0 0 30px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+
+/* 正文段 */
+.mail__content__body,
+.mail__content__closing {
+  line-height: 1.5;
+}
+
+.mail__content__body {
+  font-size: 14px;
+}
+
+.mail__content__body > p {
+  margin: 16px 0 16px 63px;
+}
+
+.p-minor {
+  font-size: 12px;
+}
+
+.lnk {
+  color: #08c;
+  text-decoration: underline;
+}
+
+.lnk-minor {
+  color: #808080;
+  text-decoration: underline;
+}
+
+.button {
+  display: inline-block;
+
+  color: #fff;
+  background-color: #5bbc1b;
+  border-radius: 3px;
+
+  margin: 0 0 0 63px;
+  padding: 10px 20px;
+
+  font-size: 14px;
+}
+
+.button:hover, .button:active {
+  background-color: #438913;
+}
+
+.button:active {
+  transform: translate-z(10px);
+}
+
+.button__link:after {
+  display: inline-block;
+  content: "»";
+  margin: 0 0 0 0.2em;
+}
+
+
+/* 落款 */
+.mail__content__closing {
+  color: #999;
+
+  margin: 12px 0 0;
+  padding: 0 30px 12px 0;
+
+  font-size: 12px;
+  text-align: right;
+}
+
+
+/* 内容框 footer */
+.mail__footbox {
+  color: #959595;
+  font-size: 12px;
+  line-height: 25px;
+
+  margin: 0 10px;
+  padding: 20px 0 10px 1em;
+}
+
+.mail__footbox > a {
+  color: #95bddc;
+  text-decoration: underline;
+}
+
+
+/* 信件 footer */
+.foot {
+  /* 同上, 大部分样式 */
+  width: 700px;
+
+  color: #999;
+  background-color: #fff;
+
+  font-size: 12px;
+  line-height: 1.3em;
+  text-align: center;
+
+  margin: 42px auto 20px;
+  padding: 10px 10px 0;
+
+  border-top: 1px solid #ccc;
+}
+
+.foot > p {
+  margin-top: 12px;
+}
+
+.foot__link {
+  text-decoration: underline;
+}
+
+.foot__noreply-reminder {
+  margin-bottom: 30px;
+}
+
+.foot__versions {
+  color: #ddd;
+}
+
+
+/* vim:set ai et ts=2 sw=2 sts=2 fenc=utf-8: */

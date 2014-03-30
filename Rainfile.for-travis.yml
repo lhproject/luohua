@@ -1,5 +1,6 @@
 $$include:
   - Rain.d/site.yml
+  - Rain.d/rendering.yml
 
 
 # 数据库配置
