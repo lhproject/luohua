@@ -67,6 +67,13 @@ class MailChannel(object):
         mail = self.get_envelope(to_addr, subject, body, is_html)
         return self._do_send(mail)
 
+    def send_from_template(self, to_addr, template):
+        is_html = template.is_html
+        subject = template.get_subject()
+        body = template.get_body()
+
+        return self.sendmail(to_addr, subject, body, is_html)
+
 
 class MailChannelManager(object):
     def __init__(self):
@@ -77,7 +84,8 @@ class MailChannelManager(object):
 
         # 初始化邮件通道
         for channel_name, channel_cfg in channels_cfg.items():
-            channels[channel_name] = MailChannel(channel_cfg)
+            if channel_cfg.get('enabled', True):
+                channels[channel_name] = MailChannel(channel_cfg)
 
     def get_channel(self, name):
         return self._channels[name]

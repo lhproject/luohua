@@ -46,7 +46,7 @@ class MailTransport(object):
 class MailTransportManager(object):
     def __init__(self):
         # 取邮件服务器配置
-        reg = self._reg = regrequest('weiyu.mail')
+        reg = self._reg = regrequest('luohua.mail')
         servers = self._servers = reg['servers']
         transports = self._transports = {}
 

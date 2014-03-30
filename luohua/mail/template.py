@@ -21,18 +21,24 @@ from __future__ import unicode_literals, division
 
 __all__ = [
         'MailTemplate',
+        'MakoMailTemplate',
         ]
 
 from weiyu.rendering import render_hub
+from weiyu.rendering.base import RenderContext
+
+from .channel import channel_manager
 
 
 class MailTemplate(object):
-    template_view = None
+    template_path = None
     template_type = None
+    is_html = None
 
     def __init__(self, ctx):
-        assert self.template_view is not None
+        assert self.template_path is not None
         assert self.template_type is not None
+        assert self.is_html is not None
 
         self.ctx = ctx
 
@@ -40,15 +46,19 @@ class MailTemplate(object):
         raise NotImplementedError
 
     def get_body(self):
-        return render_hub.render_view(
-                self.template_view,
-                self.ctx,
-                {},
+        tmpl = render_hub.get_template(
                 self.template_type,
+                self.template_path,
                 )
 
+        return tmpl.render(self.ctx, RenderContext())[0]
 
-class MakoMailTemplate(object):
+    def send_to_channel(self, channel_name, to_addr):
+        ch = channel_manager.get_channel(channel_name)
+        return ch.send_from_template(to_addr, self)
+
+
+class MakoMailTemplate(MailTemplate):
     template_type = 'mako'
 
 
