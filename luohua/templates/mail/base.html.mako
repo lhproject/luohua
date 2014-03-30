@@ -1,5 +1,5 @@
 ## -*- coding: utf-8 -*-
-<%namespace name="utils" file="utils.html" />
+<%namespace name="utils" file="utils.html.mako" />
 <!DOCTYPE html>
 <html lang="cmn">
 <head>

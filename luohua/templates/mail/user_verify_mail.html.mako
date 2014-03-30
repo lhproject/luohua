@@ -1,6 +1,6 @@
 ## -*- coding: utf-8 -*-
 <%inherit file="base.html" />
-<%namespace name="utils" file="utils.html" />
+<%namespace name="utils" file="utils.html.mako" />
 
 <%block name="title">验证邮箱</%block>
 
