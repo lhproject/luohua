@@ -67,9 +67,10 @@
   <tr><td height="42"></td></tr>
 
   <tr>
-    <td align="center" style="color: #999; font-size: 12px; line-height: 1.3em;">
-      <table width="700" border="0" cellspacing="0" cellpadding="0">
-        <tr><td height="12" align="center"  style="border-top: 1px solid #ccc;"></td></tr>
+    <td align="center">
+      <table width="700" border="0" cellspacing="0" cellpadding="0" style="color: #999; font-size: 12px; line-height: 1.3em;">
+        <tr><td height="1" style="background-color: #ccc;"></td></tr>
+        <tr><td height="12"></td></tr>
 
         <%utils:foot_p>江南听雨网系统自动发送, 请不要回复</%utils:foot_p>
         <tr><td height="30"></td></tr>
