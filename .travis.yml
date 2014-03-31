@@ -43,7 +43,7 @@ before_script:
   - 'if ${IS_PY3K}; then echo Switching .coveragerc to Python 3 version. ; rm .coveragerc && ln -s .coveragerc.py3 .coveragerc ; fi'
   - ls -l .coveragerc
   # specify the proper Rainfile to use
-  - 'if ${IS_PY3K}; then export RAINFILE_TO_USE=Rainfile.for-travis.py3.yml ; else export RAINFILE_TO_USE=Rainfile.for-travis.yml ; fi ; printf "\033[1;32m * \033[mUsing Rainfile: ${RAINFILE_TO_USE}\n"'
+  - 'if ${IS_PY3K}; then export RAINFILE_TO_USE=Rain.d/config.for-travis.py3.yml ; else export RAINFILE_TO_USE=Rain.d/config.for-travis.yml ; fi ; printf "\033[1;32m * \033[mUsing Rainfile: ${RAINFILE_TO_USE}\n"'
 
 
 script: nosetests --with-coverage

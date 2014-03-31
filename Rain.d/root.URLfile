@@ -2,7 +2,7 @@
 --renderer=json
 
 /v1/:
-    --include=urls.apiv1.txt
+    --include=apiv1.URLfile
 
 /socket.io rt-gateway
 
