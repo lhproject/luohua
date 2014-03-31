@@ -31,31 +31,31 @@ from .channel import channel_manager
 
 
 class MailTemplate(object):
-    template_path = None
+    text_template_path = None
+    html_template_path = None
     template_type = None
-    is_html = None
 
     def __init__(self, ctx):
-        assert self.template_path is not None
+        assert self.text_template_path is not None
+        assert self.html_template_path is not None
         assert self.template_type is not None
-        assert self.is_html is not None
 
         self.ctx = ctx
 
     def get_subject(self):
         raise NotImplementedError
 
-    def get_body(self):
+    def get_body(self, html):
         tmpl = render_hub.get_template(
                 self.template_type,
-                self.template_path,
+                self.html_template_path if html else self.text_template_path,
                 )
 
         return tmpl.render(self.ctx, RenderContext())[0]
 
-    def send_to_channel(self, channel_name, to_addr):
+    def send_to_channel(self, channel_name, to_addr, html):
         ch = channel_manager.get_channel(channel_name)
-        return ch.send_from_template(to_addr, self)
+        return ch.send_from_template(to_addr, self, html)
 
 
 class MakoMailTemplate(MailTemplate):

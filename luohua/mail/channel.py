@@ -67,12 +67,11 @@ class MailChannel(object):
         mail = self.get_envelope(to_addr, subject, body, is_html)
         return self._do_send(mail)
 
-    def send_from_template(self, to_addr, template):
-        is_html = template.is_html
+    def send_from_template(self, to_addr, template, html):
         subject = template.get_subject()
-        body = template.get_body()
+        body = template.get_body(html)
 
-        return self.sendmail(to_addr, subject, body, is_html)
+        return self.sendmail(to_addr, subject, body, html)
 
 
 class MailChannelManager(object):
