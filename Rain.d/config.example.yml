@@ -1,16 +1,16 @@
 $$include:
-  - Rain.d/site.yml
-  - Rain.d/rendering.yml
-  - Rain.d/lh.mail.example.yml
+  - site.yml
+  - rendering.yml
+  - lh.mail.example.yml
 
 
 # 数据库配置
 weiyu.db:
   databases:
-    $$include: Rain.d/db.databases.example.yml
+    $$include: db.databases.example.yml
 
   storage:
-    $$include: Rain.d/db.storage.yml
+    $$include: db.storage.yml
 
 
 # vim:set ai et ts=2 sw=2 sts=2 fenc=utf=8:

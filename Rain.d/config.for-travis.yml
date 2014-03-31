@@ -1,15 +1,15 @@
 $$include:
-  - Rain.d/site.yml
-  - Rain.d/rendering.yml
+  - site.yml
+  - rendering.yml
 
 
 # 数据库配置
 weiyu.db:
   databases:
-    $$include: Rain.d/db.databases.for-travis.yml
+    $$include: db.databases.for-travis.yml
 
   storage:
-    $$include: Rain.d/db.storage.yml
+    $$include: db.storage.yml
 
 
 # vim:set ai et ts=2 sw=2 sts=2 fenc=utf=8:
