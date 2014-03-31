@@ -13,7 +13,7 @@
       <table border="0" cellspacing="0" cellpadding="0">
         <tr>
           <td width="24"></td>
-          <td width="141" height="50"><img src="//static.jnrain.com/common/img/logo-141x50-w.png" alt="JNRain" width="141" height="50" style="display: block; margin: 0;" /></td>
+          <td width="141" height="50"><img src="http://static.jnrain.com/common/img/logo-141x50-w.png" alt="JNRain" width="141" height="50" style="display: block; margin: 0;" /></td>
           <td width="595" align="right" valign="middle" style="color: #fff; padding-right: 10px; font-size: 16px;">${self.title()}</td>
         </tr>
       </table>
