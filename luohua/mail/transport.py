@@ -23,8 +23,6 @@ __all__ = [
         'transport_manager',
         ]
 
-import os
-
 import envelopes
 
 from weiyu.registry.provider import request as regrequest
@@ -47,6 +45,12 @@ class MailTransport(object):
 
 class MailTransportManager(object):
     def __init__(self):
+        self._reg = self._servers = self._transports = None
+
+    def _ensure_config(self):
+        if self._transports is not None:
+            return
+
         # 取邮件服务器配置
         reg = self._reg = regrequest('luohua.mail')
         servers = self._servers = reg['servers']
@@ -57,14 +61,11 @@ class MailTransportManager(object):
             transports[server_name] = MailTransport(server_cfg)
 
     def get_transport(self, name):
+        self._ensure_config()
         return self._transports[name]
 
 
-if os.environ.get('_IN_SPHINX_DOC_BUILD', None) != 'true':
-    transport_manager = MailTransportManager()
-else:
-    # fake for autodoc
-    transport_manager = None
+transport_manager = MailTransportManager()
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:

@@ -23,8 +23,6 @@ __all__ = [
         'channel_manager',
         ]
 
-import os
-
 import envelopes
 
 from weiyu.registry.provider import request as regrequest
@@ -78,6 +76,12 @@ class MailChannel(object):
 
 class MailChannelManager(object):
     def __init__(self):
+        self._reg = self._channels_cfg = self._channels = None
+
+    def _ensure_config(self):
+        if self._channels is not None:
+            return
+
         # 取邮件通道配置
         reg = self._reg = regrequest('luohua.mail')
         channels_cfg = self._channels_cfg = reg['channels']
@@ -89,14 +93,11 @@ class MailChannelManager(object):
                 channels[channel_name] = MailChannel(channel_cfg)
 
     def get_channel(self, name):
+        self._ensure_config()
         return self._channels[name]
 
 
-if os.environ.get('_IN_SPHINX_DOC_BUILD', None) != 'true':
-    channel_manager = MailChannelManager()
-else:
-    # fake for autodoc
-    channel_manager = None
+channel_manager = MailChannelManager()
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
