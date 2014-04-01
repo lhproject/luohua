@@ -23,6 +23,12 @@ from weiyu.helpers.misc import smartbytes
 from weiyu.db.mapper.base import Document
 
 
+class MultipleObjectsError(ValueError):
+    '''2i 查询对最多只期待 1 个结果的查询返回了多于 1 个的结果.'''
+
+    pass
+
+
 class RiakDocument(Document):
     '''存储于 Riak 的对象公共包装.
 
@@ -66,6 +72,21 @@ class RiakDocument(Document):
             for obj_key in page.results:
                 obj = conn.get(obj_key)
                 yield cls._from_obj(obj)
+
+    @classmethod
+    def _do_fetch_one_by_index(cls, idx, key):
+        result = list(cls._do_fetch_by_index(idx, key))
+
+        if result:
+            if len(result) > 1:
+                raise MultipleObjectsError(
+                        '>1 record returned from idx={0} key={1}'.format(
+                            repr(idx),
+                            repr(key),
+                            ))
+            return result[0]
+
+        return None
 
     @classmethod
     def _do_fetch_range_by_index(cls, idx, start, end):
