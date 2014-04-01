@@ -23,6 +23,8 @@ __all__ = [
         'transport_manager',
         ]
 
+import os
+
 import envelopes
 
 from weiyu.registry.provider import request as regrequest
@@ -58,7 +60,11 @@ class MailTransportManager(object):
         return self._transports[name]
 
 
-transport_manager = MailTransportManager()
+if os.environ.get('_IN_SPHINX_DOC_BUILD', None) != 'true':
+    transport_manager = MailTransportManager()
+else:
+    # fake for autodoc
+    transport_manager = None
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:

@@ -23,6 +23,8 @@ __all__ = [
         'channel_manager',
         ]
 
+import os
+
 import envelopes
 
 from weiyu.registry.provider import request as regrequest
@@ -90,7 +92,11 @@ class MailChannelManager(object):
         return self._channels[name]
 
 
-channel_manager = MailChannelManager()
+if os.environ.get('_IN_SPHINX_DOC_BUILD', None) != 'true':
+    channel_manager = MailChannelManager()
+else:
+    # fake for autodoc
+    channel_manager = None
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
