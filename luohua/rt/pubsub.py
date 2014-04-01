@@ -21,6 +21,8 @@ from __future__ import unicode_literals, division
 
 __all__ = [
         'publish_json',
+        'publish_event',
+        'publish_global_event',
         'JSONPubSub',
         ]
 
@@ -62,6 +64,19 @@ def _get_publish_connection():
 def publish_json(channel, data):
     channel_name = PUBSUB_CHANNEL_PREFIX + channel
     return _get_publish_connection().publish(channel_name, json.dumps(data))
+
+
+def publish_event(channel, typ, **kwargs):
+    '''发送一条事件消息到一个频道. 传入的命名参数会成为消息的一部分.'''
+
+    kwargs['type'] = typ
+    return publish_json('evt/' + channel, kwargs)
+
+
+def publish_global_event(typ, **kwargs):
+    '''发送一条事件消息到全局事件频道.'''
+
+    return publish_event('GLOBAL', typ, **kwargs)
 
 
 class JSONPubSub(object):
