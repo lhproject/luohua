@@ -32,6 +32,7 @@ except ImportError:
 from weiyu.db import db_hub
 
 PUBSUB_STORAGE_ID = 'luohua.rt.pubsub'
+PUBSUB_CHANNEL_PREFIX = '/lh/'
 
 DATA_MESSAGE_TYPES = frozenset({'message', 'pmessage', })
 
@@ -59,7 +60,8 @@ def _get_publish_connection():
 
 
 def publish_json(channel, data):
-    return _get_publish_connection().publish(channel, json.dumps(data))
+    channel_name = PUBSUB_CHANNEL_PREFIX + channel
+    return _get_publish_connection().publish(channel_name, json.dumps(data))
 
 
 class JSONPubSub(object):
