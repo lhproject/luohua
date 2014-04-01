@@ -23,6 +23,9 @@ import six
 
 from ..utils.dblayer import RiakDocument
 from ..utils.stringop import escape_lucene
+
+from ..mail.template import MakoMailTemplate
+
 from .passwd import Password
 from .role import Role
 
@@ -148,6 +151,15 @@ def user_enc_v1(user):
             'r': list(user['roles']),
             'x': user['xattr'],
             }
+
+
+# 邮件模板
+class UserVerifyMailMailTemplate(MakoMailTemplate):
+    text_template_path = 'mail/user_verify_mail.txt.mako'
+    html_template_path = 'mail/user_verify_mail.html.mako'
+
+    def get_subject(self):
+        return '验证您的注册邮箱'
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
