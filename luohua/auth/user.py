@@ -22,17 +22,24 @@ from __future__ import unicode_literals, division
 import six
 
 from ..utils.dblayer import RiakDocument
-from ..utils.stringop import escape_lucene
 
 from ..mail.template import MakoMailTemplate
 
-from .passwd import Password
-from .role import Role
+from . import passwd
+from . import ident
+from . import role
 
 USER_STRUCT_ID = 'luohua.user'
 
 USER_ALIAS_IDX = 'user_alias_bin'
 USER_IDENT_IDX = 'user_ident_bin'
+
+# 注册用户返回值
+(
+        NEW_USER_OK,
+        NEW_USER_DUP,
+        NEW_USER_PASSWORD_TOO_WEAK,
+        ) = range(3)
 
 
 class User(RiakDocument):
@@ -101,7 +108,7 @@ class User(RiakDocument):
 
     @property
     def caps(self):
-        return Role.allcaps(self['roles'])
+        return role.Role.allcaps(self['roles'])
 
     def _do_sync_2i(self, obj):
         obj.set_index(USER_IDENT_IDX, self['ident'])
@@ -110,6 +117,50 @@ class User(RiakDocument):
             obj.set_index(USER_ALIAS_IDX, self['alias'])
 
         return obj
+
+    @classmethod
+    def new_user(
+            cls,
+            password,
+            ident_type,
+            ident_number,
+            ident_id_type,
+            ident_id_number,
+            ident_info,
+            xattr=None,
+            ):
+        xattr = xattr if xattr is not None else {}
+
+        # 查重
+        if cls.find_by_ident(ident_number) is not None:
+            return NEW_USER_DUP, None
+
+        # 验证 ident
+        ident_result, ident_obj = ident.Ident.new_ident(
+                ident_type,
+                ident_number,
+                ident_id_type,
+                ident_id_number,
+                ident_info,
+                )
+        if ident_result != ident.IDENT_OK:
+            return ident_result, None
+
+        user = cls()
+
+        # 新用户不会有 KBS 用户名
+        # TODO: 检查弱密码
+        user['password'] = passwd.Password('', password)
+        user['alias'] = None
+
+        # 其他基本设置
+        user['ident'] = ident_obj['id']
+        user['roles'] = ''
+        user['xattr'] = xattr
+
+        user.save()
+
+        return NEW_USER_OK, user
 
 
 # 数据库序列化/反序列化
@@ -122,7 +173,7 @@ def user_dec_v1(data):
     # 才有 KBS 格式的 hash, 所以这里对没有设置别名的用户传入空字符串是完全
     # 没有问题的
     return {
-            'password': Password(alias or '', data['p']),
+            'password': passwd.Password(alias or '', data['p']),
             'alias': alias,
             'ident': data['i'],
             'roles': set(data['r']),
@@ -133,7 +184,7 @@ def user_dec_v1(data):
 @User.encoder(1)
 def user_enc_v1(user):
     assert 'password' in user
-    assert isinstance(user['password'], Password)
+    assert isinstance(user['password'], passwd.Password)
     assert 'alias' in user
     if user['alias'] is not None:
         assert isinstance(user['alias'], six.text_type)
