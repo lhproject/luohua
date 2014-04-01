@@ -193,7 +193,7 @@ class User(dblayer.RiakDocument):
         # 其他基本设置
         user['display_name'] = display_name
         user['ident'] = ident_obj['id']
-        user['roles'] = ''
+        user['roles'] = set()
         user['xattr'] = xattr
 
         user.save()
