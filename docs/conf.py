@@ -17,6 +17,10 @@ from __future__ import unicode_literals
 import sys
 import os
 
+# Indicate that we are doing doc build, allowing some modules to keep from
+# doing routine initialization (and failing).
+os.environ['_IN_SPHINX_DOC_BUILD'] = 'true'
+
 # Use RTD theme if available, but only do the actual import if we are not
 # already running on readthedocs.org
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
