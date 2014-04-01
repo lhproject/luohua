@@ -21,8 +21,8 @@ from __future__ import unicode_literals, division
 
 import six
 
-from ..utils.dblayer import RiakDocument
-
+from ..utils import dblayer
+from ..rt import pubsub
 from ..mail.template import MakoMailTemplate
 
 from . import passwd
@@ -49,7 +49,7 @@ USER_DISPLAY_NAME_IDX = 'user_nd_bin'
 DISPLAY_NAME_MAX_LENGTH = 16
 
 
-class User(RiakDocument):
+class User(dblayer.RiakDocument):
     struct_id = USER_STRUCT_ID
     uses_2i = True
 
@@ -197,6 +197,9 @@ class User(RiakDocument):
         user['xattr'] = xattr
 
         user.save()
+
+        # 发送一条实时信息
+        pubsub.publish_global_event('new_user', display_name=display_name)
 
         return NEW_USER_OK, user
 
