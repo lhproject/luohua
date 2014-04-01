@@ -27,7 +27,7 @@ __all__ = [
 import abc
 import hashlib
 
-from ..utils.randomness import random_salt
+from ..utils import randomness
 
 _KBS_MAGIC = r'wwj&kcn4SMTHBBS MD5 p9w2d gen2rat8, //grin~~, 2001/5/7'
 HASH_ALGORITHMS = {}
@@ -109,7 +109,7 @@ class BaseHashAlgorithm(object):
     @classmethod
     def create(cls, uid, psw):
         # 16 个随机字母数字的盐够长了吧...
-        new_salt = random_salt(16)
+        new_salt = randomness.salt(16)
 
         # XXX KBS Hash 无视随机生成的盐, 而需要使用 UID (这也是这个密码类需要
         # 同时传入用户 ID 才能正常工作的唯一原因)! 所以 make_hash 目前只能是
