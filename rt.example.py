@@ -16,7 +16,7 @@ inject_app()
 if __name__ == '__main__':
     cli_server(
             'socketio',
-            ('0.0.0.0', 9091),
+            listen=('0.0.0.0', 9091),
             resource='socket.io',
             policy_server=True,
             policy_listener=('0.0.0.0', 10843),
