@@ -30,7 +30,11 @@ from weiyu.registry.provider import request as regrequest
 
 class MailTransport(object):
     def __init__(self, cfg):
-        self._conn = envelopes.SMTP(
+        self._cfg = cfg
+
+    def _get_conn(self):
+        cfg = self._cfg
+        return envelopes.SMTP(
                 cfg['host'],
                 cfg['port'],
                 cfg['login'],
@@ -40,7 +44,7 @@ class MailTransport(object):
                 )
 
     def send(self, mail):
-        return self._conn.send(mail)
+        return self._get_conn().send(mail)
 
 
 class MailTransportManager(object):
