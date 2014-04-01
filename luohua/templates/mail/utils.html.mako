@@ -1,35 +1,8 @@
 ## -*- coding: utf-8 -*-
-<%!
-import time
-
-import weiyu
-import luohua
+<%namespace name="common" file="utils.common.mako" />
 
 
-def now():
-    return time.time()
-
-
-def cvt_timestamp(timestamp):
-    return time.localtime(int(timestamp) if timestamp != 'None' else now())
-
-
-def for_time_elem(timestamp=None):
-    return time.strftime('%Y-%m-%dT%H:%M:%SZ', cvt_timestamp(timestamp))
-
-
-def for_time_elem_text(timestamp=None):
-    return time.strftime('%Y-%m-%d', cvt_timestamp(timestamp))
-%>
-
-
-<%def name="weiyu_version()">${weiyu.VERSION_STR}</%def>
-
-
-<%def name="luohua_version()">${luohua.__version__}</%def>
-
-
-<%def name="time_elem(ts=None)"><time datetime="${ts | for_time_elem}">${ts | for_time_elem_text}</time></%def>
+<%def name="time_elem(ts=None)"><time datetime="${common.machine_readable_time(ts)}">${common.for_date_text(ts)}</time></%def>
 
 
 <%def name="p(style='')"><tr><td><p style="margin: 16px 0;${style}">${caller.body()}</p></td></tr></%def>

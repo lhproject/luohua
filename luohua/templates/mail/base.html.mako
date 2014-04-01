@@ -1,4 +1,5 @@
 ## -*- coding: utf-8 -*-
+<%namespace name="common" file="utils.common.mako" />
 <%namespace name="utils" file="utils.html.mako" />
 <!DOCTYPE html>
 <html lang="cmn">
@@ -77,7 +78,7 @@
 
         <%utils:foot_p>
           &copy; 2013-2014 <%utils:foot_lnk href="//jnrain.com/">江南听雨网</%utils:foot_lnk><br />
-          <span style="color: #ddd;">luohua ${utils.luohua_version()} | weiyu ${utils.weiyu_version()}</span>
+          <span style="color: #ddd;">luohua ${common.luohua_version()} | weiyu ${common.weiyu_version()}</span>
         </%utils:foot_p>
       </table>
     </td>
