@@ -53,7 +53,7 @@ def _get_publish_connection():
     if _PUBLISH_CONNECTION:
         return _PUBLISH_CONNECTION[0]
 
-    pubsub = get_pubsub()
+    pubsub = _get_pubsub()
     _PUBLISH_CONNECTION.append(pubsub)
     return pubsub
 
