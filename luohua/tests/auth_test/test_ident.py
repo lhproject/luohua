@@ -94,7 +94,7 @@ class TestFrozenIdent(Case):
         assert obj['id_number'] == '12345X'
 
     def test_check_ident_constants(self):
-        assert ident.CHECK_IDENT_OK == 0
+        assert ident.IDENT_OK == 0
         assert ident.CHECK_IDENT_NOTFOUND == 1
         assert ident.CHECK_IDENT_INVALID_INPUT == 2
         assert ident.CHECK_IDENT_WRONG == 3
