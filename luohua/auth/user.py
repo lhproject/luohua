@@ -33,13 +33,20 @@ USER_STRUCT_ID = 'luohua.user'
 
 USER_ALIAS_IDX = 'user_alias_bin'
 USER_IDENT_IDX = 'user_ident_bin'
+USER_DISPLAY_NAME_IDX = 'user_nd_bin'
 
 # 注册用户返回值
 (
         NEW_USER_OK,
         NEW_USER_DUP,
         NEW_USER_PASSWORD_TOO_WEAK,
-        ) = range(3)
+        NEW_USER_DISPLAY_NAME,
+        NEW_USER_DISPLAY_NAME_LENGTH,
+        NEW_USER_DISPLAY_NAME_DUP,
+        ) = range(6)
+
+# 常量
+DISPLAY_NAME_MAX_LENGTH = 16
 
 
 class User(RiakDocument):
@@ -86,19 +93,33 @@ class User(RiakDocument):
         return None
 
     @classmethod
-    def find_by_name(cls, name):
+    def find_by_display_name(cls, name):
+        '''寻找显示名称符合 name 的用户.'''
+
+        try:
+            return cls._do_fetch_one_by_index(USER_DISPLAY_NAME_IDX, name)
+        except dblayer.MultipleObjectsError:
+            raise ValueError('user display name collision: %s' % (name, ))
+
+    @classmethod
+    def find_by_guess(cls, name):
         '''寻找登陆身份符合 name 的用户.
 
         将按照以下顺序检测 ``name``:
 
         1. 学号/工号
-        2. KBS 帐户名
+        2. 显示名称
+        3. KBS 帐户名
 
         '''
 
         result_by_ident = cls.find_by_ident(name)
         if result_by_ident is not None:
             return result_by_ident
+
+        result_by_display_name = cls.find_by_display_name(name)
+        if result_by_display_name is not None:
+            return result_by_display_name
 
         result_by_alias = cls.find_by_alias(name)
         if result_by_alias is not None:
@@ -112,6 +133,7 @@ class User(RiakDocument):
 
     def _do_sync_2i(self, obj):
         obj.set_index(USER_IDENT_IDX, self['ident'])
+        obj.set_index(USER_DISPLAY_NAME_IDX, self['display_name'])
 
         if 'alias' in self:
             obj.set_index(USER_ALIAS_IDX, self['alias'])
@@ -127,6 +149,7 @@ class User(RiakDocument):
             ident_id_type,
             ident_id_number,
             ident_info,
+            display_name,
             xattr=None,
             ):
         xattr = xattr if xattr is not None else {}
@@ -134,6 +157,20 @@ class User(RiakDocument):
         # 查重
         if cls.find_by_ident(ident_number) is not None:
             return NEW_USER_DUP, None
+
+        # 检查显示名称
+        if not isinstance(display_name, six.text_type):
+            return NEW_USER_DISPLAY_NAME, None
+        if len(display_name) > DISPLAY_NAME_MAX_LENGTH:
+            return NEW_USER_DISPLAY_NAME_LENGTH, None
+
+        # 显示名称查重
+        if cls.find_by_display_name(display_name) is not None:
+            return NEW_USER_DISPLAY_NAME_DUP, None
+
+        # 检查显示名称与 KBS 帐户的可能冲突
+        if cls.find_by_alias(display_name) is not None:
+            return NEW_USER_DISPLAY_NAME_DUP, None
 
         # 验证 ident
         ident_result, ident_obj = ident.Ident.new_ident(
@@ -154,6 +191,7 @@ class User(RiakDocument):
         user['alias'] = None
 
         # 其他基本设置
+        user['display_name'] = display_name
         user['ident'] = ident_obj['id']
         user['roles'] = ''
         user['xattr'] = xattr
@@ -175,6 +213,8 @@ def user_dec_v1(data):
     return {
             'password': passwd.Password(alias or '', data['p']),
             'alias': alias,
+            'display_name': data['nd'],
+            'display_name_mtime': data['ndm'],
             'ident': data['i'],
             'roles': set(data['r']),
             'xattr': data['x'],
@@ -188,6 +228,15 @@ def user_enc_v1(user):
     assert 'alias' in user
     if user['alias'] is not None:
         assert isinstance(user['alias'], six.text_type)
+
+    assert 'display_name' in user
+    display_name = user['display_name']
+    assert isinstance(display_name, six.text_type)
+    assert len(display_name) <= DISPLAY_NAME_MAX_LENGTH
+
+    assert 'display_name_mtime' in user
+    assert isinstance(user['display_name_mtime'], six.integer_types)
+
     assert 'ident' in user
     assert isinstance(user['ident'], six.text_type)
     assert 'roles' in user
@@ -198,6 +247,8 @@ def user_enc_v1(user):
     return {
             'p': user['password'].psw_hash,
             'a': user['alias'],
+            'nd': display_name,
+            'ndm': user['display_name_mtime'],
             'i': user['ident'],
             'r': list(user['roles']),
             'x': user['xattr'],
