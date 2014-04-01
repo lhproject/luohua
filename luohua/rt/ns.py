@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 落花 / 实时信道 / 包
+# 落花 / 实时信道 / Socket.IO 命名空间
 #
 # Copyright (C) 2013-2014 JNRain
 #
