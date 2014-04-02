@@ -206,7 +206,7 @@ class RiakDocument(Document):
         '''
 
         obj = self._rawobj if self._rawobj is not None else conn.new()
-        obj.key, obj.data = self.get('id'), self.encode()
+        obj.key, obj.data = smartbytes(self.get('id')), self.encode()
 
         # 如果有的话就同步 2i 索引
         if self.uses_2i:
