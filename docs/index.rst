@@ -16,6 +16,7 @@
     auth/index
     rt
     utils/index
+    admin/index
 
 
 索引页面
