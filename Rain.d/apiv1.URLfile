@@ -13,7 +13,6 @@ account/:
     ^(?P<userid>[^/]+)/:
         ^stat/$ account-stat-v1
         ^fcntl/$ account-fcntl-v1
-        ^unlink/$ account-unlink-v1
 
     # 实名身份相关
     ^ident/:
@@ -30,14 +29,12 @@ vtp/:
                 ^stat/$ vtag-stat-v1
                 ^readdir/(?P<time_start>\d+)/(?P<time_end>\d+)/$ vtag-getdents-v1
                 ^fcntl/$ vtag-fcntl-v1
-                ^unlink/$ vtag-unlink-v1
 
 vth/:
     ^(?P<vthid>[^/]+)/:
         ^stat/$ vthread-stat-v1
         ^readdir/$ vthread-getdents-v1
         ^fcntl/$ vthread-fcntl-v1
-        ^unlink/$ vthread-unlink-v1
 
 vf/:
     ^creat/$ vfile-creat-v1
@@ -45,7 +42,6 @@ vf/:
         ^stat/$ vfile-stat-v1
         ^read/$ vfile-read-v1
         ^fcntl/$ vfile-fcntl-v1
-        ^unlink/$ vfile-unlink-v1
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8 syn=weiyu-urls:

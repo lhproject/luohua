@@ -55,12 +55,6 @@ def account_fcntl_v1_view(request, userid):
 
 @http
 @jsonview
-def account_unlink_v1_view(request, userid):
-    raise NotImplementedError
-
-
-@http
-@jsonview
 @only_methods(['POST', ])
 def ident_query_v1_view(request):
     '''v1 实名信息查询接口.

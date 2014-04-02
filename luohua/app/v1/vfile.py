@@ -357,10 +357,4 @@ def vfile_fcntl_v1_view(request, vfid):
     raise NotImplementedError
 
 
-@http
-@jsonview
-def vfile_unlink_v1_view(request, vfid):
-    raise NotImplementedError
-
-
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
