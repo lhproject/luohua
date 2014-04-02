@@ -1,5 +1,5 @@
 序列生成
---------
+~~~~~~~~
 
 .. automodule:: luohua.utils.sequences
     :members:

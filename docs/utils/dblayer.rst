@@ -1,5 +1,5 @@
 数据库抽象层
-------------
+~~~~~~~~~~~~
 
 .. autoclass:: luohua.utils.dblayer.RiakDocument
     :members:

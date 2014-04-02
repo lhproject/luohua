@@ -1,5 +1,5 @@
 数制转换工具
-------------
+~~~~~~~~~~~~
 
 .. automodule:: luohua.utils.radices
     :members:

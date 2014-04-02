@@ -1,8 +1,8 @@
 不区分版本 API
-==============
+~~~~~~~~~~~~~~
 
 实时信道 API
-------------
+^^^^^^^^^^^^
 
 .. automodule:: luohua.app.rt
     :members:
@@ -10,7 +10,7 @@
 
 
 杂项 API
---------
+^^^^^^^^
 
 .. automodule:: luohua.app.misc
     :members:

@@ -1,5 +1,5 @@
 随机序列发生
-------------
+~~~~~~~~~~~~
 
 .. automodule:: luohua.utils.randomness
     :members:
