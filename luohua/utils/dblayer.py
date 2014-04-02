@@ -190,25 +190,48 @@ class RiakDocument(Document):
 
         return obj
 
+    def save_to_conn(self, conn):
+        '''使用给定的数据库连接保存对象到数据库.
+
+        .. note::
+
+            此方法主要是用于批量操作时减少一些多余的操作 (虽然 Riak
+            的连接是没有状态的, 但仍然会造成大量多余的空函数调用),
+            一般处理少量数据时建议使用 :meth:`.save` 方法以降低代码复杂度.
+
+        :param conn: 欲使用的 Riak 连接.
+        :type conn: :class:`RiakBucket <riak.bucket.RiakBucket>`
+        :return: :const:`None`
+
+        '''
+
+        obj = self._rawobj if self._rawobj is not None else conn.new()
+        obj.key, obj.data = self.get('id'), self.encode()
+
+        # 如果有的话就同步 2i 索引
+        if self.uses_2i:
+            obj = self._do_sync_2i(obj)
+
+        obj.store()
+
+        # 刷新对象关联信息
+        self['id'], self._rawobj = obj.key, obj
+
     def save(self):
         '''保存对象到数据库.
+
+        .. note::
+
+            此方法会请求一条新数据库连接进行工作. 如果需要进行批量数据库操作,
+            建议自行在工作函数内使用 ``with SomeDocument.storage as conn:``
+            获取一条连接, 并配合 :meth:`.save_to_conn` 重复利用该连接.
 
         :return: :const:`None`
 
         '''
 
         with self.storage as conn:
-            obj = self._rawobj if self._rawobj is not None else conn.new()
-            obj.key, obj.data = self.get('id'), self.encode()
-
-            # 如果有的话就同步 2i 索引
-            if self.uses_2i:
-                obj = self._do_sync_2i(obj)
-
-            obj.store()
-
-            # 刷新对象关联信息
-            self['id'], self._rawobj = obj.key, obj
+            return self.save_to_conn(conn)
 
     def purge(self):
         '''从数据库中彻底删除被包装对象.
