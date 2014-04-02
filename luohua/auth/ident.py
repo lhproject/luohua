@@ -74,6 +74,11 @@ IDENT_ACTIVATION_KEY_INDEX = 'ident_ak_bin'
 IDENT_EMAIL_INDEX = 'ident_e_bin'
 IDENT_MOBILE_INDEX = 'ident_m_bin'
 
+FIDENT_STUD_SCHOOL_INDEX = 'fident_ss_bin'
+FIDENT_STUD_MAJOR_INDEX = 'fident_sm_bin'
+FIDENT_STUD_CLASS_INDEX = 'fident_sc_bin'
+FIDENT_STUD_YEAR_INDEX = 'fident_sy_bin'
+
 # 实名记录类型
 IDENT_TYPES = (
         IDENT_TYPE_UNDERGRAD,
@@ -154,6 +159,7 @@ class FrozenIdent(dblayer.RiakDocument):
     '''不可变实名信息.'''
 
     struct_id = IDENT_FROZEN_STRUCT_ID
+    uses_2i = True
 
     def __init__(self, data=None, number=None, rawobj=None):
         super(FrozenIdent, self).__init__(data, number, rawobj)
@@ -174,6 +180,14 @@ class FrozenIdent(dblayer.RiakDocument):
             return CHECK_IDENT_WRONG
 
         return IDENT_OK
+
+    def _do_sync_2i(self, obj):
+        obj.set_index(FIDENT_STUD_SCHOOL_INDEX, self['student_school'])
+        obj.set_index(FIDENT_STUD_MAJOR_INDEX, self['student_major'])
+        obj.set_index(FIDENT_STUD_CLASS_INDEX, self['student_class'])
+        obj.set_index(FIDENT_STUD_YEAR_INDEX, self['student_year'])
+
+        return obj
 
 
 class Ident(dblayer.RiakDocument):
@@ -437,14 +451,27 @@ def ident_enc_v1(ident):
 
 @FrozenIdent.decoder(1)
 def frozen_ident_dec_v1(data):
-    return {
+    typ = data['t']
+    result = {
             # 公共信息
-            'type': data['t'],
+            'type': typ,
+            'name': data['n'],
             'gender': data['g'],
             # 身份信息
             'id_number_type': data['it'],
             'id_number': data['in'],
             }
+
+    if typ in IDENT_TYPES_CURRENT_STUDENT:
+        # 学生信息
+        result.update({
+                'student_school': data['ss'],
+                'student_major': data['sm'],
+                'student_class': data['sc'],
+                'student_year': data['sy'],
+                })
+
+    return result
 
 
 @FrozenIdent.encoder(1)
@@ -453,6 +480,9 @@ def frozen_ident_enc_v1(ident):
     assert 'type' in ident
     typ = ident['type']
     assert typ in IDENT_TYPES
+
+    assert 'name' in ident
+    assert isinstance(ident['name'], six.text_type)
 
     assert 'gender' in ident
     assert ident['gender'] in GENDER_TYPES
@@ -465,6 +495,7 @@ def frozen_ident_enc_v1(ident):
     result = {
             # 公共信息
             't': ident['type'],
+            'n': ident['name'],
             'g': ident['gender'],
             # 身份信息
             'it': ident['id_number_type'],
@@ -478,11 +509,14 @@ def frozen_ident_enc_v1(ident):
         assert isinstance(ident['student_major'], six.text_type)
         assert 'student_class' in ident
         assert isinstance(ident['student_class'], six.integer_types)
+        assert 'student_year' in ident
+        assert isinstance(ident['student_year'], six.integer_types)
 
         result.update({
                 'ss': ident['student_school'],
                 'sm': ident['student_major'],
                 'sc': ident['student_class'],
+                'sy': ident['student_year'],
                 })
 
     return result
