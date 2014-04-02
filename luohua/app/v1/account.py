@@ -25,6 +25,7 @@ from weiyu.utils.decorators import only_methods
 from ...utils.viewhelpers import jsonreply, parse_form
 
 from ...auth import ident
+from ...auth import user
 
 IDENT_CHECK_RETCODE_MAP = {
         ident.IDENT_OK: (True, ident.IDENT_OK, ),
@@ -132,7 +133,11 @@ def ident_query_v1_view(request):
     except ValueError:
         return jsonreply(r=22)
 
-    # 做检查
+    # 检查是否已对应用户
+    if user.User.find_by_ident(number) is not None:
+        return jsonreply(r=17)
+
+    # 核对身份信息
     chkresult = ident.FrozenIdent.check_ident(number, idtype, idnum)
     success, retcode = IDENT_CHECK_RETCODE_MAP[chkresult]
     if not success:
