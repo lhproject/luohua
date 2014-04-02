@@ -63,6 +63,8 @@ __all__ = [
 
 import six
 
+from weiyu.helpers.misc import smartbytes
+
 from ..utils import dblayer
 from ..utils import randomness
 
@@ -70,14 +72,14 @@ IDENT_FROZEN_STRUCT_ID = 'luohua.ident.frozen'
 IDENT_ENTRY_STRUCT_ID = 'luohua.ident.entry'
 
 # 2i 索引
-IDENT_ACTIVATION_KEY_INDEX = 'ident_ak_bin'
-IDENT_EMAIL_INDEX = 'ident_e_bin'
-IDENT_MOBILE_INDEX = 'ident_m_bin'
+IDENT_ACTIVATION_KEY_INDEX = b'ident_ak_bin'
+IDENT_EMAIL_INDEX = b'ident_e_bin'
+IDENT_MOBILE_INDEX = b'ident_m_bin'
 
-FIDENT_STUD_SCHOOL_INDEX = 'fident_ss_bin'
-FIDENT_STUD_MAJOR_INDEX = 'fident_sm_bin'
-FIDENT_STUD_CLASS_INDEX = 'fident_sc_bin'
-FIDENT_STUD_YEAR_INDEX = 'fident_sy_bin'
+FIDENT_STUD_SCHOOL_INDEX = b'fident_ss_bin'
+FIDENT_STUD_MAJOR_INDEX = b'fident_sm_bin'
+FIDENT_STUD_CLASS_INDEX = b'fident_sc_bin'
+FIDENT_STUD_YEAR_INDEX = b'fident_sy_bin'
 
 # 实名记录类型
 IDENT_TYPES = (
@@ -182,10 +184,22 @@ class FrozenIdent(dblayer.RiakDocument):
         return IDENT_OK
 
     def _do_sync_2i(self, obj):
-        obj.set_index(FIDENT_STUD_SCHOOL_INDEX, self['student_school'])
-        obj.set_index(FIDENT_STUD_MAJOR_INDEX, self['student_major'])
-        obj.set_index(FIDENT_STUD_CLASS_INDEX, self['student_class'])
-        obj.set_index(FIDENT_STUD_YEAR_INDEX, self['student_year'])
+        obj.set_index(
+                FIDENT_STUD_SCHOOL_INDEX,
+                smartbytes(self['student_school']),
+                )
+        obj.set_index(
+                FIDENT_STUD_MAJOR_INDEX,
+                smartbytes(self['student_major']),
+                )
+        obj.set_index(
+                FIDENT_STUD_CLASS_INDEX,
+                smartbytes(self['student_class']),
+                )
+        obj.set_index(
+                FIDENT_STUD_YEAR_INDEX,
+                smartbytes(self['student_year']),
+                )
 
         return obj
 
