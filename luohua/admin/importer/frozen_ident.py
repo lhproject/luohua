@@ -25,7 +25,7 @@ from ...auth import ident
 def import_student_frozen_idents(data):
     '''向数据库导入学生的不可变实名信息.
 
-    接受一个包含欲导入记录的列表, 记录格式形如:
+    接受一个包含欲导入记录的列表, 记录格式形如::
 
         {
             'id': '1030567890',  # 学号
