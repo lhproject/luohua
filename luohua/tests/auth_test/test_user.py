@@ -42,28 +42,35 @@ class TestUser(Case):
     def test_find_by_ident(self):
         number1, number2 = '1030512202', '0123456789'
 
-        assert User.find_by_name(number1)['alias'] == 'test2'
-        assert User.find_by_name(number2) is None
+        assert User.find_by_ident(number1)['alias'] == 'test2'
+        assert User.find_by_ident(number2) is None
 
     def test_find_by_alias(self):
         alias1, alias2 = 'test0', 'nonexistent'
 
-        assert User.find_by_name(alias1)['ident'] == '1030513101'
-        assert User.find_by_name(alias2) is None
+        assert User.find_by_alias(alias1)['ident'] == '1030513101'
+        assert User.find_by_alias(alias2) is None
 
-    def test_find_by_name(self):
-        assert User.find_by_name('1030512202')['alias'] == 'test2'
-        assert User.find_by_name('test0')['ident'] == '1030513101'
+    def test_find_by_display_name(self):
+        nd1, nd2 = '-灰 煮 牛-', 'test2'
+
+        assert User.find_by_display_name(nd1)['ident'] == '1030513101'
+        assert User.find_by_display_name(nd2) is None
+
+    def test_find_by_guess(self):
+        assert User.find_by_guess('1030512202')['alias'] == 'test2'
+        assert User.find_by_guess('叫我曹尼玛')['alias'] == 'test2'
+        assert User.find_by_guess('test0')['ident'] == '1030513101'
 
     # 密码验证测试
     def test_chkpasswd(self):
         # new hash
-        test0 = User.find_by_name('test0')
+        test0 = User.find_by_alias('test0')
         assert test0.chkpasswd('testtest')
         assert not test0.chkpasswd('deadf00d')
 
         # KBS hash
-        test2 = User.find_by_name('test2')
+        test2 = User.find_by_alias('test2')
         assert test2.chkpasswd('woshiruomima')
         assert not test2.chkpasswd('th1s-1z_mUCh>S7r0nG3r')
 

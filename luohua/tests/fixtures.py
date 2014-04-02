@@ -19,6 +19,7 @@
 
 from __future__ import unicode_literals, division, print_function
 
+import time
 import six
 
 from weiyu.helpers.misc import smartbytes
@@ -31,6 +32,8 @@ TEST_USERS = {
             '_V': 1,
             'a': 'test0',
             'i': '1030513101',
+            'nd': '-灰 煮 牛-',
+            'ndm': int(time.time()),
             'p': (
                 'lh1$ZcMloWnpTCDoCwXI|f9b2fcb14e85afd8333cc969275f27ab1343e7'
                 '8a414c9c7f52507d5e53436df62f8f16f55fb383a1a9a88971b3f152566'
@@ -43,6 +46,8 @@ TEST_USERS = {
             '_V': 1,
             'a': 'test2',
             'i': '1030512202',
+            'nd': '叫我曹尼玛',
+            'ndm': int(time.time() - 86400 * 32),  # 32 天前注册/改名的情况
             'p': 'kbs$0b84f4bb2b3c572572015dd1050b3232',
             'r': 'user adm',
             'x': {},
@@ -53,10 +58,12 @@ TEST_USERS_2I = {
         '9fabe73980ff48aba62303812aa93765': {
             'user_alias_bin': 'test0',
             'user_ident_bin': '1030513101',
+            'user_nd_bin': '-灰 煮 牛-',
             },
         '0012cdf931a64c01ab97cb26f5f84bf0': {
             'user_alias_bin': 'test2',
             'user_ident_bin': '1030512202',
+            'user_nd_bin': '叫我曹尼玛',
             },
         }
 
@@ -87,22 +94,26 @@ TEST_FROZEN_IDENTS = {
         '1030513101': {
             '_V': 1,
             't': 0,
+            'n': '王尼玛',
             'g': 0,
             'it': 0,
             'in': '12345X',
             'ss': '数字媒体学院',
             'sm': '0305',
             'sc': 1,
+            'sy': 2013,
             },
         '1030512202': {
             '_V': 1,
             't': 0,
+            'n': '曹尼玛',
             'g': 0,
             'it': 0,
             'in': '543210',
             'ss': '数字媒体学院',
             'sm': '0305',
             'sc': 2,
+            'sy': 2012,
             },
         }
 
