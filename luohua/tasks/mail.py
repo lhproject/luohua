@@ -22,12 +22,14 @@ from __future__ import absolute_import, unicode_literals
 import time
 
 from . import celery
-from ..auth import ident
 from ..utils import urls
 
 
 @celery.jsontask
 def send_ident_verify_mail(to_addr, number, html):
+    # auth.ident 引用了这个模块, 所以不能在模块级加载, 会循环依赖的
+    from ..auth import ident
+
     curtime = int(time.time())
 
     # 取激活码
