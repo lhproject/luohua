@@ -1,6 +1,7 @@
 $$include:
   - site.yml
   - lh.celery.example.yml
+  - lh.univ.example.yml
 
 
 # 数据库配置

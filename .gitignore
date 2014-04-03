@@ -52,6 +52,7 @@ Rain.d/config.yml
 
 Rain.d/lh.celery.yml
 Rain.d/lh.mail.yml
+Rain.d/lh.univ.yml
 
 # suggested name of entry point file
 # this may contain modifications to loader parameters
