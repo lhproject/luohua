@@ -1,0 +1,12 @@
+luohua.celery:
+  BROKER_URL: redis://localhost:6379/13
+  CELERY_RESULT_BACKEND: redis://localhost:6379/14
+
+  CELERY_ENABLE_UTC: true
+  CELERY_TIMEZONE: Asia/Shanghai
+
+  $$include:
+    - lh.celery.common.yml
+
+
+# vim:set ai et ts=2 sw=2 sts=2 fenc=utf=8:

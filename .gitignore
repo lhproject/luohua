@@ -50,6 +50,7 @@ conf.yml
 Rainfile.yml
 Rain.d/config.yml
 
+Rain.d/lh.celery.yml
 Rain.d/lh.mail.yml
 
 # suggested name of entry point file
