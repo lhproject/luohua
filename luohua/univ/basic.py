@@ -30,7 +30,7 @@ from . import base
 BASIC_DATA_FILENAME = 'basic.yml'
 
 
-class BasicInfo(object):
+class BasicInfo(base.BaseUnivInfo):
     '''宿舍信息对象.'''
 
     data_filename = BASIC_DATA_FILENAME
