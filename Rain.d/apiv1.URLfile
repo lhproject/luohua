@@ -44,4 +44,10 @@ vf/:
         ^fcntl/$ vfile-fcntl-v1
 
 
+# 大学信息
+univ/:
+    ^basic/$ univ-basic-v1
+    ^dorms/$ univ-dorms-list-v1
+
+
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8 syn=weiyu-urls:
