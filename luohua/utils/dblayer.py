@@ -19,7 +19,7 @@
 
 from __future__ import unicode_literals, division
 
-from weiyu.helpers.misc import smartbytes
+from weiyu.helpers.misc import smartbytes, smartstr
 from weiyu.db.mapper.base import Document
 
 
@@ -215,7 +215,7 @@ class RiakDocument(Document):
         obj.store()
 
         # 刷新对象关联信息
-        self['id'], self._rawobj = obj.key, obj
+        self['id'], self._rawobj = smartstr(obj.key), obj
 
     def save(self):
         '''保存对象到数据库.
