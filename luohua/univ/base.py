@@ -25,7 +25,7 @@ __all__ = [
 
 import yaml
 
-from . import request_univ_data
+from . import request_univ_data, get_default_univ
 
 
 class BaseUnivInfo(object):
@@ -33,13 +33,28 @@ class BaseUnivInfo(object):
 
     data_filename = None
 
-    def __init__(self, univ):
+    def __init__(self, univ=None):
         assert self.data_filename is not None
+
+        self.univ = univ
+        self._data = None
+
+    def _ensure_data(self):
+        if self._data is not None:
+            return
+
+        # 默认大学存放在配置里, 所以不能在 import 阶段访问, 只能按需加载
+        univ = self.univ or get_default_univ()
 
         # NOTE: 与 PyYAML 默认行为不同, 所有字符串都会被加载为 Unicode 类型.
         # 这是因为微雨框架加载配置文件时, 由 YAMLConfig 修改了 yaml 的 loader
         # 配置.
-        self.data = yaml.load(request_univ_data(univ, self.data_filename))
+        self._data = yaml.load(request_univ_data(univ, self.data_filename))
+
+    @property
+    def data(self):
+        self._ensure_data()
+        return self._data
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:

@@ -21,9 +21,10 @@ from __future__ import unicode_literals, division
 
 __all__ = [
         'SUPPORTED_UNIVERSITIES',
-        'DEFAULT_UNIVERSITY',
         'is_supported',
         'request_univ_data',
+        'get_default_univ',
+        'basic_info',
         'dorm_info',
         ]
 
@@ -73,7 +74,7 @@ def request_univ_data(univ, filename):
     return pkg_resources.resource_string(__name__, path)
 
 
-def _get_default_univ():
+def get_default_univ():
     univ_config = registry.request('luohua.univ')
 
     univ = univ_config['university']
@@ -81,14 +82,12 @@ def _get_default_univ():
     return univ
 
 
-DEFAULT_UNIVERSITY = _get_default_univ()
-
 # 用默认大学初始化各个组件
 from . import basic
 from . import dorms
 
-basic_info = basic.BasicInfo(DEFAULT_UNIVERSITY)
-dorm_info = dorms.DormInfo(DEFAULT_UNIVERSITY)
+basic_info = basic.BasicInfo()
+dorm_info = dorms.DormInfo()
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
