@@ -50,6 +50,7 @@ conf.yml
 Rainfile.yml
 Rain.d/config.yml
 
+Rain.d/lh.bridge.yml
 Rain.d/lh.celery.yml
 Rain.d/lh.mail.yml
 Rain.d/lh.univ.yml

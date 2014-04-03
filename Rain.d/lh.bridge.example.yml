@@ -1,0 +1,9 @@
+luohua.bridge:
+  # API 服务器域名, 即为落花所部署在的域名
+  api_domain: api.example.com
+
+  # 前端所在域名
+  frontend_domain: example.com
+
+
+# vim:set ai et ts=2 sw=2 sts=2 fenc=utf=8:
