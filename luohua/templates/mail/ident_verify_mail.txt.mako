@@ -6,7 +6,7 @@
 <%block name="content">
 感谢您注册江南听雨网帐户，请您点击下面的链接或复制到地址栏并转到，以验证注册邮箱：
 
-https://jnrain.com/hehe/12345678abcdef/
+${url}
 </%block>
 
 

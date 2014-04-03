@@ -8,7 +8,7 @@
 
 <%block name="content">
 <%utils:p>感谢您注册江南听雨网帐户，请您点击下面的按钮验证注册邮箱：</%utils:p>
-<%utils:button href="https://jnrain.com/hehe/12345678abcdef/">现在去验证</%utils:button>
+<%utils:button href="${url}">现在去验证</%utils:button>
 </%block>
 
 
