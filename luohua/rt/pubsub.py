@@ -39,26 +39,20 @@ PUBSUB_CHANNEL_PREFIX = '/lh/'
 DATA_MESSAGE_TYPES = frozenset({'message', 'pmessage', })
 
 _PUBSUB_CLIENT_CACHE = []
-_PUBLISH_CONNECTION = []
 
 
-def _get_pubsub():
+def _get_pubsub_client():
     if _PUBSUB_CLIENT_CACHE:
-        return _PUBSUB_CLIENT_CACHE[0].pubsub()
+        return _PUBSUB_CLIENT_CACHE[0]
 
     storage = db_hub.get_storage(PUBSUB_STORAGE_ID)
     client = storage.raw()
     _PUBSUB_CLIENT_CACHE.append(client)
-    return client.pubsub()
+    return client
 
 
-def _get_publish_connection():
-    if _PUBLISH_CONNECTION:
-        return _PUBLISH_CONNECTION[0]
-
-    pubsub = _get_pubsub()
-    _PUBLISH_CONNECTION.append(pubsub)
-    return pubsub
+def _get_pubsub():
+    return _get_pubsub_client().pubsub()
 
 
 def publish_json(channel, data):
@@ -78,7 +72,7 @@ def publish_json(channel, data):
     '''
 
     channel_name = PUBSUB_CHANNEL_PREFIX + channel
-    return _get_publish_connection().publish(channel_name, json.dumps(data))
+    return _get_pubsub_client().publish(channel_name, json.dumps(data))
 
 
 def publish_event(channel, typ, **kwargs):
