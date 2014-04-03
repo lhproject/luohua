@@ -32,29 +32,39 @@ class TestURLs(Case):
     def setup_class(cls):
         cls._old_bridge_cfg = registry._registries['luohua.bridge']
         registry._registries['luohua.bridge'] = {
-                'api_domain': 'api.example.com',
-                'frontend_domain': 'example.com',
+                'api': {
+                    'domain': 'api.example.com',
+                    'https': True,
+                    },
+                'frontend': {
+                    'domain': 'example.com',
+                    'https': False,
+                    },
                 }
 
     @classmethod
     def teardown_class(cls):
         registry._registries['luohua.bridge'] = cls._old_bridge_cfg
 
-    def test_get_api_domain(self):
-        assert urls.get_api_domain() == 'api.example.com'
+    def test_get_api_info(self):
+        info = urls.get_api_info()
+        assert info == {'domain': 'api.example.com', 'https': True, }
 
     def test_get_frontend_domain(self):
-        assert urls.get_frontend_domain() == 'example.com'
+        info = urls.get_frontend_info()
+        assert info == {'domain': 'example.com', 'https': False, }
 
-    def test_get_https_url(self):
-        url1 = urls.get_https_url('abc.com', 'a/b', '', '')
-        url2 = urls.get_https_url('abc.com', '/a/b', '', '')
-        url3 = urls.get_https_url('abc.com', 'a/b/', '', '')
-        url4 = urls.get_https_url('abc.com', 'a/b/', 'abc=123', '')
-        url5 = urls.get_https_url('abc.com', 'a/b/', '', '!/foo')
-        url6 = urls.get_https_url('abc.com', 'a/b/', 'abc=123', '!/foo')
+    def test_get_url(self):
+        url1 = urls.get_url('abc.com', 'a/b', '', '')
+        url1b = urls.get_url('abc.com', 'a/b', '', '', https=False)
+        url2 = urls.get_url('abc.com', '/a/b', '', '')
+        url3 = urls.get_url('abc.com', 'a/b/', '', '')
+        url4 = urls.get_url('abc.com', 'a/b/', 'abc=123', '')
+        url5 = urls.get_url('abc.com', 'a/b/', '', '!/foo')
+        url6 = urls.get_url('abc.com', 'a/b/', 'abc=123', '!/foo')
 
         assert url1 == 'https://abc.com/a/b'
+        assert url1b == 'http://abc.com/a/b'
         assert url2 == 'https://abc.com/a/b'
         assert url3 == 'https://abc.com/a/b/'
         assert url4 == 'https://abc.com/a/b/?abc=123'
@@ -67,9 +77,9 @@ class TestURLs(Case):
         assert urls.get_api_url('a/b/') == 'https://api.example.com/a/b/'
 
     def test_get_frontend_url(self):
-        assert urls.get_frontend_url('a/b') == 'https://example.com/a/b'
-        assert urls.get_frontend_url('/a/b') == 'https://example.com/a/b'
-        assert urls.get_frontend_url('a/b/') == 'https://example.com/a/b/'
+        assert urls.get_frontend_url('a/b') == 'http://example.com/a/b'
+        assert urls.get_frontend_url('/a/b') == 'http://example.com/a/b'
+        assert urls.get_frontend_url('a/b/') == 'http://example.com/a/b/'
 
     def test_reverse_api_url(self):
         url1 = urls.reverse_api_url('api:session-ping-v1')

@@ -20,9 +20,9 @@
 from __future__ import unicode_literals, division
 
 __all__ = [
-        'get_api_domain',
-        'get_frontend_domain',
-        'get_https_url',
+        'get_api_info',
+        'get_frontend_info',
+        'get_url',
         'get_api_url',
         'get_frontend_url',
         'reverse_api_url',
@@ -37,24 +37,32 @@ from weiyu.shortcuts import reverse_http
 BRIDGE_CONF_REGISTRY = 'luohua.bridge'
 
 
-def get_api_domain():
-    return registry.request(BRIDGE_CONF_REGISTRY)['api_domain']
+def get_api_info():
+    return registry.request(BRIDGE_CONF_REGISTRY)['api']
 
 
-def get_frontend_domain():
-    return registry.request(BRIDGE_CONF_REGISTRY)['frontend_domain']
+def get_frontend_info():
+    return registry.request(BRIDGE_CONF_REGISTRY)['frontend']
 
 
-def get_https_url(netloc, path, query, fragment):
-    return urlparse.urlunsplit(('https', netloc, path, query, fragment, ))
+def get_url(netloc, path, query, fragment, https=True):
+    return urlparse.urlunsplit((
+            'https' if https else 'http',
+            netloc,
+            path,
+            query,
+            fragment,
+            ))
 
 
 def get_api_url(path):
-    return get_https_url(get_api_domain(), path, '', '')
+    info = get_api_info()
+    return get_url(info['domain'], path, '', '', info['https'])
 
 
 def get_frontend_url(path):
-    return get_https_url(get_frontend_domain(), path, '', '')
+    info = get_frontend_info()
+    return get_url(info['domain'], path, '', '', info['https'])
 
 
 def reverse_api_url(endpoint, **kwargs):
