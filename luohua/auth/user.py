@@ -162,6 +162,7 @@ class User(dblayer.RiakDocument):
             ident_id_number,
             ident_info,
             display_name,
+            send_html_mail,
             xattr=None,
             ):
         xattr = xattr if xattr is not None else {}
@@ -191,6 +192,7 @@ class User(dblayer.RiakDocument):
                 ident_id_type,
                 ident_id_number,
                 ident_info,
+                send_html_mail,
                 )
         if ident_result != ident.IDENT_OK:
             return ident_result, None

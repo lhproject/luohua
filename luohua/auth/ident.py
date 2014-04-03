@@ -71,6 +71,7 @@ from .. import univ
 from ..utils import dblayer
 from ..utils import randomness
 from ..mail.template import MakoMailTemplate
+from ..tasks import mail
 
 IDENT_FROZEN_STRUCT_ID = 'luohua.ident.frozen'
 IDENT_ENTRY_STRUCT_ID = 'luohua.ident.entry'
@@ -315,7 +316,7 @@ class Ident(dblayer.RiakDocument):
         return obj
 
     @classmethod
-    def new_ident(cls, typ, number, id_type, id_number, info):
+    def new_ident(cls, typ, number, id_type, id_number, info, send_html_mail):
         if typ not in IDENT_TYPES:
             return NEW_IDENT_INVALID_TYPE, None
 
@@ -382,6 +383,13 @@ class Ident(dblayer.RiakDocument):
 
         obj.update(info)
         obj.save()
+
+        # 发送验证注册邮箱的邮件
+        mail.send_ident_verify_mail.delay(
+                email,
+                number,
+                send_html_mail,
+                )
 
         return IDENT_OK, obj
 
