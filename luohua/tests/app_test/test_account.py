@@ -43,5 +43,8 @@ class TestAccountViews(Case):
         assert 'account-creat-v1' in http_views
         assert 'account-fcntl-v1' in http_views
 
+        assert 'ident-query-v1' in http_views
+        assert 'ident-activate-v1' in http_views
+
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
