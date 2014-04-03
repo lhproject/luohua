@@ -20,8 +20,11 @@
 from __future__ import unicode_literals, division
 
 import six
+import time
 
+from weiyu.helpers.misc import smartbytes
 from ..utils import dblayer
+from ..utils import sequences
 from ..rt import pubsub
 
 from . import passwd
@@ -30,9 +33,9 @@ from . import role
 
 USER_STRUCT_ID = 'luohua.user'
 
-USER_ALIAS_IDX = 'user_alias_bin'
-USER_IDENT_IDX = 'user_ident_bin'
-USER_DISPLAY_NAME_IDX = 'user_nd_bin'
+USER_ALIAS_IDX = b'user_alias_bin'
+USER_IDENT_IDX = b'user_ident_bin'
+USER_DISPLAY_NAME_IDX = b'user_nd_bin'
 
 # 注册用户返回值
 (
@@ -144,11 +147,11 @@ class User(dblayer.RiakDocument):
         return ident_obj
 
     def _do_sync_2i(self, obj):
-        obj.set_index(USER_IDENT_IDX, self['ident'])
-        obj.set_index(USER_DISPLAY_NAME_IDX, self['display_name'])
+        obj.set_index(USER_IDENT_IDX, smartbytes(self['ident']))
+        obj.set_index(USER_DISPLAY_NAME_IDX, smartbytes(self['display_name']))
 
         if 'alias' in self:
-            obj.set_index(USER_ALIAS_IDX, self['alias'])
+            obj.set_index(USER_ALIAS_IDX, smartbytes(self['alias']))
 
         return obj
 
@@ -198,18 +201,21 @@ class User(dblayer.RiakDocument):
             return ident_result, None
 
         user = cls()
+        user['id'] = sequences.time_ascending_suffixed()
 
         # 新用户不会有 KBS 用户名
         # TODO: 检查弱密码
-        user['password'] = passwd.Password('', password)
+        user['password'] = passwd.new_password(password)
         user['alias'] = None
 
         # 其他基本设置
         user['display_name'] = display_name
+        user['display_name_mtime'] = int(time.time())
         user['ident'] = ident_obj['id']
         user['roles'] = set()
         user['xattr'] = xattr
 
+        print user
         user.save()
 
         # 发送一条实时信息
@@ -228,7 +234,7 @@ def user_dec_v1(data):
     # 才有 KBS 格式的 hash, 所以这里对没有设置别名的用户传入空字符串是完全
     # 没有问题的
     return {
-            'password': passwd.Password(alias or '', data['p']),
+            'password': passwd.Password('', data['p']),
             'alias': alias,
             'display_name': data['nd'],
             'display_name_mtime': data['ndm'],

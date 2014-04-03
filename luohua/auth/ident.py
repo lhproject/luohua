@@ -71,7 +71,6 @@ from .. import univ
 from ..utils import dblayer
 from ..utils import randomness
 from ..mail.template import MakoMailTemplate
-from ..tasks import mail
 
 IDENT_FROZEN_STRUCT_ID = 'luohua.ident.frozen'
 IDENT_ENTRY_STRUCT_ID = 'luohua.ident.entry'
@@ -317,6 +316,9 @@ class Ident(dblayer.RiakDocument):
 
     @classmethod
     def new_ident(cls, typ, number, id_type, id_number, info, send_html_mail):
+        # 打破循环依赖...
+        from ..tasks import mail
+
         if typ not in IDENT_TYPES:
             return NEW_IDENT_INVALID_TYPE, None
 
@@ -374,9 +376,12 @@ class Ident(dblayer.RiakDocument):
 
         # 类型特异信息
         if typ in IDENT_TYPES_CURRENT_STUDENT:
-            chkstud_ret = _validate_info_pack_student(info)
+            chkstud_ret = _validate_info_pack_student(args)
             if chkstud_ret != IDENT_OK:
                 return chkstud_ret, None
+
+            obj['student_dorm_building'] = args['student_dorm_building']
+            obj['student_dorm_room'] = args['student_dorm_room']
         else:
             # TODO: 其他类型信息验证
             return NEW_IDENT_TYPE_NOT_IMPL, None
@@ -385,7 +390,7 @@ class Ident(dblayer.RiakDocument):
         obj.save()
 
         # 发送验证注册邮箱的邮件
-        mail.send_ident_verify_mail.delay(
+        mail.send_ident_verify_mail_mail.delay(
                 email,
                 number,
                 send_html_mail,
@@ -459,7 +464,7 @@ def ident_enc_v1(ident):
     if typ in IDENT_TYPES_STUDENT:
         # 学生专用字段
         assert 'student_dorm_building' in ident
-        assert isinstance(ident['student_dorm_building'], six.text_type)
+        assert isinstance(ident['student_dorm_building'], six.integer_types)
         assert 'student_dorm_room' in ident
         assert isinstance(ident['student_dorm_room'], six.text_type)
         assert ident['student_dorm_room'].isdigit()
@@ -575,8 +580,8 @@ def frozen_ident_enc_v1(ident):
 
 # 邮件模板
 class IdentVerifyMailMailTemplate(MakoMailTemplate):
-    text_template_path = 'mail/user_verify_mail.txt.mako'
-    html_template_path = 'mail/user_verify_mail.html.mako'
+    text_template_path = 'mail/ident_verify_mail.txt.mako'
+    html_template_path = 'mail/ident_verify_mail.html.mako'
 
     def get_subject(self):
         return '验证您的注册邮箱'
