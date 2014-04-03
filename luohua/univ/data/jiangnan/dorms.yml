@@ -5,35 +5,35 @@
 # 梅园
 1:
   campus: 北区
-  bldg: 梅园
+  group: 梅园
   gender: 2
   ip:
     - 172.17.0.0/21
 
 2:
   campus: 北区
-  bldg: 梅园
+  group: 梅园
   gender: 2
   ip:
     - 172.17.8.0/21
 
 3:
   campus: 北区
-  bldg: 梅园
+  group: 梅园
   gender: 2
   ip:
     - 172.17.16.0/21
 
 4:
   campus: 北区
-  bldg: 梅园
+  group: 梅园
   gender: 2
   ip:
     - 172.17.24.0/21
 
 5:
   campus: 北区
-  bldg: 梅园
+  group: 梅园
   gender: 2
   ip:
     - 172.17.32.0/21
@@ -42,42 +42,42 @@
 # 桂园
 6:
   campus: 北区
-  bldg: 桂园
+  group: 桂园
   gender: 1
   ip:
     - 172.17.40.0/21
 
 7:
   campus: 北区
-  bldg: 桂园
+  group: 桂园
   gender: 1
   ip:
     - 172.17.48.0/21
 
 8:
   campus: 北区
-  bldg: 桂园
+  group: 桂园
   gender: 1
   ip:
     - 172.17.56.0/21
 
 9:
   campus: 北区
-  bldg: 桂园
+  group: 桂园
   gender: 1
   ip:
     - 172.17.64.0/21
 
 10:
   campus: 北区
-  bldg: 桂园
+  group: 桂园
   gender: 1
   ip:
     - 172.17.72.0/21
 
 11:
   campus: 北区
-  bldg: 桂园
+  group: 桂园
   gender: 1
   ip:
     - 172.17.80.0/21
@@ -86,42 +86,42 @@
 # 榴园
 12:
   campus: 北区
-  bldg: 榴园
+  group: 榴园
   gender: 1
   ip:
     - 172.17.88.0/21
 
 13:
   campus: 北区
-  bldg: 榴园
+  group: 榴园
   gender: 1
   ip:
     - 172.17.96.0/21
 
 14:
   campus: 北区
-  bldg: 榴园
+  group: 榴园
   gender: 1
   ip:
     - 172.17.104.0/21
 
 15:
   campus: 北区
-  bldg: 榴园
+  group: 榴园
   gender: 1
   ip:
     - 172.17.112.0/21
 
 16:
   campus: 北区
-  bldg: 榴园
+  group: 榴园
   gender: 1
   ip:
     - 172.17.120.0/21
 
 17:
   campus: 北区
-  bldg: 榴园
+  group: 榴园
   gender: 1
   ip:
     - 172.17.128.0/21
@@ -130,28 +130,28 @@
 # 桃园
 18:
   campus: 北区
-  bldg: 桃园
+  group: 桃园
   gender: 2
   ip:
     - 172.17.136.0/21
 
 19:
   campus: 北区
-  bldg: 桃园
+  group: 桃园
   gender: 2
   ip:
     - 172.17.144.0/21
 
 20:
   campus: 北区
-  bldg: 桃园
+  group: 桃园
   gender: 2
   ip:
     - 172.17.152.0/21
 
 21:
   campus: 北区
-  bldg: 桃园
+  group: 桃园
   gender: 2
   ip:
     - 172.17.160.0/21
@@ -160,28 +160,28 @@
 # 李园
 22:
   campus: 北区
-  bldg: 李园
+  group: 李园
   gender: 2
   ip:
     - 172.17.168.0/21
 
 23:
   campus: 北区
-  bldg: 李园
+  group: 李园
   gender: 2
   ip:
     - 172.17.176.0/21
 
 24:
   campus: 北区
-  bldg: 李园
+  group: 李园
   gender: 2
   ip:
     - 172.17.184.0/21
 
 25:
   campus: 北区
-  bldg: 李园
+  group: 李园
   gender: 2
   ip:
     - 172.17.192.0/21
@@ -190,21 +190,21 @@
 # 杏园
 26:
   campus: 北区
-  bldg: 杏园
+  group: 杏园
   gender: 1
   ip:
     - 172.17.200.0/21
 
 27:
   campus: 北区
-  bldg: 杏园
+  group: 杏园
   gender: 1
   ip:
     - 172.17.208.0/21
 
 28:
   campus: 北区
-  bldg: 杏园
+  group: 杏园
   gender: 1
   ip:
     - 172.17.216.0/22  # 172.17.216.0 - 172.17.219.0
@@ -212,7 +212,7 @@
 
 29:
   campus: 北区
-  bldg: 杏园
+  group: 杏园
   gender: 1
   ip:
     - 172.17.222.0/23  # 172.17.222.0 - 172.17.223.0
@@ -224,35 +224,35 @@
 # 浩苑
 60:
   campus: 南区
-  bldg: 浩苑
+  group: 浩苑
   gender: 1
   ip:
     - 172.20.0.0/21
 
 61:
   campus: 南区
-  bldg: 浩苑
+  group: 浩苑
   gender: 1
   ip:
     - 172.20.8.0/21
 
 62:
   campus: 南区
-  bldg: 浩苑
+  group: 浩苑
   gender: 1
   ip:
     - 172.20.16.0/21
 
 63:
   campus: 南区
-  bldg: 浩苑
+  group: 浩苑
   gender: 1
   ip:
     - 172.20.24.0/21
 
 64:
   campus: 南区
-  bldg: 浩苑
+  group: 浩苑
   gender: 1
   ip:
     - 172.20.32.0/21
@@ -261,56 +261,56 @@
 # 润苑
 65:
   campus: 南区
-  bldg: 润苑
+  group: 润苑
   gender: 0
   ip:
     - 172.20.40.0/21
 
 66:
   campus: 南区
-  bldg: 润苑
+  group: 润苑
   gender: 0
   ip:
     - 172.20.48.0/21
 
 67:
   campus: 南区
-  bldg: 润苑
+  group: 润苑
   gender: 0
   ip:
     - 172.20.56.0/21
 
 68:
   campus: 南区
-  bldg: 润苑
+  group: 润苑
   gender: 0
   ip:
     - 172.20.64.0/21
 
 69:
   campus: 南区
-  bldg: 润苑
+  group: 润苑
   gender: 0
   ip:
     - 172.20.72.0/21
 
 70:
   campus: 南区
-  bldg: 润苑
+  group: 润苑
   gender: 0
   ip:
     - 172.20.80.0/21
 
 71:
   campus: 南区
-  bldg: 润苑
+  group: 润苑
   gender: 0
   ip:
     - 172.20.88.0/21
 
 72:
   campus: 南区
-  bldg: 润苑
+  group: 润苑
   gender: 0
   ip:
     - 172.20.96.0/21
@@ -319,28 +319,28 @@
 # 澈苑
 73:
   campus: 南区
-  bldg: 澈苑
+  group: 澈苑
   gender: 1
   ip:
     - 172.20.104.0/21
 
 74:
   campus: 南区
-  bldg: 澈苑
+  group: 澈苑
   gender: 1
   ip:
     - 172.20.112.0/21
 
 75:
   campus: 南区
-  bldg: 澈苑
+  group: 澈苑
   gender: 1
   ip:
     - 172.20.120.0/21
 
 76:
   campus: 南区
-  bldg: 澈苑
+  group: 澈苑
   gender: 1
   ip:
     - 172.20.128.0/21
@@ -349,28 +349,28 @@
 # 清苑
 77:
   campus: 南区
-  bldg: 清苑
+  group: 清苑
   gender: 2
   ip:
     - 172.20.136.0/21
 
 78:
   campus: 南区
-  bldg: 清苑
+  group: 清苑
   gender: 2
   ip:
     - 172.20.144.0/21
 
 79:
   campus: 南区
-  bldg: 清苑
+  group: 清苑
   gender: 2
   ip:
     - 172.20.152.0/21
 
 80:
   campus: 南区
-  bldg: 清苑
+  group: 清苑
   gender: 2
   ip:
     - 172.20.160.0/21
@@ -379,28 +379,28 @@
 # 涓苑
 81:
   campus: 南区
-  bldg: 涓苑
+  group: 涓苑
   gender: 1
   ip:
     - 172.20.168.0/21
 
 82:
   campus: 南区
-  bldg: 涓苑
+  group: 涓苑
   gender: 1
   ip:
     - 172.20.176.0/21
 
 83:
   campus: 南区
-  bldg: 涓苑
+  group: 涓苑
   gender: 1
   ip:
     - 172.20.184.0/21
 
 84:
   campus: 南区
-  bldg: 涓苑
+  group: 涓苑
   gender: 1
   ip:
     - 172.20.192.0/21
