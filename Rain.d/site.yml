@@ -30,6 +30,7 @@ site:
       - .v1.vtag
       - .v1.vthread
       - .v1.vfile
+      - .v1.univ
 
       # 杂项 API
       - .misc
