@@ -158,4 +158,11 @@ def ident_query_v1_view(request):
     return jsonreply(**result)
 
 
+@http
+@jsonview
+@only_methods(['GET', ])
+def ident_activate_v1_view(request, activation_key):
+    raise NotImplementedError
+
+
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
