@@ -1,0 +1,214 @@
+0102:
+  name: 食品质量与安全
+  school: 食品学院
+
+0103:
+  name: 食品科学与工程
+  school: 食品学院
+
+0203:
+  name: 生物工程
+  school: 生物工程学院
+
+0205:
+  name: 生物技术
+  school: 生物工程学院
+
+0206:
+  name: 酿酒工程
+  school: 生物工程学院
+
+0304:
+  name: 计算机科学与技术
+  school: 物联网工程学院
+
+0305:
+  name: 数字媒体技术
+  school: 数字媒体学院
+
+0306:
+  name: 物联网工程
+  school: 物联网工程学院
+
+0308:
+  name: 微电子科学与工程
+  school: 物联网工程学院
+
+0402:
+  name: 过程装备与控制工程
+  school: 机械工程学院
+
+0403:
+  name: 包装工程
+  school: 机械工程学院
+
+0405:
+  name: 机械工程
+  school: 机械工程学院
+
+0501:
+  name: 应用化学
+  school: 化学与材料工程学院
+
+0502:
+  name: 高分子材料与工程
+  school: 化学与材料工程学院
+
+0503:
+  name: 化学工程与工艺
+  school: 化学与材料工程学院
+
+0601:
+  name: 工业设计
+  school: 设计学院
+
+0607:
+  name: 建筑学
+  school: 设计学院
+
+0609:
+  name: 动画
+  school: 数字媒体学院
+
+0610:
+  name: 美术学（师范）
+  school: 设计学院
+
+0612:
+  name: 艺术设计（创新）
+  school: 设计学院
+
+0613:
+  name: 视觉传达设计
+  school: 设计学院
+
+0614:
+  name: 环境设计
+  school: 设计学院
+
+0615:
+  name: 产品设计
+  school: 设计学院
+
+0701:
+  name: 电气工程及其自动化
+  school: 物联网工程学院
+
+0702:
+  name: 通信工程
+  school: 物联网工程学院
+
+0703:
+  name: 电子信息工程
+  school: 物联网工程学院
+
+0704:
+  name: 自动化
+  school: 物联网工程学院
+
+0801:
+  name: 会计学
+  school: 商学院
+
+0802:
+  name: 工商管理
+  school: 商学院
+
+0805:
+  name: 工业工程
+  school: 商学院
+
+0806:
+  name: 国际经济与贸易
+  school: 商学院
+
+0807:
+  name: 金融学
+  school: 商学院
+
+0901:
+  name: 纺织工程
+  school: 纺织服装学院
+
+0902:
+  name: 轻化工程
+  school: 纺织服装学院
+
+0903:
+  name: 服装设计与工程（工）
+  school: 纺织服装学院
+
+0907:
+  name: 服装与服饰设计
+  school: 纺织服装学院
+
+0908:
+  name: 服装与服饰设计（时装表演）
+  school: 纺织服装学院
+
+1001:
+  name: 土木工程
+  school: 环境与土木工程学院
+
+1002:
+  name: 工程管理
+  school: 环境与土木工程学院
+
+1003:
+  name: 环境工程
+  school: 环境与土木工程学院
+
+1102:
+  name: 社会工作
+  school: 法学院
+
+1103:
+  name: 法学
+  school: 法学院
+
+1201:
+  name: 英语
+  school: 外国语学院
+
+1203:
+  name: 日语
+  school: 外国语学院
+
+1301:
+  name: 信息与计算科学
+  school: 理学院
+
+1305:
+  name: 光电信息科学与工程
+  school: 理学院
+
+1501:
+  name: 汉语言文学
+  school: 人文学院
+
+1504:
+  name: 教育技术学（师范）
+  school: 人文学院
+
+1506:
+  name: 音乐学（师范）
+  school: 人文学院
+
+1507:
+  name: 舞蹈编导
+  school: 人文学院
+
+1508:
+  name: 小学教育（师范）
+  school: 人文学院
+
+1601:
+  name: 护理学
+  school: 医学院
+
+1602:
+  name: 制药工程
+  school: 药学院
+
+
+# vim:set ai et ts=2 sw=2 sts=2 fenc=utf-8:
