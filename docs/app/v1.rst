@@ -1,6 +1,14 @@
 API 版本 1
 ~~~~~~~~~~
 
+帐号 API
+^^^^^^^^
+
+.. automodule:: luohua.app.v1.account
+    :members:
+    :private-members:
+
+
 会话管理 API
 ^^^^^^^^^^^^
 
@@ -37,6 +45,14 @@ API 版本 1
 ^^^^^^^^^^
 
 .. automodule:: luohua.app.v1.vfile
+    :members:
+    :private-members:
+
+
+大学信息 API
+^^^^^^^^^^^^
+
+.. automodule:: luohua.app.v1.univ
     :members:
     :private-members:
 
