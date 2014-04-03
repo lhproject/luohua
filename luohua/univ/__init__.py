@@ -31,8 +31,6 @@ import pkg_resources
 
 from weiyu import registry
 
-from . import dorms
-
 
 def _discover_univs():
     maybe_univ_dirs = pkg_resources.resource_listdir(__name__, 'data')
@@ -86,6 +84,10 @@ def _get_default_univ():
 DEFAULT_UNIVERSITY = _get_default_univ()
 
 # 用默认大学初始化各个组件
+from . import basic
+from . import dorms
+
+basic_info = basic.BasicInfo(DEFAULT_UNIVERSITY)
 dorm_info = dorms.DormInfo(DEFAULT_UNIVERSITY)
 
 
