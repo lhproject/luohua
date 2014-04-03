@@ -19,5 +19,74 @@
 
 from __future__ import unicode_literals, division
 
+__all__ = [
+        'SUPPORTED_UNIVERSITIES',
+        'DEFAULT_UNIVERSITY',
+        'is_supported',
+        'request_univ_data',
+        'dorm_info',
+        ]
+
+import pkg_resources
+
+from weiyu import registry
+
+from . import dorms
+
+
+def _discover_univs():
+    maybe_univ_dirs = pkg_resources.resource_listdir(__name__, 'data')
+
+    # 这里直接拼路径也许会有安全问题, 但是只有在 d 取到类似
+    # '../../../../../etc' 的值的时候才会出现, 那么这种情况应该就不可能了
+    univ_dirs = [
+            d
+            for d in maybe_univ_dirs
+            if pkg_resources.resource_isdir(__name__, 'data/' + d)
+            ]
+
+    return frozenset(univ_dirs)
+
+
+SUPPORTED_UNIVERSITIES = _discover_univs()
+
+
+def is_supported(univ):
+    '''返回给定的大学是否被支持.'''
+
+    return univ in SUPPORTED_UNIVERSITIES
+
+
+def _check_univ_support(univ):
+    if not is_supported(univ):
+        raise RuntimeError('university not supported: {0}'.format(univ))
+
+
+def request_univ_data(univ, filename):
+    '''请求给定大学数据目录中的文件内容.'''
+
+    _check_univ_support(univ)
+
+    # 安全检查
+    if '/' in filename:
+        raise ValueError('slash char in path: {0}'.format(filename))
+
+    path = 'data/{0}/{1}'.format(univ, filename)
+    return pkg_resources.resource_string(__name__, path)
+
+
+def _get_default_univ():
+    univ_config = registry.request('luohua.univ')
+
+    univ = univ_config['university']
+    _check_univ_support(univ)
+    return univ
+
+
+DEFAULT_UNIVERSITY = _get_default_univ()
+
+# 用默认大学初始化各个组件
+dorm_info = dorms.DormInfo(DEFAULT_UNIVERSITY)
+
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
