@@ -65,6 +65,7 @@ import six
 
 from weiyu.helpers.misc import smartbytes
 
+from .. import univ
 from ..utils import dblayer
 from ..utils import randomness
 
@@ -121,9 +122,10 @@ ID_NUMBER_TYPES = frozenset(ID_NUMBER_TYPES)
         NEW_IDENT_EMAIL_DUP,
         NEW_IDENT_MOBILE,
         NEW_IDENT_MOBILE_DUP,
+        NEW_IDENT_STUDENT_INFO,
         NEW_IDENT_STUDENT_DORM_BLDG,
         NEW_IDENT_STUDENT_DORM_ROOM,
-        ) = six.moves.range(13)
+        ) = six.moves.range(14)
 
 # 激活 key 相关常量
 ACTIVATION_KEY_LENGTH = 32
@@ -146,11 +148,35 @@ def validate_id_number(id_number_type, id_number):
 
 
 def _validate_info_pack_student(info):
+    tmp = info.copy()
+
     # 字段存在性
-    if 'student_dorm_building' not in info:
+    try:
+        building = tmp.pop('student_dorm_building')
+    except KeyError:
         return NEW_IDENT_STUDENT_DORM_BLDG
 
-    if 'student_dorm_room' not in info:
+    try:
+        room = tmp.pop('student_dorm_room')
+    except KeyError:
+        return NEW_IDENT_STUDENT_DORM_ROOM
+
+    # 多余字段
+    if tmp:
+        return NEW_IDENT_STUDENT_INFO
+
+    # 楼号存在性
+    try:
+        univ.dorm_info.query_building(building)
+    except KeyError:
+        return NEW_IDENT_STUDENT_DORM_BLDG
+
+    # 房间号格式
+    # TODO: 仅适用江南大学, 应该随各大学不同而有不同的判断
+    if not isinstance(room, six.text_type):
+        return NEW_IDENT_STUDENT_DORM_ROOM
+
+    if len(room) != 3 or not room.isdigit():
         return NEW_IDENT_STUDENT_DORM_ROOM
 
     # TODO: 真正的寝室信息验证
