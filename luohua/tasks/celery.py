@@ -28,15 +28,15 @@ import os
 
 from celery import Celery
 
-from weiyu.init import boot
-from weiyu.registry.provider import request as regrequest
+from weiyu import init
+from weiyu import registry
 
 # 走到项目根目录, 初始化微雨框架
 # 因为微雨框架已经有了针对多次初始化的保护措施, 所以在应用服务器的组件里导入
 # Celery 任务也不会出问题.
 project_root = os.path.join(os.path.dirname(__file__),  '../..')
 os.chdir(project_root)
-boot()
+init.boot()
 
 
 class ConfigPlaceholder(object):
@@ -44,7 +44,8 @@ class ConfigPlaceholder(object):
 
 
 def _read_config():
-    task_reg, config_obj = regrequest('luohua.celery'), ConfigPlaceholder()
+    task_reg = registry.request('luohua.celery')
+    config_obj = ConfigPlaceholder()
     for k, v in task_reg.items():
         setattr(config_obj, k, v)
 

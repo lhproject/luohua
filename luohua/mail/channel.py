@@ -25,7 +25,7 @@ __all__ = [
 
 import envelopes
 
-from weiyu.registry.provider import request as regrequest
+from weiyu import registry
 
 from . import transport
 
@@ -83,7 +83,7 @@ class MailChannelManager(object):
             return
 
         # 取邮件通道配置
-        reg = self._reg = regrequest('luohua.mail')
+        reg = self._reg = registry.request('luohua.mail')
         channels_cfg = self._channels_cfg = reg['channels']
         channels = self._channels = {}
 

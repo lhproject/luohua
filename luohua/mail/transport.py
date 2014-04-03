@@ -25,7 +25,7 @@ __all__ = [
 
 import envelopes
 
-from weiyu.registry.provider import request as regrequest
+from weiyu import registry
 
 
 class MailTransport(object):
@@ -56,7 +56,7 @@ class MailTransportManager(object):
             return
 
         # 取邮件服务器配置
-        reg = self._reg = regrequest('luohua.mail')
+        reg = self._reg = registry.request('luohua.mail')
         servers = self._servers = reg['servers']
         transports = self._transports = {}
 
