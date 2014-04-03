@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 落花 / 大学信息 / 宿舍信息
+# 落花 / 大学信息 / 基类
 #
 # Copyright (C) 2013-2014 JNRain
 #
@@ -20,30 +20,26 @@
 from __future__ import unicode_literals, division
 
 __all__ = [
-        'DormInfo',
+        'BaseUnivInfo',
         ]
 
 import yaml
 
-from . import base
-
-DORMS_DATA_FILENAME = 'dorms.yml'
+from . import request_univ_data
 
 
-class DormInfo(base.BaseUnivInfo):
-    '''宿舍信息对象.'''
+class BaseUnivInfo(object):
+    '''大学信息对象基类.'''
 
-    data_filename = DORMS_DATA_FILENAME
+    data_filename = None
 
-    def query_building(self, bldg):
-        '''查询某一号楼的信息.'''
+    def __init__(self, univ):
+        assert self.data_filename is not None
 
-        return self.data[bldg]
-
-    def ip_to_building(self, address):
-        '''根据 IP 查询对应宿舍楼信息.'''
-
-        raise NotImplementedError
+        # NOTE: 与 PyYAML 默认行为不同, 所有字符串都会被加载为 Unicode 类型.
+        # 这是因为微雨框架加载配置文件时, 由 YAMLConfig 修改了 yaml 的 loader
+        # 配置.
+        self.data = yaml.load(request_univ_data(univ, self.data_filename))
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
