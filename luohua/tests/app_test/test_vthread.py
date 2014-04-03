@@ -42,7 +42,6 @@ class TestVThreadViews(Case):
         assert 'vthread-stat-v1' in http_views
         assert 'vthread-getdents-v1' in http_views
         assert 'vthread-fcntl-v1' in http_views
-        assert 'vthread-unlink-v1' in http_views
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:

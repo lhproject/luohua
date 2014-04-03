@@ -43,7 +43,6 @@ class TestVTagViews(Case):
         assert 'vtag-getdents-v1' in http_views
         assert 'vtag-creat-v1' in http_views
         assert 'vtag-fcntl-v1' in http_views
-        assert 'vtag-unlink-v1' in http_views
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:

@@ -42,7 +42,6 @@ class TestAccountViews(Case):
         assert 'account-stat-v1' in http_views
         assert 'account-creat-v1' in http_views
         assert 'account-fcntl-v1' in http_views
-        assert 'account-unlink-v1' in http_views
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
