@@ -59,6 +59,8 @@ __all__ = [
         'validate_id_number',
         'FrozenIdent',
         'Ident',
+        # 邮件模板
+        'IdentVerifyMailMailTemplate',
         ]
 
 import six
@@ -68,6 +70,7 @@ from weiyu.helpers.misc import smartbytes
 from .. import univ
 from ..utils import dblayer
 from ..utils import randomness
+from ..mail.template import MakoMailTemplate
 
 IDENT_FROZEN_STRUCT_ID = 'luohua.ident.frozen'
 IDENT_ENTRY_STRUCT_ID = 'luohua.ident.entry'
@@ -560,6 +563,15 @@ def frozen_ident_enc_v1(ident):
                 })
 
     return result
+
+
+# 邮件模板
+class IdentVerifyMailMailTemplate(MakoMailTemplate):
+    text_template_path = 'mail/user_verify_mail.txt.mako'
+    html_template_path = 'mail/user_verify_mail.html.mako'
+
+    def get_subject(self):
+        return '验证您的注册邮箱'
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:

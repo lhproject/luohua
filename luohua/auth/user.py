@@ -23,7 +23,6 @@ import six
 
 from ..utils import dblayer
 from ..rt import pubsub
-from ..mail.template import MakoMailTemplate
 
 from . import passwd
 from . import ident
@@ -269,15 +268,6 @@ def user_enc_v1(user):
             'r': list(user['roles']),
             'x': user['xattr'],
             }
-
-
-# 邮件模板
-class UserVerifyMailMailTemplate(MakoMailTemplate):
-    text_template_path = 'mail/user_verify_mail.txt.mako'
-    html_template_path = 'mail/user_verify_mail.html.mako'
-
-    def get_subject(self):
-        return '验证您的注册邮箱'
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
