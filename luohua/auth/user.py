@@ -56,6 +56,8 @@ class User(dblayer.RiakDocument):
     def __init__(self, data=None, uid=None, rawobj=None):
         super(User, self).__init__(data, uid, rawobj)
 
+        self._ident_cache = []
+
     def chkpasswd(self, psw):
         '''进行密码验证。'''
 
@@ -130,6 +132,17 @@ class User(dblayer.RiakDocument):
     @property
     def caps(self):
         return role.Role.allcaps(self['roles'])
+
+    @property
+    def ident(self):
+        try:
+            return self._ident_cache[0]
+        except IndexError:
+            pass
+
+        ident_obj = ident.Ident.fetch(self['ident'])
+        self._ident_cache.append(ident_obj)
+        return ident_obj
 
     def _do_sync_2i(self, obj):
         obj.set_index(USER_IDENT_IDX, self['ident'])
