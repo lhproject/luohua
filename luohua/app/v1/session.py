@@ -22,7 +22,8 @@ from __future__ import unicode_literals, division
 from weiyu.shortcuts import http, jsonview
 from weiyu.utils.decorators import only_methods
 
-from ...auth.user import User
+from ...auth import user
+from ...rt import pubsub
 from ...utils.viewhelpers import jsonreply, parse_form
 
 
@@ -57,6 +58,7 @@ def session_login_v1_view(request):
             - 如请求未带 cookie 或 cookie 所示会话过期, 新建服务器端会话, 发送
               ``Set-Cookie`` HTTP 头
             - 在服务器会话中记录 UID
+            - 向该用户的实时消息频道发送 ``online`` 事件
 
     :注:
         * ``lease`` 字段的可选取值:
@@ -92,7 +94,7 @@ def session_login_v1_view(request):
         return jsonreply(r=3)
 
     try:
-        usr = User.find_by_name(name)
+        usr = user.User.find_by_guess(name)
     except KeyError:
         # 没有拥有这个登陆身份的用户
         return jsonreply(r=2)
@@ -112,6 +114,10 @@ def session_login_v1_view(request):
     if lease:
         request.session.set_cookie_prop(86400 * lease)
     # TODO: 在全局用户状态里做相应设置
+
+    # 发送通知
+    # TODO: 加上终端类型!
+    pubsub.publish_user_event(usr['id'], 'online')
 
     return jsonreply(r=0)
 
@@ -135,15 +141,23 @@ def session_logout_v1_view(request):
         * 注销成功时:
             - 从会话中删去 UID
             - 刷新会话 ID
+            - 向该用户的实时消息频道发送 ``offline`` 事件
 
     '''
 
-    if 'uid' not in request.session:
+    # 微雨 Redis 后端的 __getitem__ 不会抛 KeyError 的
+    uid = request.session['uid']
+    if uid is None:
         return jsonreply(r=1)
 
     del request.session['uid']
     request.session['logged_in'] = False
     request.session.new_id()
+
+    # 发送通知
+    # 之所以放在实际注销动作后边, 是为了万一通知发送过程出现异常不会影响
+    # 注销的正常进行
+    pubsub.publish_user_event(uid, 'offline')
 
     return jsonreply(r=0)
 
