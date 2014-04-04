@@ -40,7 +40,6 @@ def session_login_v1_view(request):
         ======= ======== ==================================================
          name    unicode  **必须** 登录名, 可能是邮箱/ID/学号之类的信息
          pass    unicode  **必须** 密码
-         lease   int      **可选** 登陆会话 cookie 保存时间 (可取值见下)
         ======= ======== ==================================================
 
     :返回:
@@ -60,37 +59,15 @@ def session_login_v1_view(request):
             - 在服务器会话中记录 UID
             - 向该用户的实时消息频道发送 ``online`` 事件
 
-    :注:
-        * ``lease`` 字段的可选取值:
-
-            ================= ============
-             取值              保留时间
-            ================= ============
-             0 或省略          仅本次会话
-             1                 1 天
-             7                 1 周
-             14                2 周
-             30                1 月
-            ================= ============
-
     '''
 
     try:
-        name, pass_, lease = parse_form(
+        name, pass_ = parse_form(
                 request,
                 'name',
                 'pass',
-                'lease',
-                lease=0,
                 )
     except KeyError:
-        return jsonreply(r=3)
-
-    if not lease.isdigit():
-        return jsonreply(r=3)
-
-    lease = int(lease)
-    if lease not in (0, 1, 7, 14, 30):
         return jsonreply(r=3)
 
     try:
@@ -111,8 +88,6 @@ def session_login_v1_view(request):
     # 密码验证通过, 设置会话
     request.session['uid'] = usr['id']
     request.session['logged_in'] = True
-    if lease:
-        request.session.set_cookie_prop(86400 * lease)
     # TODO: 在全局用户状态里做相应设置
 
     # 发送通知
