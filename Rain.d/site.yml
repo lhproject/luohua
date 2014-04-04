@@ -16,6 +16,7 @@ site:
     pre:
       - session
       - luohua.metrics
+      - luohua.session.user
     post:
       - luohua.metrics
       - session
@@ -37,6 +38,7 @@ site:
 
       # 中间件
       - .metrics.middleware
+      - .session.middleware
 
       # 实时信道
       - .rt

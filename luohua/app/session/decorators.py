@@ -26,14 +26,14 @@ __all__ = [
 
 import decorator
 
-from .acl import EACCES_reply, sync_session_user
-from ...auth.role import has_cap
+from . import acl
+from ...auth import role
 
 
 def _require_login_fn_(fn, request, *args, **kwargs):
-    user, exc_reason = sync_session_user(request)
-    if user is None:
-        return EACCES_reply(exc_reason)
+    # 需要加载 session user 中间件以正常工作
+    if request.user is None:
+        return acl.EACCES_reply(request._user_check_fail_reason)
 
     return fn(request, *args, **kwargs)
 
@@ -45,12 +45,13 @@ def require_login(fn):
 def require_cap(cap):
     def _decorator_(fn):
         def _wrapped_(fn, request, *args, **kwargs):
-            user, exc_reason = sync_session_user(request)
+            # 同上, 需要 session user 中间件
+            user = request.user
             if user is None:
-                return EACCES_reply(exc_reason)
+                return acl.EACCES_reply(request._user_check_fail_reason)
 
-            if not has_cap(user.caps, cap):
-                return EACCES_reply(2)
+            if not role.has_cap(user.caps, cap):
+                return acl.EACCES_reply(2)
 
             return fn(request, *args, **kwargs)
 
