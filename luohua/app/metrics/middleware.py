@@ -28,7 +28,7 @@ from weiyu.helpers.misc import smartbytes
 def get_req_prefixed_logger(request):
     # 调试目的, 只要不同请求不一样, 同一请求一样就行
     req_id = id(request)
-    req_prefix = b'[%16x] ' % (req_id, )
+    req_prefix = b'[%s][%16x] ' % (smartbytes(request.remote_addr), req_id, )
 
     def _logger_print_(value, *args, **kwargs):
         return print(req_prefix + smartbytes(value), *args, **kwargs)
