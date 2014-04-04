@@ -101,11 +101,15 @@ class BaseAuditedAction(object):
     MODULE_NAME = None
     ACTION_TYPE = None
 
-    def __init__(self, uid, audit_entry=None, **kwargs):
+    def __init__(self, request, audit_entry=None, **kwargs):
         if audit_entry is None:
             self._check_params_spec(kwargs)
 
+            user = request.user
+            uid = user['id'] if user is not None else ''
+
             entry = AuditEntry()
+            entry['remote_addr'] = request.remote_addr
             entry['uid'] = uid
             entry['module'] = self.MODULE_NAME
             entry['type'] = self.ACTION_TYPE
@@ -148,6 +152,7 @@ class BaseAuditedAction(object):
 @AuditEntry.decoder(1)
 def audit_entry_dec_v1(data):
     return {
+            'remote_addr': data['r'],
             'uid': data['u'],
             'ctime': data['c'],
             'module': data['m'],
@@ -159,6 +164,8 @@ def audit_entry_dec_v1(data):
 
 @AuditEntry.encoder(1)
 def audit_entry_enc_v1(ae):
+    assert 'remote_addr' in ae
+    assert isinstance(ae['remote_addr'], six.text_type)
     assert 'uid' in ae
     assert isinstance(ae['uid'], six.text_type)
     assert 'ctime' in ae
@@ -179,6 +186,7 @@ def audit_entry_enc_v1(ae):
         group = ae['id']
 
     return {
+            'r': ae['remote_addr'],
             'u': ae['uid'],
             'c': ae['ctime'],
             'm': ae['module'],
