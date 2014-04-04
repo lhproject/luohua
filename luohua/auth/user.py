@@ -234,7 +234,7 @@ def user_dec_v1(data):
     # 才有 KBS 格式的 hash, 所以这里对没有设置别名的用户传入空字符串是完全
     # 没有问题的
     return {
-            'password': passwd.Password('', data['p']),
+            'password': passwd.Password(alias or '', data['p']),
             'alias': alias,
             'display_name': data['nd'],
             'display_name_mtime': data['ndm'],
