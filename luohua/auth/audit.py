@@ -27,16 +27,17 @@ __all__ = [
 import six
 import time
 
+from weiyu.helpers.misc import smartbytes
 from ..utils.dblayer import RiakDocument
 from ..utils.sequences import time_ascending_suffixed
 
 AUDIT_ENTRY_STRUCT_ID = 'luohua.audit'
 
-AUDIT_UID_IDX =  'audit_uid_bin'
-AUDIT_MODULE_IDX = 'audit_module_bin'
-AUDIT_ACTION_IDX = 'audit_act_bin'
-AUDIT_GROUP_IDX = 'audit_group_bin'
-AUDIT_TIMESTAMP_IDX = 'audit_ts_int'
+AUDIT_UID_IDX = b'audit_uid_bin'
+AUDIT_MODULE_IDX = b'audit_module_bin'
+AUDIT_ACTION_IDX = b'audit_act_bin'
+AUDIT_GROUP_IDX = b'audit_group_bin'
+AUDIT_TIMESTAMP_IDX = b'audit_ts_int'
 
 AUDIT_MODULE_AUDIT = 'audit'
 
@@ -62,14 +63,14 @@ class AuditEntry(RiakDocument):
             self['ctime'] = now
 
     def _do_sync_2i(self, obj):
-        obj.set_index(AUDIT_UID_IDX, self['uid'])
-        obj.set_index(AUDIT_MODULE_IDX, self['module'])
-        obj.set_index(AUDIT_ACTION_IDX, self['type'])
+        obj.set_index(AUDIT_UID_IDX, smartbytes(self['uid']))
+        obj.set_index(AUDIT_MODULE_IDX, smartbytes(self['module']))
+        obj.set_index(AUDIT_ACTION_IDX, smartbytes(self['type']))
         obj.set_index(AUDIT_TIMESTAMP_IDX, int(self['ctime']))
 
         # 记录组
         group = self['group'] if 'group' in self else self['id']
-        obj.set_index(AUDIT_GROUP_IDX, group)
+        obj.set_index(AUDIT_GROUP_IDX, smartbytes(group))
 
         return obj
 
