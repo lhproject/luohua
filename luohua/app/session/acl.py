@@ -39,7 +39,6 @@ def fetch_user_or_die(request):
     # 微雨的 Redis 会话后端对不存在的会话 key 请求不会抛异常, 而是直接返回
     # Redis 驱动库返回的 None, 那我们就适应一下
     uid = request.session['uid']
-    print(uid)
     if uid is None:
         raise ACLError(0)
 
