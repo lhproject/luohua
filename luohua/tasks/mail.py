@@ -34,10 +34,11 @@ def send_ident_verify_mail_mail(to_addr, number, html):
 
     # 取激活码
     ident_obj = ident.Ident.fetch(number)
-    ak = ident_obj['activation_key']
-    if ak == ident.ALREADY_ACTIVATED_KEY:
+    if ident_obj.activated:
         # 这个身份已经激活; 什么都不发送, 抛异常
         raise ValueError('this ident already activated: {0}'.format(number))
+
+    ak = ident_obj['activation_key']
 
     # 构造激活 URL
     activation_url = urls.reverse_api_url(
