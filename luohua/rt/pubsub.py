@@ -23,6 +23,7 @@ __all__ = [
         'publish_json',
         'publish_event',
         'publish_global_event',
+        'publish_user_event',
         'JSONPubSub',
         ]
 
@@ -109,6 +110,22 @@ def publish_global_event(typ, **kwargs):
     '''
 
     return publish_event('GLOBAL', typ, **kwargs)
+
+
+def publish_user_event(uid, typ, **kwargs):
+    '''发送一条事件消息到某用户的事件频道 (以便关注该用户的客户端接收).
+
+    :param uid: 用户 ID.
+    :type uid: :data:`six.text_type`
+    :param typ: 事件类型, 如 ``'new_user'`` 或 ``'online_status'`` 等.
+    :type typ: :data:`six.text_type`
+    :param kwargs: 事件参数.
+    :return: 消息总共抵达的订阅端总数.
+    :rtype: :data:`six.integer_types`
+
+    '''
+
+    return publish_event('user/' + uid, typ, **kwargs)
 
 
 class JSONPubSub(object):
