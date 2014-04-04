@@ -43,6 +43,8 @@ AUDIT_MODULE_AUDIT = 'audit'
 
 AUDIT_TYPE_UPDATE = 'update'
 
+_number_types = six.integer_types + (float, )
+
 
 class AuditEntry(RiakDocument):
     '''审计记录条目.'''
@@ -160,7 +162,7 @@ def audit_entry_enc_v1(ae):
     assert 'uid' in ae
     assert isinstance(ae['uid'], six.text_type)
     assert 'ctime' in ae
-    assert isinstance(ae['ctime'], six.integer_types + (float, ))
+    assert isinstance(ae['ctime'], _number_types)
     assert 'module' in ae
     assert isinstance(ae['module'], six.text_type)
     assert '/' not in ae['module']
