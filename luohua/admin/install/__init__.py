@@ -22,6 +22,7 @@ from __future__ import unicode_literals, division
 __all__ = [
         'init_sysop_role',
         'init_sysop_user',
+        'init_default_roles',
         ]
 
 from ...auth.user import User
@@ -57,6 +58,32 @@ def init_sysop_user(email, psw):
     sysop['roles'] = {SYSOP_ROLE_ID, }
     sysop['xattr'] = {}
     sysop.save()
+
+    return True
+
+
+def init_default_roles():
+    # 确保 initial 角色
+    tmp1 = Role.fetch('initial')
+    if tmp1 is not None:
+        tmp1.purge()
+
+    initial_role = Role()
+    initial_role['id'] = 'initial'
+    initial_role['name'] = '初始角色'
+    initial_role['caps'] = {'user-login', 'vf-creat', }
+    initial_role.save()
+
+    # 确保 default 角色 (邮箱验证通过之后的默认权限)
+    tmp2 = Role.fetch('default')
+    if tmp2 is not None:
+        tmp2.purge()
+
+    default_role = Role()
+    default_role['id'] = 'default'
+    default_role['name'] = '默认用户角色'
+    default_role['caps'] = {'vth-creat', }
+    default_role.save()
 
     return True
 
