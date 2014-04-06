@@ -39,7 +39,7 @@ TEST_USERS = {
                 '8a414c9c7f52507d5e53436df62f8f16f55fb383a1a9a88971b3f152566'
                 '0e6ff6b6f49c2a9f1c7b9f58adce29c'
                 ),
-            'r': 'user',
+            'r': 'testuser',
             'x': {},
             },
         '0012cdf931a64c01ab97cb26f5f84bf0': {
@@ -49,7 +49,7 @@ TEST_USERS = {
             'nd': '叫我曹尼玛',
             'ndm': int(time.time() - 86400 * 32),  # 32 天前注册/改名的情况
             'p': 'kbs$0b84f4bb2b3c572572015dd1050b3232',
-            'r': 'user adm',
+            'r': 'testuser testadm',
             'x': {},
             },
         }
@@ -59,11 +59,13 @@ TEST_USERS_2I = {
             'user_alias_bin': 'test0',
             'user_ident_bin': '1030513101',
             'user_nd_bin': '-灰 煮 牛-',
+            'user_roles_bin': ['testuser', ],
             },
         '0012cdf931a64c01ab97cb26f5f84bf0': {
             'user_alias_bin': 'test2',
             'user_ident_bin': '1030512202',
             'user_nd_bin': '叫我曹尼玛',
+            'user_roles_bin': ['testuser', 'testadm', ],
             },
         }
 
@@ -73,12 +75,12 @@ TEST_PASSWORDS = {
         }
 
 TEST_ROLES = {
-        'user': {
+        'testuser': {
             '_V': 1,
             'n': '用户',
             'c': ['c1', 'c2', ],
             },
-        'adm': {
+        'testadm': {
             '_V': 1,
             'n': '鹳狸猿',
             'c': ['c2', 'c3', 'c5', ],
@@ -148,7 +150,13 @@ def users_setup():
             # 2i
             for idx_k, idx_v in six.iteritems(TEST_USERS_2I[uid]):
                 # 采用 protobuf 协议连接 Riak 的话这里必须是 bytes 类型
-                obj.set_index(smartbytes(idx_k), smartbytes(idx_v))
+                # value 同
+                idx_k_bytes = smartbytes(idx_k)
+                if isinstance(idx_v, list):
+                    for idx_item in idx_v:
+                        obj.add_index(idx_k_bytes, smartbytes(idx_item))
+                else:
+                    obj.set_index(idx_k_bytes, smartbytes(idx_v))
 
             obj.store()
 

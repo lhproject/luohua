@@ -37,11 +37,11 @@ class TestRole(Case):
         pass
 
     def test_fetch(self):
-        assert Role.fetch('user')
+        assert Role.fetch('testuser')
         assert Role.fetch('nonexist') is None
 
     def test_caps(self):
-        r = Role.fetch('user')
+        r = Role.fetch('testuser')
 
         caps = r['caps']
         assert isinstance(caps, set)
@@ -54,7 +54,7 @@ class TestRole(Case):
         assert not has_cap({'a', 'b', }, 'c')
 
     def test_role_hascap(self):
-        r = Role.fetch('user')
+        r = Role.fetch('testuser')
 
         assert r.hascap('c1')
         assert not r.hascap('c100')
@@ -62,7 +62,7 @@ class TestRole(Case):
         assert 'c200' not in r
 
     def test_allcaps(self):
-        caps = Role.allcaps(['user', 'adm', ])
+        caps = Role.allcaps(['testuser', 'testadm', ])
 
         assert isinstance(caps, set)
         assert caps == {'c1', 'c2', 'c3', 'c5', }
@@ -124,7 +124,7 @@ class TestRole(Case):
         assert has_cap({'*', '-foo', }, 'bar')
 
     def test_allcaps_exclude_cap(self):
-        caps = Role.allcaps(['user', 'restricted-user', ])
+        caps = Role.allcaps(['testuser', 'restricted-user', ])
         assert caps == {'c1', 'c2', '-c1', }
 
     def test_combine_caps(self):
