@@ -36,6 +36,7 @@ USER_STRUCT_ID = 'luohua.user'
 USER_ALIAS_IDX = b'user_alias_bin'
 USER_IDENT_IDX = b'user_ident_bin'
 USER_DISPLAY_NAME_IDX = b'user_nd_bin'
+USER_ROLES_IDX = b'user_roles_bin'
 
 # 注册用户返回值
 (
@@ -152,6 +153,11 @@ class User(dblayer.RiakDocument):
 
         if 'alias' in self:
             obj.set_index(USER_ALIAS_IDX, smartbytes(self['alias']))
+
+        # 角色
+        obj.remove_index(USER_ROLES_IDX)
+        for role in self['roles']:
+            obj.add_index(USER_ROLES_IDX, smartbytes(role))
 
         return obj
 
