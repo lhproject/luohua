@@ -104,6 +104,9 @@ class BaseAuditedAction(object):
     ACTION_TYPE = None
 
     def __init__(self, request, audit_entry=None, **kwargs):
+        assert self.MODULE_NAME is not None
+        assert self.ACTION_TYPE is not None
+
         if audit_entry is None:
             self._check_params_spec(kwargs)
 
@@ -121,18 +124,6 @@ class BaseAuditedAction(object):
             entry = audit_entry
 
         self.entry = entry
-
-    def __new__(cls, **kwargs):
-        if cls.MODULE_NAME is None:
-            raise TypeError(
-                    'cannot instantiate action object without module name'
-                    )
-        if cls.ACTION_TYPE is None:
-            raise TypeError(
-                    'cannot instantiate action object without action id'
-                    )
-
-        return super(BaseAuditedAction, cls).__new__(cls)
 
     @classmethod
     def _check_params_spec(cls, params):
