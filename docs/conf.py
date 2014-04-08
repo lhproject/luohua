@@ -45,6 +45,17 @@ _USE_LOCAL_RTD_THEME = _HAVE_RTD_THEME and not on_rtd
 sys.path.insert(0, os.path.abspath('..'))
 
 
+# init weiyu framework
+from weiyu import init as weiyu_init
+
+_cwd = os.getcwd()
+try:
+    os.chdir('..')
+    weiyu_init.boot()
+finally:
+    os.chdir(_cwd)
+
+
 # -- General configuration --------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
