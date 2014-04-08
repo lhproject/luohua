@@ -19,6 +19,11 @@
 
 from __future__ import unicode_literals, division
 
+try:
+    import ujson as json
+except ImportError:
+    import json
+
 from weiyu.shortcuts import http, jsonview
 from weiyu.utils.decorators import only_methods
 
@@ -43,8 +48,138 @@ def account_stat_v1_view(request, userid):
 
 @http
 @jsonview
+@only_methods(['POST', ])
 def account_creat_v1_view(request):
-    raise NotImplementedError
+    '''v1 帐号注册接口.
+
+    :Allow: POST
+    :URL 格式: :wyurl:`api:account-creat-v1`
+    :GET 参数: 无
+    :POST 参数:
+        ========== ========= ===============================================
+         字段       类型      说明
+        ========== ========= ===============================================
+         name       unicode   **必须** 显示名称 (昵称)
+         pass       unicode   **必须** 密码
+         email      unicode   **必须** 注册邮箱地址
+         mobile     unicode   **必须** 手机号码
+         itype      int       **必须** 实名记录类型;
+                              目前仅支持 ``0`` (在读本科生)
+         inum       unicode   **必须** 编号, 如学号/工号等
+         idtype     int       **必须** 身份信息类型;
+                              目前仅支持 ``0`` (身份证号后六位)
+         idnum      unicode   **必须** 身份信息
+         iinfo      dict      **必须** JSON 格式的实名记录详细信息 (见下)
+         htmlmail   int       **必须** 如注册成功, 发送验证邮件的类型.
+                              为 ``0`` 发送纯文本邮件,
+                              为 ``1`` 发送 HTML 邮件
+        ========== ========= ===============================================
+
+        当 ``itype`` 为 ``0`` (在读本科生) 时, 要求 ``iinfo``
+        字段内容具有以下形式:
+
+        =========== ========= =============================================
+         字段        类型      说明
+        =========== ========= =============================================
+         dorm_bldg   int       **必须** 寝室所在楼号
+         dorm_room   unicode   **必须** 寝室房间号
+        =========== ========= =============================================
+
+        其他字段有效性要求:
+
+        * ``name`` 不允许超过 16 个 Unicode 字符,
+          且不允许与系统中已有显示名称重复.
+
+    :返回:
+        :r:
+            ===== =========================================================
+             0     注册成功
+             22    传入参数格式不正确
+             28    系统今日注册用户量已达最大值
+             257   创建用户失败
+            ===== =========================================================
+
+        :e:
+            如果创建用户失败, 这里返回对应阶段的错误码 (TODO: 整理错误码文档),
+            否则该属性不存在.
+
+    :副作用:
+
+        * 注册成功时:
+
+            - 新建一条用户记录 (:class:`luohua.auth.user.User`)
+            - 新建一条可变实名身份记录 (:class:`luohua.auth.ident.Ident`)
+            - 向给定的邮箱发送一封邮件, 提示验证注册邮箱
+            - 记录审计事件
+
+    '''
+
+    try:
+        (
+                name, pass_, email, mobile,
+                itype, inum, idtype, idnum, iinfo, htmlmail,
+                ) = parse_form(
+                        request,
+                        'name', 'pass', 'email', 'mobile',
+                        'itype', 'inum', 'idtype', 'idnum',
+                        'iinfo', 'htmlmail',
+                        )
+    except KeyError:
+        return jsonreply(r=22)
+
+    try:
+        name = name.decode('utf-8')
+        pass_ = pass_.decode('utf-8')
+        email = email.decode('utf-8')
+        mobile = mobile.decode('utf-8')
+        itype = int(itype)
+        inum = inum.decode('utf-8')
+        idtype = int(idtype)
+        idnum = idnum.decode('utf-8')
+        iinfo = json.loads(iinfo)
+        htmlmail = int(htmlmail)
+    except ValueError:
+        return jsonreply(r=22)
+
+    if htmlmail not in {0, 1}:
+        return jsonreply(r=22)
+    htmlmail = htmlmail != 0
+
+    if itype in ident.IDENT_TYPES_CURRENT_STUDENT:
+        # 在读学生
+        # 检查宿舍信息
+        if iinfo.viewkeys() != {'dorm_bldg', 'dorm_room', }:
+            return jsonreply(r=22)
+
+        dorm_bldg, dorm_room = iinfo['dorm_bldg'], iinfo['dorm_room']
+
+        # 构造传入参数
+        ident_info = {
+                'email': email,
+                'mobile': mobile,
+                'student_dorm_building': dorm_bldg,
+                'student_dorm_room': dorm_room,
+                }
+
+        result = user.User.new_user(
+                pass_,
+                itype,
+                inum,
+                idtype,
+                idnum,
+                ident_info,
+                name,
+                htmlmail,
+                request,
+                )
+        retcode = result[0]
+        if retcode != 0:
+            # 创建失败
+            return jsonreply(r=257, e=retcode)
+
+        # 创建成功, 不过没什么有价值的信息返回
+        # (用户需要去验证邮箱, 然后再登陆)
+        return jsonreply(r=0)
 
 
 @http
