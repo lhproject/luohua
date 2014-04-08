@@ -181,6 +181,11 @@ def account_creat_v1_view(request):
         # (用户需要去验证邮箱, 然后再登陆)
         return jsonreply(r=0)
 
+    # 无法处理的实名记录类型
+    # 因为这个函数的代码结构原因 (提前根据 itype 取值分叉), 错误码不会由 user
+    # 模块返回. 因此我们需要装作自己是 user 模块, 返回正确的错误码
+    return jsonreply(r=257, e=ident.NEW_IDENT_TYPE_NOT_IMPL)
+
 
 @http
 @jsonview
