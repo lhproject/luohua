@@ -72,6 +72,8 @@ from ..utils import dblayer
 from ..utils import randomness
 from ..mail.template import MakoMailTemplate
 
+from . import audit
+
 IDENT_FROZEN_STRUCT_ID = 'luohua.ident.frozen'
 IDENT_ENTRY_STRUCT_ID = 'luohua.ident.entry'
 
@@ -268,6 +270,16 @@ class Ident(dblayer.RiakDocument):
 
         self['activation_key'] = ALREADY_ACTIVATED_KEY
 
+    def activate_mail_and_save(self, request):
+        '''标记本条记录为已激活 (通过邮箱认证) 并保存.'''
+
+        self.mark_activated()
+        self.save()
+
+        # 记录审计事件
+        record = MailActivateAction(request, email=self['email'])
+        record.save()
+
     @property
     def activated(self):
         '''本条记录是否已激活 (通过邮箱认证).'''
@@ -315,7 +327,16 @@ class Ident(dblayer.RiakDocument):
         return obj
 
     @classmethod
-    def new_ident(cls, typ, number, id_type, id_number, info, send_html_mail):
+    def new_ident(
+            cls,
+            typ,
+            number,
+            id_type,
+            id_number,
+            info,
+            send_html_mail,
+            request,
+            ):
         # 打破循环依赖...
         from ..tasks import mail
 
@@ -388,6 +409,15 @@ class Ident(dblayer.RiakDocument):
 
         obj.update(info)
         obj.save()
+
+        # 记录审计事件
+        record = IdentCreateAction(
+                request,
+                type=typ,
+                email=email,
+                mobile=mobile,
+                )
+        record.save()
 
         # 发送验证注册邮箱的邮件
         mail.send_ident_verify_mail_mail.delay(
@@ -576,6 +606,29 @@ def frozen_ident_enc_v1(ident):
                 })
 
     return result
+
+
+# 审计事件
+class BaseIdentAction(audit.BaseAuditedAction):
+    MODULE_NAME = 'luohua.auth.ident'
+
+
+class IdentCreateAction(BaseIdentAction):
+    ACTION_TYPE = 'create'
+
+    @classmethod
+    def _check_params_spec(cls, params):
+        assert 'type' in params
+        assert 'email' in params
+        assert 'mobile' in params
+
+
+class MailActivateAction(BaseIdentAction):
+    ACTION_TYPE = 'mail.activate'
+
+    @classmethod
+    def _check_params_spec(cls, params):
+        assert 'email' in params
 
 
 # 邮件模板

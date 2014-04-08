@@ -27,6 +27,7 @@ from ..utils import dblayer
 from ..utils import sequences
 from ..rt import pubsub
 
+from . import audit
 from . import passwd
 from . import ident
 from . import role
@@ -172,6 +173,7 @@ class User(dblayer.RiakDocument):
             ident_info,
             display_name,
             send_html_mail,
+            request,
             xattr=None,
             ):
         xattr = xattr if xattr is not None else {}
@@ -202,6 +204,7 @@ class User(dblayer.RiakDocument):
                 ident_id_number,
                 ident_info,
                 send_html_mail,
+                request,
                 )
         if ident_result != ident.IDENT_OK:
             return ident_result, None
@@ -221,6 +224,14 @@ class User(dblayer.RiakDocument):
         user['roles'] = set()
         user['xattr'] = xattr
         user.save()
+
+        # 记录审计事件
+        record = UserCreateAction(
+                request,
+                display_name=display_name,
+                ident=ident_obj['id'],
+                )
+        record.save()
 
         # 发送一条实时信息
         pubsub.publish_global_event('new_user', display_name=display_name)
@@ -280,6 +291,20 @@ def user_enc_v1(user):
             'r': list(user['roles']),
             'x': user['xattr'],
             }
+
+
+# 审计事件
+class BaseUserAction(audit.BaseAuditedAction):
+    MODULE_NAME = 'luohua.auth.user'
+
+
+class UserCreateAction(BaseUserAction):
+    ACTION_TYPE = 'create'
+
+    @classmethod
+    def _check_params_spec(cls, params):
+        assert 'display_name' in params
+        assert 'ident' in params
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
