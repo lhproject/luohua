@@ -28,8 +28,10 @@ import six
 import time
 
 from weiyu.helpers.misc import smartbytes
-from ..utils.dblayer import RiakDocument
-from ..utils.sequences import time_ascending_suffixed
+
+from ..rt import pubsub
+from ..utils import dblayer
+from ..utils import sequences
 
 AUDIT_ENTRY_STRUCT_ID = 'luohua.audit'
 
@@ -46,7 +48,7 @@ AUDIT_TYPE_UPDATE = 'update'
 _number_types = six.integer_types + (float, )
 
 
-class AuditEntry(RiakDocument):
+class AuditEntry(dblayer.RiakDocument):
     '''审计记录条目.'''
 
     struct_id = AUDIT_ENTRY_STRUCT_ID
@@ -55,7 +57,7 @@ class AuditEntry(RiakDocument):
     def __init__(self, data=None, ts=None, rawobj=None):
         if ts is None:
             now = time.time()
-            key = time_ascending_suffixed(int(now))
+            key = sequences.time_ascending_suffixed(int(now))
         else:
             key = ts
 
@@ -139,13 +141,18 @@ class BaseAuditedAction(object):
     def update(self, uid, new_params):
         self._check_params_spec(new_params)
 
-        with AuditEntry.storage as conn:
-            new_entry = self.entry.make_update_object(uid, new_params)
-            new_entry.save()
+        new_entry = self.entry.make_update_object(uid, new_params)
+        new_entry.save()
+
+        # 实时通知审计频道
+        pubsub.publish_event('_auditlog', 'update', obj=new_entry)
 
     def save(self):
         self._check_params_spec(self.entry['params'])
         self.entry.save()
+
+        # 实时通知审计频道
+        pubsub.publish_event('_auditlog', 'save', obj=self.entry)
 
 
 # 数据库序列化/反序列化
