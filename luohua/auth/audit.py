@@ -41,7 +41,7 @@ AUDIT_ACTION_IDX = b'audit_act_bin'
 AUDIT_GROUP_IDX = b'audit_group_bin'
 AUDIT_TIMESTAMP_IDX = b'audit_ts_int'
 
-AUDIT_MODULE_AUDIT = 'audit'
+AUDIT_MODULE_AUDIT = 'luohua.auth.audit'
 
 AUDIT_TYPE_UPDATE = 'update'
 
