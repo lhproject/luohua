@@ -220,8 +220,6 @@ class User(dblayer.RiakDocument):
         user['ident'] = ident_obj['id']
         user['roles'] = set()
         user['xattr'] = xattr
-
-        print user
         user.save()
 
         # 发送一条实时信息
