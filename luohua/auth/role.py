@@ -222,9 +222,11 @@ def role_dec_v1(data):
 
 @Role.encoder(1)
 def role_enc_v1(role):
-    assert 'name' in role
+    # XXX: 坑: Role 的 __contains__ 被用作判断能力了, 这里必须直接调用 dict
+    # 的 __contains__ 方法! 之后也许会把这个语法糖去掉, 现在先将就一下
+    assert dict.__contains__(role, 'name')
     assert isinstance(role['name'], six.text_type)
-    assert 'caps' in role
+    assert dict.__contains__(role, 'caps')
     assert isinstance(role['caps'], set)
     assert all(isinstance(cap, six.text_type) for cap in role['caps'])
 
