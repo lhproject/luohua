@@ -40,14 +40,14 @@ USER_DISPLAY_NAME_IDX = b'user_nd_bin'
 USER_ROLES_IDX = b'user_roles_bin'
 
 # 注册用户返回值
+NEW_USER_OK = 0
 (
-        NEW_USER_OK,
         NEW_USER_DUP,
         NEW_USER_PASSWORD_TOO_WEAK,
         NEW_USER_DISPLAY_NAME,
         NEW_USER_DISPLAY_NAME_LENGTH,
         NEW_USER_DISPLAY_NAME_DUP,
-        ) = range(6)
+        ) = range(101, 106)
 
 # 常量
 DISPLAY_NAME_MAX_LENGTH = 16
