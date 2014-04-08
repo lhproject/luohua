@@ -1,0 +1,18 @@
+$$include:
+  - ../site.yml
+  - ../rendering.yml
+  - ../lh.bridge.example.yml
+  - ../lh.celery.example.yml
+  - ../lh.univ.example.yml
+
+
+# 数据库配置
+weiyu.db:
+  databases:
+    $$include: db.databases.yml
+
+  storage:
+    $$include: ../db.storage.yml
+
+
+# vim:set ai et ts=2 sw=2 sts=2 fenc=utf=8:
