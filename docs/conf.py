@@ -42,7 +42,8 @@ _USE_LOCAL_RTD_THEME = _HAVE_RTD_THEME and not on_rtd
 # directory, add these directories to sys.path here. If the directory is
 # relative to the documentation root, use os.path.abspath to make it absolute,
 # like shown here.
-sys.path.insert(0, os.path.abspath('..'))
+_REPO_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, _REPO_DIR)
 
 
 # init weiyu framework
@@ -50,8 +51,11 @@ from weiyu import init as weiyu_init
 
 _cwd = os.getcwd()
 try:
-    os.chdir(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-    weiyu_init.boot()
+    os.chdir(_REPO_DIR)
+
+    # RTD environment does not have default named config file, so let's use
+    # the Travis one...
+    weiyu_init.boot(os.path.join(_REPO_DIR, 'Rain.d/travis/config.yml'))
 finally:
     os.chdir(_cwd)
 
