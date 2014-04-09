@@ -5,6 +5,7 @@ $$include:
   - lh.celery.example.yml
   - lh.mail.example.yml
   - lh.univ.example.yml
+  - lh.rt.example.yml
 
 
 # 数据库配置

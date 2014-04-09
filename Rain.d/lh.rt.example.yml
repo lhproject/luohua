@@ -1,0 +1,13 @@
+luohua.rt:
+  socketio:
+    listen:
+      host: 0.0.0.0
+      port: 9091
+
+    policy_server:
+      enabled: true
+      host: 0.0.0.0
+      port: 10843
+
+
+# vim:set ai et ts=2 sw=2 sts=2 fenc=utf=8:

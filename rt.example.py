@@ -1,26 +1,35 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals, division
+from __future__ import unicode_literals
 
 from gevent import monkey
 monkey.patch_all()
 
-from weiyu.init import inject_app
-from weiyu.utils.server import cli_server
+from weiyu import init
+from weiyu import registry
+from weiyu.utils import server
+
+init.inject_app()
 
 
-inject_app()
+def main():
+    rt_conf = registry.request('luohua.rt')
+    socketio_conf = rt_conf['socketio']
+    listen_conf = socketio_conf['listen']
+    policy_conf = socketio_conf['policy_server']
+
+    server.cli_server(
+            'socketio',
+            listen=(listen_conf['host'], listen_conf['port']),
+            resource='socket.io',
+            policy_server=policy_conf['enabled'],
+            policy_listener=(policy_conf['host'], policy_conf['port']),
+            )
 
 
 if __name__ == '__main__':
-    cli_server(
-            'socketio',
-            listen=('0.0.0.0', 9091),
-            resource='socket.io',
-            policy_server=True,
-            policy_listener=('0.0.0.0', 10843),
-            )
+    main()
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
