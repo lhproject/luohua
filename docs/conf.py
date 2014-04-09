@@ -50,7 +50,7 @@ from weiyu import init as weiyu_init
 
 _cwd = os.getcwd()
 try:
-    os.chdir('..')
+    os.chdir(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
     weiyu_init.boot()
 finally:
     os.chdir(_cwd)
