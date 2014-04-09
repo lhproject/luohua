@@ -21,7 +21,7 @@ from __future__ import unicode_literals, division
 
 import os
 
-from weiyu.shortcuts import load_all
+from weiyu import init
 
 from . import fixtures
 
@@ -42,7 +42,7 @@ def setup_package():
     else:
         conf = 'Rain.d/config.yml'
 
-    load_all(conf_path=os.path.join(REPO_PATH, conf))
+    init.boot(os.path.join(REPO_PATH, conf))
 
     # 设置数据库
     fixtures.frozen_ident_setup()
