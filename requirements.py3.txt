@@ -1,4 +1,4 @@
 # riak should be manually added later, ignoring its dependency on riak-pb.
-git+https://github.com/xen0n/weiyu.git#egg=weiyu [redis,celery,mako,yaml,beaker]
+git+https://github.com/xen0n/weiyu.git#egg=weiyu [redis,mako,beaker]
 gevent-socketio>=0.3.6
 Envelopes>=0.4
