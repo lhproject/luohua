@@ -1,5 +1,6 @@
 $$include:
   - ../site.yml
+  - ../rendering.yml
   - ../lh.bridge.example.yml
   - ../lh.celery.example.yml
   - ../lh.univ.example.yml
