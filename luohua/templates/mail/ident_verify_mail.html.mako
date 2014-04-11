@@ -4,7 +4,7 @@
 
 <%block name="title">验证邮箱</%block>
 
-<%block name="recipient">小伙伴</%block>
+<%block name="recipient">${display_name | h}</%block>
 
 <%block name="content">
 <%utils:p>感谢您注册江南听雨网帐户，请您点击下面的按钮验证注册邮箱：</%utils:p>

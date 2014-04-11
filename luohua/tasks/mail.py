@@ -29,6 +29,7 @@ from ..utils import urls
 def send_ident_verify_mail_mail(to_addr, number, html):
     # auth.ident 引用了这个模块, 所以不能在模块级加载, 会循环依赖的
     from ..auth import ident
+    from ..auth import user
 
     curtime = int(time.time())
 
@@ -40,6 +41,10 @@ def send_ident_verify_mail_mail(to_addr, number, html):
 
     ak = ident_obj['activation_key']
 
+    # 取用户显示名称
+    user_obj = user.User.find_by_ident(number)
+    display_name = user_obj['display_name']
+
     # 构造激活 URL
     activation_url = urls.reverse_api_url(
             'api:ident-activate-v1',
@@ -47,6 +52,7 @@ def send_ident_verify_mail_mail(to_addr, number, html):
             )
 
     tmpl = ident.IdentVerifyMailMailTemplate({
+            'display_name': display_name,
             'url': activation_url,
             'curtime': curtime,
             })
