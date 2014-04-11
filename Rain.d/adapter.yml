@@ -1,0 +1,9 @@
+weiyu.adapter:
+  http:
+    request:
+      post_mime:
+        whitelist:
+          - application/json
+
+
+# vim:set ai et ts=2 sw=2 sts=2 fenc=utf=8:
