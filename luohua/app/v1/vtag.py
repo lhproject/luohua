@@ -20,16 +20,16 @@
 from __future__ import unicode_literals, division
 
 from weiyu.helpers.misc import smartstr
-from weiyu.shortcuts import http, jsonview
 from weiyu.utils.decorators import only_methods
 
 from ...utils.viewhelpers import jsonreply, parse_form
 from ...datastructures.vtag import VTag
 from ...datastructures.vthread import VThread
 
+from .. import luohua_api
 
-@http
-@jsonview
+
+@luohua_api
 @only_methods(['POST', ])
 def vtag_creat_v1_view(request, vtpid):
     '''v1 虚标签创建接口.
@@ -109,8 +109,7 @@ def vtag_creat_v1_view(request, vtpid):
     return jsonreply(r=0, t=vtag['id'])
 
 
-@http
-@jsonview
+@luohua_api
 @only_methods(['GET', ])
 def vtag_stat_v1_view(request, vtpid, vtagid):
     '''v1 虚标签状态接口.
@@ -161,8 +160,7 @@ def vtag_stat_v1_view(request, vtpid, vtagid):
     return jsonreply(r=0, s=stat_obj)
 
 
-@http
-@jsonview
+@luohua_api
 @only_methods(['GET', ])
 def vtag_getdents_v1_view(request, vtpid, vtagid, time_start, time_end):
     '''v1 虚线索列表接口.
@@ -230,8 +228,7 @@ def vtag_getdents_v1_view(request, vtpid, vtagid, time_start, time_end):
     return jsonreply(r=0, l=result)
 
 
-@http
-@jsonview
+@luohua_api
 def vtag_fcntl_v1_view(request, vtpid, vtagid):
     raise NotImplementedError
 

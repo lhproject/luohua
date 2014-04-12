@@ -27,13 +27,12 @@ except ImportError:
 from socketio import socketio_manage
 
 from weiyu.async import async_hub
-from weiyu.shortcuts import http, jsonview
-from weiyu.utils.decorators import only_methods
 
+from . import luohua_api
 from .session.decorators import require_cap
 
-@http
-@jsonview
+
+@luohua_api
 # @require_cap('rt-open')
 def rt_gateway_view(request):
     '''实时信道.
