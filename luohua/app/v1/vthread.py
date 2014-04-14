@@ -19,15 +19,15 @@
 
 from __future__ import unicode_literals, division
 
+from weiyu.shortcuts import http, jsonview
 from weiyu.utils.decorators import only_methods
 
 from ...utils.viewhelpers import jsonreply, parse_form
 from ...datastructures.vthread import VThread
 
-from .. import luohua_api
 
-
-@luohua_api
+@http
+@jsonview
 @only_methods(['GET', ])
 def vthread_stat_v1_view(request, vthid):
     '''v1 虚线索状态接口.
@@ -84,7 +84,8 @@ def vthread_stat_v1_view(request, vthid):
     return jsonreply(r=0, s=stat_obj)
 
 
-@luohua_api
+@http
+@jsonview
 @only_methods(['GET', ])
 def vthread_getdents_v1_view(request, vthid):
     '''v1 虚文件列表接口.
@@ -134,7 +135,8 @@ def vthread_getdents_v1_view(request, vthid):
     return jsonreply(r=0, l=vth['tree'].tree)
 
 
-@luohua_api
+@http
+@jsonview
 def vthread_fcntl_v1_view(request, vthid):
     raise NotImplementedError
 

@@ -19,18 +19,5 @@
 
 from __future__ import unicode_literals, division
 
-from weiyu.shortcuts import http, jsonview
-from weiyu.utils.decorators import cors
-
-
-def luohua_api(fn):
-    '''声明一个落花 API 终点.
-
-    当前是 ``@http @cors @jsonview`` 的简略形式.
-
-    '''
-
-    return http(cors(jsonview(fn)))
-
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:

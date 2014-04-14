@@ -20,16 +20,16 @@
 from __future__ import unicode_literals, division
 
 from weiyu.helpers.misc import smartstr
+from weiyu.shortcuts import http, jsonview
 from weiyu.utils.decorators import only_methods
 
 from ...utils.viewhelpers import jsonreply, parse_form
 from ...datastructures.vpool import VPool
 from ...datastructures.vtag import VTag
 
-from .. import luohua_api
 
-
-@luohua_api
+@http
+@jsonview
 @only_methods(['POST', ])
 def vpool_creat_v1_view(request):
     '''v1 虚线索池创建接口.
@@ -102,7 +102,8 @@ def vpool_creat_v1_view(request):
     return jsonreply(r=0, t=vtp['id'])
 
 
-@luohua_api
+@http
+@jsonview
 @only_methods(['GET', ])
 def vpool_stat_v1_view(request, vtpid):
     '''v1 虚线索池状态接口.
@@ -152,7 +153,8 @@ def vpool_stat_v1_view(request, vtpid):
     return jsonreply(r=0, s=stat_obj)
 
 
-@luohua_api
+@http
+@jsonview
 @only_methods(['GET', ])
 def vpool_getdents_v1_view(request, vtpid):
     '''v1 虚标签列表接口.

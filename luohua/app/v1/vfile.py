@@ -28,6 +28,7 @@ import six
 import time
 
 from weiyu.helpers.misc import smartstr
+from weiyu.shortcuts import http, jsonview
 from weiyu.utils.decorators import only_methods
 
 from ..session.decorators import require_cap
@@ -36,8 +37,6 @@ from ...utils.sequences import time_ascending_suffixed
 from ...datastructures.vtag import VTag
 from ...datastructures.vthread import VThread, VThreadTree
 from ...datastructures.vfile import VFile
-
-from .. import luohua_api
 
 
 def _new_vfid(timestamp):
@@ -58,7 +57,8 @@ def _new_vthid(timestamp):
     raise RuntimeError('UNLIKELY: failed to generate sequential vthid')
 
 
-@luohua_api
+@http
+@jsonview
 def vfile_stat_v1_view(request, vfid):
     '''v1 虚文件状态接口.
 
@@ -111,7 +111,8 @@ def vfile_stat_v1_view(request, vfid):
     return jsonreply(r=0, s=stat_obj)
 
 
-@luohua_api
+@http
+@jsonview
 def vfile_read_v1_view(request, vfid):
     '''v1 虚文件读取接口.
 
@@ -166,7 +167,8 @@ def vfile_read_v1_view(request, vfid):
     return jsonreply(r=0, s=stat_obj)
 
 
-@luohua_api
+@http
+@jsonview
 @require_cap('vf-creat')
 def vfile_creat_v1_view(request):
     '''v1 虚文件创建接口.
@@ -364,7 +366,8 @@ def _do_creat_vf_reply(vtpid, vtags_json, vthid, inreply2, title, content):
     return jsonreply(r=0, f=new_vf['id'], )
 
 
-@luohua_api
+@http
+@jsonview
 def vfile_fcntl_v1_view(request, vfid):
     raise NotImplementedError
 

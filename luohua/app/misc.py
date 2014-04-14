@@ -19,9 +19,10 @@
 
 from __future__ import unicode_literals, division
 
-from . import luohua_api
+from weiyu.shortcuts import http, jsonview
 
-@luohua_api
+@http
+@jsonview
 def http_404_view(request):
     '''API 404 返回.
 

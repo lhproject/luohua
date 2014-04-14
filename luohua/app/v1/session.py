@@ -19,16 +19,16 @@
 
 from __future__ import unicode_literals, division
 
+from weiyu.shortcuts import http, jsonview
 from weiyu.utils.decorators import only_methods
 
 from ...auth import user
 from ...rt import pubsub
 from ...utils.viewhelpers import jsonreply, parse_form
 
-from .. import luohua_api
 
-
-@luohua_api
+@http
+@jsonview
 @only_methods(['POST', ])
 def session_login_v1_view(request):
     '''v1 登陆接口.
@@ -99,7 +99,8 @@ def session_login_v1_view(request):
     return jsonreply(r=0)
 
 
-@luohua_api
+@http
+@jsonview
 @only_methods(['POST', ])
 def session_logout_v1_view(request):
     '''v1 注销接口.
@@ -140,7 +141,8 @@ def session_logout_v1_view(request):
     return jsonreply(r=0)
 
 
-@luohua_api
+@http
+@jsonview
 @only_methods(['GET', ])
 def session_ping_v1_view(request):
     '''v1 Ping 测试接口.

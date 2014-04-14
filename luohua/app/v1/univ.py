@@ -21,16 +21,16 @@ from __future__ import unicode_literals, division
 
 import six
 
+from weiyu.shortcuts import http, jsonview
 from weiyu.utils.decorators import only_methods
 
 from ...utils.viewhelpers import jsonreply, parse_form
 
 from ... import univ
 
-from .. import luohua_api
 
-
-@luohua_api
+@http
+@jsonview
 @only_methods(['GET', ])
 def univ_basic_v1_view(request):
     '''v1 大学基本信息查询接口.
@@ -62,7 +62,8 @@ def univ_basic_v1_view(request):
             )
 
 
-@luohua_api
+@http
+@jsonview
 @only_methods(['GET', ])
 def univ_dorms_list_v1_view(request):
     '''v1 大学宿舍信息查询接口.

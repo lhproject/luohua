@@ -24,14 +24,13 @@ try:
 except ImportError:
     import json
 
+from weiyu.shortcuts import http, jsonview
 from weiyu.utils.decorators import only_methods
 
 from ...utils.viewhelpers import jsonreply, parse_form
 
 from ...auth import ident
 from ...auth import user
-
-from .. import luohua_api
 
 IDENT_CHECK_RETCODE_MAP = {
         ident.IDENT_OK: (True, ident.IDENT_OK, ),
@@ -41,12 +40,14 @@ IDENT_CHECK_RETCODE_MAP = {
         }
 
 
-@luohua_api
+@http
+@jsonview
 def account_stat_v1_view(request, userid):
     raise NotImplementedError
 
 
-@luohua_api
+@http
+@jsonview
 @only_methods(['POST', ])
 def account_creat_v1_view(request):
     '''v1 帐号注册接口.
@@ -186,12 +187,14 @@ def account_creat_v1_view(request):
     return jsonreply(r=257, e=ident.NEW_IDENT_TYPE_NOT_IMPL)
 
 
-@luohua_api
+@http
+@jsonview
 def account_fcntl_v1_view(request, userid):
     raise NotImplementedError
 
 
-@luohua_api
+@http
+@jsonview
 @only_methods(['POST', ])
 def ident_query_v1_view(request):
     '''v1 实名信息查询接口.
@@ -296,7 +299,8 @@ def ident_query_v1_view(request):
     return jsonreply(**result)
 
 
-@luohua_api
+@http
+@jsonview
 @only_methods(['GET', ])
 def ident_activate_v1_view(request, activation_key):
     '''v1 邮箱验证 (激活) 接口.
