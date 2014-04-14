@@ -48,6 +48,7 @@ vf/:
 # 大学信息
 univ/:
     ^basic/$ univ-basic-v1
+    ^majors/$ univ-majors-list-v1
     ^dorms/$ univ-dorms-list-v1
 
 

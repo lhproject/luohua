@@ -65,6 +65,45 @@ def univ_basic_v1_view(request):
 @http
 @jsonview
 @only_methods(['GET', ])
+def univ_majors_list_v1_view(request):
+    '''v1 大学专业信息查询接口.
+
+    :Allow: GET
+    :URL 格式: :wyurl:`api:univ-majors-v1`
+    :GET 参数: 无
+    :POST 参数: 无
+    :返回:
+        :r: 常量 0
+        :d: 本大学专业信息. key 为专业代码, value 格式如下:
+
+            ==== ========= ================================================
+            属性  类型     说明
+            ==== ========= ================================================
+             n    unicode   专业名
+             s    unicode   专业所属学院名
+            ==== ========= ================================================
+
+    :副作用: 无
+
+    '''
+
+    result = {
+            k: {
+                'n': v['name'],
+                's': v['school'],
+                }
+            for k, v in six.iteritems(univ.majors_info.data)
+            }
+
+    return jsonreply(
+            r=0,
+            d=result,
+            )
+
+
+@http
+@jsonview
+@only_methods(['GET', ])
 def univ_dorms_list_v1_view(request):
     '''v1 大学宿舍信息查询接口.
 
