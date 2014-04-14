@@ -85,9 +85,11 @@ def get_default_univ():
 # 用默认大学初始化各个组件
 from . import basic
 from . import dorms
+from . import majors
 
 basic_info = basic.BasicInfo()
 dorm_info = dorms.DormInfo()
+majors_info = majors.MajorsInfo()
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
