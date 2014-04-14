@@ -6,7 +6,7 @@ weiyu.adapter:
           - application/json
 
     cors:
-      max_age: 5
+      max_age: 3600
       exposed_headers:
         - Content-Type
         - Cache-Control
