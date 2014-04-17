@@ -25,7 +25,7 @@ from weiyu import init
 
 _PROJECT_PATH = os.path.join(os.path.dirname(__file__), '../..')
 os.chdir(_PROJECT_PATH)
-init.boot()
+init.inject_app()
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
