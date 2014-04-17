@@ -420,10 +420,16 @@ class Ident(dblayer.RiakDocument):
         record.save()
 
         # 发送验证注册邮箱的邮件
-        mail.send_ident_verify_mail_mail.delay(
-                email,
-                number,
-                send_html_mail,
+        # NOTE: 考虑到数据库操作的延迟等不确定因素, 推迟任务执行 5 秒,
+        # 同时设定任务时效性为 30 分钟 (为实现重试发送功能做准备)
+        mail.send_ident_verify_mail_mail.apply_async(
+                (
+                    email,
+                    number,
+                    send_html_mail,
+                ),
+                countdown=5,
+                expires=1800,
                 )
 
         return IDENT_OK, obj
