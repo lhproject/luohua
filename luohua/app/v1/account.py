@@ -136,9 +136,11 @@ def account_creat_v1_view(request):
         inum = inum.decode('utf-8')
         idtype = int(idtype)
         idnum = idnum.decode('utf-8')
-        iinfo = json.loads(iinfo)
         htmlmail = int(htmlmail)
     except ValueError:
+        return jsonreply(r=22)
+
+    if not isinstance(iinfo, dict):
         return jsonreply(r=22)
 
     if htmlmail not in {0, 1}:
