@@ -24,6 +24,8 @@ try:
 except ImportError:
     import json
 
+import six
+
 from weiyu.shortcuts import http, jsonview
 from weiyu.utils.decorators import only_methods
 
@@ -128,19 +130,17 @@ def account_creat_v1_view(request):
         return jsonreply(r=22)
 
     try:
-        name = name.decode('utf-8')
-        pass_ = pass_.decode('utf-8')
-        email = email.decode('utf-8')
-        mobile = mobile.decode('utf-8')
-        itype = int(itype)
-        inum = inum.decode('utf-8')
-        idtype = int(idtype)
-        idnum = idnum.decode('utf-8')
-        htmlmail = int(htmlmail)
-    except ValueError:
-        return jsonreply(r=22)
-
-    if not isinstance(iinfo, dict):
+        assert isinstance(name, six.text_type)
+        assert isinstance(pass_, six.text_type)
+        assert isinstance(email, six.text_type)
+        assert isinstance(mobile, six.text_type)
+        assert isinstance(itype, six.integer_types)
+        assert isinstance(inum, six.text_type)
+        assert isinstance(idtype, six.integer_types)
+        assert isinstance(idnum, six.text_type)
+        assert isinstance(iinfo, dict)
+        assert isinstance(htmlmail, six.integer_types)
+    except AssertionError:
         return jsonreply(r=22)
 
     if htmlmail not in {0, 1}:
