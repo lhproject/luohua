@@ -77,7 +77,7 @@
         <tr><td height="30"></td></tr>
 
         <%utils:foot_p>
-          &copy; 2013-2014 <%utils:foot_lnk href="//jnrain.com/">江南听雨网</%utils:foot_lnk><br />
+          &copy; 2013-2014 <%utils:foot_lnk href="${capture(common.frontend_url, '/')}">江南听雨网</%utils:foot_lnk><br />
           <span style="color: #ddd;">luohua ${common.luohua_version()} | weiyu ${common.weiyu_version()}</span>
         </%utils:foot_p>
       </table>

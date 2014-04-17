@@ -5,6 +5,8 @@ import time
 import weiyu
 import luohua
 
+from luohua.utils import urls
+
 
 def now():
     return time.time()
@@ -25,6 +27,9 @@ def cvt_timestamp(timestamp):
 
 
 <%def name="luohua_version()">${luohua.__version__}</%def>
+
+
+<%def name="frontend_url(s)">${urls.get_frontend_url(s)}</%def>
 
 
 <!-- vim:set ai et ts=2 sw=2 sts=2 fenc=utf-8 syn=mako: -->
