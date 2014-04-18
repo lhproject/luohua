@@ -24,6 +24,9 @@ from socketio.mixins import BroadcastMixin
 
 from weiyu.async import async_hub
 
+from weiyu import VERSION_STR as weiyu_version
+from .. import __version__ as luohua_version
+
 
 @async_hub.register_ns('socketio', '/rt')
 class RTNamespace(BaseNamespace, BroadcastMixin):
@@ -35,6 +38,14 @@ class RTNamespace(BaseNamespace, BroadcastMixin):
 
     def on_ping(self):
         self.emit('pong')
+
+    def on_hello(self):
+        self.emit('helloAck', {
+               'versions': {
+                    'weiyu': weiyu_version,
+                    'luohua': luohua_version,
+                    },
+                })
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
