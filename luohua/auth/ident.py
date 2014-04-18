@@ -660,7 +660,7 @@ class IdentMailVerifiedMailTemplate(MakoMailTemplate):
     html_template_path = 'mail/ident_mail_verified.html.mako'
 
     def get_subject(self):
-        return '您已通过邮箱验证'
+        return '您已通过邮箱验证，欢迎加入江南听雨网！'
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:

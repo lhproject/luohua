@@ -3,7 +3,7 @@
 <%namespace name="common" file="utils.common.mako" />
 <%namespace name="utils" file="utils.html.mako" />
 
-<%block name="title">邮箱验证通过，欢迎加入江南听雨网</%block>
+<%block name="title">邮箱验证通过</%block>
 
 <%block name="recipient">${display_name}</%block>
 
