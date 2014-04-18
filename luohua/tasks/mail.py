@@ -46,10 +46,9 @@ def send_ident_verify_mail_mail(to_addr, number, html):
     display_name = user_obj['display_name']
 
     # 构造激活 URL
-    activation_url = urls.reverse_api_url(
-            'api:ident-activate-v1',
-            activation_key=ak,
-            )
+    # 激活 URL 现在指向前端服务, 暂时需要手工拼接字符串. 不过 Mako 会处理 URL
+    # 特殊字符转义的工作, 这里大可放心地操作.
+    activation_url = urls.get_frontend_url('/verifymail/%s' % (ak, ))
 
     tmpl = ident.IdentVerifyMailMailTemplate({
             'display_name': display_name,
