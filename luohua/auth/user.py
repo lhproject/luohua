@@ -223,6 +223,11 @@ class User(dblayer.RiakDocument):
         user['ident'] = ident_obj['id']
         user['roles'] = set()
         user['xattr'] = xattr
+
+        # 记录初始个性化设置
+        # HTML 邮件喜好
+        user.prefs['mail.html'] = send_html_mail
+
         user.save()
 
         # 记录审计事件
