@@ -87,10 +87,10 @@ class TestURLs(Case):
 
     def test_reverse_api_url_params(self):
         url2 = urls.reverse_api_url(
-                'api:ident-activate-v1',
-                activation_key='123',
+                'api:vpool-stat-v1',
+                vtpid='123',
                 )
-        assert url2 == 'https://api.example.com/v1/account/ident/activate/123/'
+        assert url2 == 'https://api.example.com/v1/vtp/123/stat/'
 
     def test_reverse_api_url_exc_behavior(self):
         assert_raises(ValueError, urls.reverse_api_url, 'non-existent-ep')
