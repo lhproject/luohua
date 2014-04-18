@@ -247,7 +247,7 @@ class User(dblayer.RiakDocument):
     def prefs(self):
         '''用户个性化设置存储.'''
 
-        xattr = user['xattr']
+        xattr = self['xattr']
 
         try:
             return xattr['prefs']
