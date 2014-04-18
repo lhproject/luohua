@@ -646,4 +646,12 @@ class IdentVerifyMailMailTemplate(MakoMailTemplate):
         return '验证您的注册邮箱'
 
 
+class IdentMailVerifiedMailTemplate(MakoMailTemplate):
+    text_template_path = 'mail/ident_mail_verified.txt.mako'
+    html_template_path = 'mail/ident_mail_verified.html.mako'
+
+    def get_subject(self):
+        return '您已通过邮箱验证'
+
+
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
