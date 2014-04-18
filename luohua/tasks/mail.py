@@ -62,4 +62,33 @@ def send_ident_verify_mail_mail(number):
     return tmpl.send_to_channel('main', to_addr, html)
 
 
+@celery.jsontask
+def send_ident_mail_verified_mail(number):
+    from ..auth import ident
+    from ..auth import user
+
+    curtime = int(time.time())
+
+    ident_obj = ident.Ident.fetch(number)
+    number = ident_obj['id']
+    to_addr = ident_obj['email']
+
+    if not ident_obj.activated:
+        # 这个身份还没有激活, 抛异常
+        raise ValueError('this ident not activated yet: {0}'.format(
+                number,
+                ))
+
+    user_obj = user.User.find_by_ident(number)
+    display_name = user_obj['display_name']
+    html = user_obj.prefs['mail.html']
+
+    tmpl = ident.IdentMailVerifiedMailTemplate({
+            'display_name': display_name,
+            'curtime': curtime,
+            })
+
+    return tmpl.send_to_channel('main', to_addr, html)
+
+
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
