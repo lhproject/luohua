@@ -1,4 +1,4 @@
-# 落花项目  [![Build Status](https://travis-ci.org/jnrainerds/luohua.png)](https://travis-ci.org/jnrainerds/luohua) [![Coverage Status](https://coveralls.io/repos/jnrainerds/luohua/badge.png?branch=master)](https://coveralls.io/r/jnrainerds/luohua?branch=master)
+# 落花项目  [![Build Status](https://travis-ci.org/jnrainerds/luohua.png)](https://travis-ci.org/jnrainerds/luohua) [![Coverage Status](https://coveralls.io/repos/jnrainerds/luohua/badge.png?branch=master)](https://coveralls.io/r/jnrainerds/luohua?branch=master) [![Total views](https://sourcegraph.com/api/repos/github.com/jnrainerds/luohua/counters/views.png)](https://sourcegraph.com/github.com/jnrainerds/luohua) [![Views in the last 24 hours](https://sourcegraph.com/api/repos/github.com/jnrainerds/luohua/counters/views-24h.png?no-count=1)](https://sourcegraph.com/github.com/jnrainerds/luohua)
 
 ![luohua logo](/docs/_static/logo-720x240.png)
 
