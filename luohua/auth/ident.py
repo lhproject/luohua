@@ -281,6 +281,8 @@ class Ident(dblayer.RiakDocument):
         record.save()
 
         # 发送验证注册邮箱的邮件
+        # 循环依赖
+        from ..tasks import mail
         mail.send_ident_mail_verified_mail.apply_async(
                 (
                     self['id'],
