@@ -21,6 +21,7 @@ from __future__ import unicode_literals, division
 
 from weiyu.shortcuts import http, jsonview
 
+
 @http
 @jsonview
 def http_404_view(request):

@@ -32,6 +32,7 @@ from weiyu.utils.decorators import only_methods
 
 from .session.decorators import require_cap
 
+
 @http
 @jsonview
 # @require_cap('rt-open')
