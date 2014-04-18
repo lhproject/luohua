@@ -17,7 +17,7 @@ account/:
     # 实名身份相关
     ^ident/:
         ^query/$ ident-query-v1
-        ^activate/(?P<activation_key>[0-9A-Za-z_-]{32})/$ ident-activate-v1
+        ^activate/$ ident-activate-v1
 
 vtp/:
     ^creat/$ vpool-creat-v1

@@ -24,6 +24,7 @@ try:
 except ImportError:
     import json
 
+import re
 import six
 
 from weiyu.shortcuts import http, jsonview
@@ -40,6 +41,8 @@ IDENT_CHECK_RETCODE_MAP = {
         ident.CHECK_IDENT_INVALID_INPUT: (False, 257, ),
         ident.CHECK_IDENT_WRONG: (False, 13, ),
         }
+
+ACTIVATION_KEY_RE = re.compile(r'^[0-9A-Za-z_-]{32}$')
 
 
 @http
@@ -303,29 +306,27 @@ def ident_query_v1_view(request):
 
 @http
 @jsonview
-@only_methods(['GET', ])
-def ident_activate_v1_view(request, activation_key):
+@only_methods(['POST', ])
+def ident_activate_v1_view(request):
     '''v1 邮箱验证 (激活) 接口.
 
-    因为本接口的用意是让用户从发送到注册邮箱的激活链接点击进入, 所以使用
-    ``GET`` 方法而非 ``POST``.
-
-    :Allow: GET
+    :Allow: POST
     :URL 格式: :wyurl:`api:ident-activate-v1`
-    :GET 参数:
+    :GET 参数: 无
+    :POST 参数:
         ================ ========= ========================================
          字段             类型      说明
         ================ ========= ========================================
          activation_key   unicode   32 位激活 key
         ================ ========= ========================================
 
-    :POST 参数: 无
     :返回:
         :r:
             ===== =========================================================
              0     邮箱验证 (激活) 成功
              2     给定的激活 key 不存在
              22    传入参数格式不正确
+             999   激活 key 重复; 应该不会发生
             ===== =========================================================
 
     :副作用:
@@ -337,7 +338,29 @@ def ident_activate_v1_view(request, activation_key):
 
     '''
 
-    raise NotImplementedError
+    try:
+        # NOTE: 因为只有一个元素, 而返回还是一个列表, 这个 ``,`` 不能省!
+        ak, = parse_form(request, 'activation_key')
+    except KeyError:
+        return jsonreply(r=22)
+
+    if not isinstance(ak, six.text_type):
+        return jsonreply(r=22)
+
+    if ACTIVATION_KEY_RE.match(ak) is None:
+        return jsonreply(r=22)
+
+    try:
+        ident_ = ident.Ident.from_activation_key(ak)
+    except ValueError:
+        # 激活 key 重复?! 少年快去买彩票...
+        return jsonreply(r=999)
+
+    if ident_ is None:
+        return jsonreply(r=2)
+
+    ident_.activate_mail_and_save(request)
+    return jsonreply(r=0)
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
