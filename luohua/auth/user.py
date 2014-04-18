@@ -238,6 +238,20 @@ class User(dblayer.RiakDocument):
 
         return NEW_USER_OK, user
 
+    @property
+    def prefs(self):
+        '''用户个性化设置存储.'''
+
+        xattr = user['xattr']
+
+        try:
+            return xattr['prefs']
+        except KeyError:
+            pass
+
+        xattr['prefs'] = {}
+        return xattr['prefs']
+
 
 # 数据库序列化/反序列化
 @User.decoder(1)
