@@ -424,9 +424,7 @@ class Ident(dblayer.RiakDocument):
         # 同时设定任务时效性为 30 分钟 (为实现重试发送功能做准备)
         mail.send_ident_verify_mail_mail.apply_async(
                 (
-                    email,
                     number,
-                    send_html_mail,
                 ),
                 countdown=5,
                 expires=1800,

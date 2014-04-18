@@ -26,7 +26,7 @@ from ..utils import urls
 
 
 @celery.jsontask
-def send_ident_verify_mail_mail(to_addr, number, html):
+def send_ident_verify_mail_mail(number):
     # auth.ident 引用了这个模块, 所以不能在模块级加载, 会循环依赖的
     from ..auth import ident
     from ..auth import user
@@ -39,11 +39,13 @@ def send_ident_verify_mail_mail(to_addr, number, html):
         # 这个身份已经激活; 什么都不发送, 抛异常
         raise ValueError('this ident already activated: {0}'.format(number))
 
+    to_addr = ident_obj['email']
     ak = ident_obj['activation_key']
 
-    # 取用户显示名称
+    # 取用户显示名称和 HTML 邮件喜好
     user_obj = user.User.find_by_ident(number)
     display_name = user_obj['display_name']
+    html = user_obj.prefs['mail.html']
 
     # 构造激活 URL
     # 激活 URL 现在指向前端服务, 暂时需要手工拼接字符串. 不过 Mako 会处理 URL
