@@ -280,6 +280,15 @@ class Ident(dblayer.RiakDocument):
         record = MailActivateAction(request, email=self['email'])
         record.save()
 
+        # 发送验证注册邮箱的邮件
+        mail.send_ident_mail_verified_mail.apply_async(
+                (
+                    self['id'],
+                ),
+                countdown=5,
+                expires=1800,
+                )
+
     @property
     def activated(self):
         '''本条记录是否已激活 (通过邮箱认证).'''
