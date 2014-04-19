@@ -221,7 +221,7 @@ class User(dblayer.RiakDocument):
         user['display_name'] = display_name
         user['display_name_mtime'] = int(time.time())
         user['ident'] = ident_obj['id']
-        user['roles'] = set()
+        user['roles'] = set('initial')
         user['xattr'] = xattr
 
         # 记录初始个性化设置

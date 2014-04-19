@@ -276,6 +276,12 @@ class Ident(dblayer.RiakDocument):
         self.mark_activated()
         self.save()
 
+        # 为用户添加 default 角色
+        from . import user
+        usr = user.User.find_by_ident(self['id'])
+        usr['roles'].update(['default', ])
+        usr.save()
+
         # 记录审计事件
         record = MailActivateAction(request, email=self['email'])
         record.save()
