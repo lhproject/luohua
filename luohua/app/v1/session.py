@@ -167,7 +167,7 @@ def session_refresh_v1_view(request):
 
     # 根据 token 设置会话
     request.session['uid'] = usr['id']
-    request.session['login_token'] = usr['login_token']
+    request.session['login_token'] = token
     request.session['logged_in'] = True
 
     # 刷新会话 ID
