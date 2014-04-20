@@ -25,6 +25,7 @@ __all__ = [
         'allocate_token',
         'request_token',
         'revoke_token',
+        'purge_token',
         ]
 
 import time
@@ -188,12 +189,23 @@ def revoke_token(request, typ, uid, token):
             )
     record.save()
 
+    purge_token(token)
+    return True
+
+
+def purge_token(token):
+    '''删除给定的 token.
+
+    注意: 这个操作没有日志记录, 仅适用于系统检测到不一致状态时,
+    用来销毁不一致的数据, 或其他内部用途.
+
+    '''
+
+    conn = _get_redis()
     with conn.pipeline() as pipe:
         pipe.delete(token)
         pipe.hdel(TOKENS_HASH_KEY, hash_key)
         pipe.execute()
-
-    return True
 
 
 # 审计事件
