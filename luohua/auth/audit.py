@@ -27,7 +27,7 @@ __all__ = [
 import six
 import time
 
-from weiyu.helpers.misc import smartbytes
+from weiyu.helpers.misc import smartstr, smartbytes
 
 from ..rt import pubsub
 from ..utils import dblayer
@@ -115,7 +115,7 @@ class BaseAuditedAction(object):
 
             entry = AuditEntry()
             entry['remote_addr'] = request.remote_addr
-            entry['uid'] = uid
+            entry['uid'] = smartstr(uid)
             entry['module'] = self.MODULE_NAME
             entry['type'] = self.ACTION_TYPE
             entry['group'] = entry['id']
