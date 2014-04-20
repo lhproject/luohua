@@ -21,6 +21,7 @@ from __future__ import unicode_literals, division
 
 __all__ = [
         'new_token_string',
+        'query_token',
         'allocate_token',
         'request_token',
         'revoke_token',
@@ -63,6 +64,12 @@ def new_token_string():
     '''生成一个随机 token 字符串.'''
 
     return randomness.fixed_length_b64(TOKEN_STRING_LENGTH)
+
+
+def query_token(token):
+    '''返回指定 token 的信息.'''
+
+    return _get_redis().hgetall(token) or None
 
 
 def allocate_token(request, typ, uid):
@@ -124,7 +131,7 @@ def revoke_token(request, typ, uid, token):
     '''销毁一个给定用户创建的给定类型的 token.'''
 
     conn = _get_redis()
-    token_data = conn.hgetall(token)
+    token_data = query_token(token)
 
     # 验证权限
     # TODO: 让某角色的用户可以代替其他用户删除他们的 token?
