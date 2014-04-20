@@ -7,7 +7,7 @@ site:
       struct_id: luohua.session
       cookie-key: lh_s
       secret: '7h1z_must_13e_s3cr37'
-      ttl: 300
+      ttl: 3600
 
   staticfile:
     root: ../jnrain2/static/
