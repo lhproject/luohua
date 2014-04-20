@@ -189,11 +189,11 @@ def revoke_token(request, typ, uid, token):
             )
     record.save()
 
-    purge_token(token)
+    purge_token(token, hash_key)
     return True
 
 
-def purge_token(token):
+def purge_token(token, hash_key=None):
     '''删除给定的 token.
 
     注意: 这个操作没有日志记录, 仅适用于系统检测到不一致状态时,
@@ -204,7 +204,10 @@ def purge_token(token):
     conn = _get_redis()
     with conn.pipeline() as pipe:
         pipe.delete(token)
-        pipe.hdel(TOKENS_HASH_KEY, hash_key)
+
+        if hash_key is not None:
+            pipe.hdel(TOKENS_HASH_KEY, hash_key)
+
         pipe.execute()
 
 
