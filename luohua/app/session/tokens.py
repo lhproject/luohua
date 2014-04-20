@@ -66,10 +66,14 @@ def new_token_string():
     return randomness.fixed_length_b64(TOKEN_STRING_LENGTH)
 
 
-def query_token(token):
-    '''返回指定 token 的信息.'''
+def query_token(typ, token):
+    '''返回指定类型的指定 token 的信息.'''
 
-    return _get_redis().hgetall(token) or None
+    result = _get_redis().hgetall(token)
+    if not result or result.get('type') != typ:
+        return None
+
+    return result
 
 
 def allocate_token(request, typ, uid):
@@ -131,7 +135,18 @@ def revoke_token(request, typ, uid, token):
     '''销毁一个给定用户创建的给定类型的 token.'''
 
     conn = _get_redis()
-    token_data = query_token(token)
+    token_data = query_token(typ, token)
+    if token_data is None:
+        # 所请求的 token 不存在或类型不正确
+        record = RevokeTokenFailedAction(
+                request,
+                token=token,
+                token_data=None,
+                type=typ,
+                uid=uid,
+                )
+        record.save()
+        return False
 
     # 验证权限
     # TODO: 让某角色的用户可以代替其他用户删除他们的 token?
