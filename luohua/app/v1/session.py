@@ -204,13 +204,13 @@ def session_logout_v1_view(request):
     if uid is None or token is None:
         return jsonreply(r=0)
 
+    # 销毁 token
+    tokens.revoke_token(request, 'login', uid, token)
+
     del request.session['uid']
     del request.session['login_token']
     request.session['logged_in'] = False
     request.session.new_id()
-
-    # 销毁 token
-    tokens.revoke_token(request, 'login', uid, token)
 
     return jsonreply(r=0)
 
