@@ -4,9 +4,9 @@
 --scope=api
 
 session/:
-    ^login/$ session-login-v1
+    ^auth/$ session-auth-v1
+    ^refresh/$ session-refresh-v1
     ^logout/$ session-logout-v1
-    ^ping/$ session-ping-v1
 
 account/:
     ^creat/$ account-creat-v1

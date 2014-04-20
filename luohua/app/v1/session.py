@@ -25,43 +25,45 @@ from weiyu.shortcuts import http, jsonview
 from weiyu.utils.decorators import only_methods
 
 from ...auth import user
-from ...rt import pubsub
 from ...utils.viewhelpers import jsonreply, parse_form
+
+from ..session import tokens
 
 
 @http
 @jsonview
 @only_methods(['POST', ])
-def session_login_v1_view(request):
-    '''v1 登陆接口.
+def session_auth_v1_view(request):
+    '''v1 认证接口.
 
     :Allow: POST
-    :URL 格式: :wyurl:`api:session-login-v1`
+    :URL 格式: :wyurl:`api:session-auth-v1`
     :GET 参数: 无
     :POST 参数:
         ======= ========= =================================================
          字段    类型      说明
         ======= ========= =================================================
-         name    unicode   **必须** 登录名, 可能是邮箱/ID/学号之类的信息
+         name    unicode   **必须** 登录名, 可取邮箱/学号
          pass    unicode   **必须** 密码的 SHA-512 hash 的十六进制表示
         ======= ========= =================================================
 
     :返回:
         :r:
-            === ===========================================================
-             0   登陆成功
-             1   登陆失败, 用户名或密码错误
-             2   登陆失败, 无法唯一匹配用户 (见代码实现)
-             22   登陆失败, 调用格式不正确
-            === ===========================================================
+            ==== ==========================================================
+             0    认证成功
+             5    认证失败, 用户名或密码错误
+             17   认证失败, 无法唯一匹配用户 (正常情况不会出现; 详见代码)
+             22   认证失败, 调用格式不正确
+            ==== ==========================================================
+
+        :t:
+            如认证成功, 返回可以用来请求会话 cookie 的 token 字符串.
+            认证不成功则该属性不存在.
 
     :副作用:
-        * 登陆成功时:
+        * 认证成功时:
 
-            - 如请求未带 cookie 或 cookie 所示会话过期, 新建服务器端会话, 发送
-              ``Set-Cookie`` HTTP 头
-            - 在服务器会话中记录 UID
-            - 向该用户的实时消息频道发送 ``online`` 事件
+            - 为该请求 IP 及对应用户生成一个登陆 token
 
     '''
 
@@ -88,25 +90,90 @@ def session_login_v1_view(request):
         usr = user.User.find_by_guess(name)
     except KeyError:
         # 没有拥有这个登陆身份的用户
-        return jsonreply(r=2)
+        return jsonreply(r=5)
     except ValueError:
         # 有多个匹配上的用户
         # 永远不应该出现; 注册部分的逻辑不会允许这种事情发生的.
         # 出现这种情况的话应该是手工编辑数据的原因了.
-        return jsonreply(r=2)
+        return jsonreply(r=17)
 
     if not usr.chkpasswd(pass_):
         # 密码错误
-        return jsonreply(r=1)
+        return jsonreply(r=5)
 
-    # 密码验证通过, 设置会话
+    # 签发 token
+    token = tokens.request_token(request, 'login', usr['id'])
+    return jsonreply(r=0, t=token)
+
+
+@http
+@jsonview
+@only_methods(['POST', ])
+def session_refresh_v1_view(request):
+    '''v1 会话刷新接口.
+
+    :Allow: POST
+    :URL 格式: :wyurl:`api:session-refresh-v1`
+    :GET 参数: 无
+    :POST 参数:
+        ======= ========= =================================================
+         字段    类型      说明
+        ======= ========= =================================================
+         token   unicode   **必须** 由 ``session-auth-v1`` 接口派发的登陆
+                           token
+        ======= ========= =================================================
+
+    :返回:
+        :r:
+            ===== =========================================================
+             0     刷新会话成功
+             5     给定的 token 不合法
+             22    传入参数格式不正确
+             257   当前会话已关联用户 (已登陆)
+            ===== =========================================================
+
+    :副作用:
+        * 认证成功时:
+
+            - 如请求未带 cookie 或 cookie 所示会话过期, 新建服务器端会话, 发送
+              ``Set-Cookie`` HTTP 头
+            - 在服务器会话中记录 UID
+            - 刷新会话 ID
+
+    '''
+
+    if 'uid' in request.session:
+        return jsonreply(r=257)
+
+    try:
+        token, = parse_form(request, 'token')
+    except KeyError:
+        return jsonreply(r=22)
+
+    if not isinstance(token, six.text_type):
+        return jsonreply(r=22)
+
+    tok = tokens.query_token('login', token)
+    if tok is None:
+        # token 不存在
+        return jsonreply(r=5)
+
+    # 检查用户
+    usr = user.User.fetch(tok['uid'])
+    if usr is None:
+        # token 指定的用户不存在... 销毁 token
+        tokens.purge_token(token)
+        return jsonreply(r=5)
+
+    # 根据 token 设置会话
     request.session['uid'] = usr['id']
+    request.session['login_token'] = usr['login_token']
     request.session['logged_in'] = True
-    # TODO: 在全局用户状态里做相应设置
 
-    # 发送通知
-    # TODO: 加上终端类型!
-    pubsub.publish_user_event(usr['id'], 'online')
+    # 刷新会话 ID
+    request.session.new_id()
+
+    # TODO: 在全局用户状态里做相应设置
 
     return jsonreply(r=0)
 
@@ -122,57 +189,30 @@ def session_logout_v1_view(request):
     :GET 参数: 无
     :POST 参数: 无
     :返回:
-        :r:
-            === ===========================================================
-             0   注销成功
-             1   注销不成功, 很可能是因为当前并没有登陆
-            === ===========================================================
+        :r: 常量 ``0``
 
     :副作用:
         * 注销成功时:
             - 从会话中删去 UID
             - 刷新会话 ID
-            - 向该用户的实时消息频道发送 ``offline`` 事件
+            - 销毁本次使用的登陆 token
 
     '''
 
     # 微雨 Redis 后端的 __getitem__ 不会抛 KeyError 的
-    uid = request.session['uid']
-    if uid is None:
-        return jsonreply(r=1)
+    uid, token = request.session['uid'], request.session['login_token']
+    if uid is None or token is None:
+        return jsonreply(r=0)
 
     del request.session['uid']
+    del request.session['login_token']
     request.session['logged_in'] = False
     request.session.new_id()
 
-    # 发送通知
-    # 之所以放在实际注销动作后边, 是为了万一通知发送过程出现异常不会影响
-    # 注销的正常进行
-    pubsub.publish_user_event(uid, 'offline')
+    # 销毁 token
+    tokens.revoke_token(request, 'login', uid, token)
 
     return jsonreply(r=0)
-
-
-@http
-@jsonview
-@only_methods(['GET', ])
-def session_ping_v1_view(request):
-    '''v1 Ping 测试接口.
-
-    :Allow: GET
-    :URL 格式: :wyurl:`api:session-ping-v1`
-    :GET 参数: 无
-    :POST 参数: 无
-    :返回:
-        :r: 常数 0
-        :m: 常量字符串 ``'pong'``
-        :s: 会话 ID
-
-    :副作用: 无
-
-    '''
-
-    return jsonreply(r=0, m='pong', s=request.session.id)
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
