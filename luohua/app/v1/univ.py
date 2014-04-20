@@ -69,7 +69,7 @@ def univ_majors_list_v1_view(request):
     '''v1 大学专业信息查询接口.
 
     :Allow: GET
-    :URL 格式: :wyurl:`api:univ-majors-v1`
+    :URL 格式: :wyurl:`api:univ-majors-list-v1`
     :GET 参数: 无
     :POST 参数: 无
     :返回:
