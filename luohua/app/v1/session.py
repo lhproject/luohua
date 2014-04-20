@@ -19,6 +19,8 @@
 
 from __future__ import unicode_literals, division
 
+import six
+
 from weiyu.shortcuts import http, jsonview
 from weiyu.utils.decorators import only_methods
 
@@ -41,7 +43,7 @@ def session_login_v1_view(request):
          字段    类型      说明
         ======= ========= =================================================
          name    unicode   **必须** 登录名, 可能是邮箱/ID/学号之类的信息
-         pass    unicode   **必须** 密码
+         pass    unicode   **必须** 密码的 SHA-512 hash 的十六进制表示
         ======= ========= =================================================
 
     :返回:
@@ -50,7 +52,7 @@ def session_login_v1_view(request):
              0   登陆成功
              1   登陆失败, 用户名或密码错误
              2   登陆失败, 无法唯一匹配用户 (见代码实现)
-             3   登陆失败, 调用格式不正确
+             22   登陆失败, 调用格式不正确
             === ===========================================================
 
     :副作用:
@@ -70,7 +72,17 @@ def session_login_v1_view(request):
                 'pass',
                 )
     except KeyError:
-        return jsonreply(r=3)
+        return jsonreply(r=22)
+
+    try:
+        assert isinstance(name, six.text_type)
+        assert isinstance(pass_, six.text_type)
+    except AssertionError:
+        return jsonreply(r=22)
+
+    if len(pass_) != 128:
+        # 密码长度不符合 SHA-512 的十六进制 hash
+        return jsonreply(r=22)
 
     try:
         usr = user.User.find_by_guess(name)
