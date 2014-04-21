@@ -10,6 +10,9 @@ session/:
 
 account/:
     ^creat/$ account-creat-v1
+    ^self/:
+        ^stat/$ account-stat-self-v1
+
     ^(?P<userid>[^/]+)/:
         ^stat/$ account-stat-v1
         ^fcntl/$ account-fcntl-v1

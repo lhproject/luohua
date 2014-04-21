@@ -40,6 +40,7 @@ class TestAccountViews(Case):
         http_views = router_hub._endpoints['http']
 
         assert 'account-stat-v1' in http_views
+        assert 'account-stat-self-v1' in http_views
         assert 'account-creat-v1' in http_views
         assert 'account-fcntl-v1' in http_views
 

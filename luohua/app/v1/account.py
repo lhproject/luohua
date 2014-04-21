@@ -45,10 +45,113 @@ IDENT_CHECK_RETCODE_MAP = {
 ACTIVATION_KEY_RE = re.compile(r'^[0-9A-Za-z_-]{32}$')
 
 
+def _get_user_stat(user):
+    return {
+            'i': user['id'],
+            'n': user['display_name'],
+            'r': list(user['roles']),
+            }
+
+
+def _get_user_extended_stat(user):
+    return {
+            'i': user['id'],
+            'n': user['display_name'],
+            'nm': user['display_name_mtime'],
+            'r': list(user['roles']),
+            'p': user.prefs,
+            }
+
+
 @http
 @jsonview
+@only_methods(['GET', ])
 def account_stat_v1_view(request, userid):
-    raise NotImplementedError
+    '''v1 帐号信息查询接口.
+
+    :Allow: GET
+    :URL 格式: :wyurl:`api:account-stat-v1`
+    :GET 参数:
+        ====== ========= ==================================================
+         字段   类型      说明
+        ====== ========= ==================================================
+         uid    unicode   **必须** 欲查询用户的 UID
+        ====== ========= ==================================================
+
+    :POST 参数: 无
+    :返回:
+        :r:
+            ==== ==========================================================
+             0    查询成功
+             2    所查询用户不存在
+             22   传入参数格式不正确
+            ==== ==========================================================
+
+        :s: 如查询成功, 返回所查询用户的信息; 否则不存在.
+
+            ====== ========= ==============================================
+             字段   类型      说明
+            ====== ========= ==============================================
+             i      unicode   传入的 UID
+             n      unicode   用户的显示名称 (昵称)
+             r      list      用户所属角色的列表
+            ====== ========= ==============================================
+
+    :副作用: 无
+
+    '''
+
+    if not userid.isalnum():
+        # 目前所有 UID 都是字母数字... 为了以防万一还是判断一下
+        return jsonreply(r=22)
+
+    user_obj = user.User.fetch(userid)
+    if user_obj is None:
+        return jsonreply(r=2)
+
+    stat_obj = _get_user_stat(user_obj)
+    return jsonreply(r=0, s=stat_obj)
+
+
+@http
+@jsonview
+@only_methods(['GET', ])
+def account_stat_self_v1_view(request):
+    '''v1 当前帐号详细信息查询接口.
+
+    :Allow: GET
+    :URL 格式: :wyurl:`api:account-stat-self-v1`
+    :GET 参数: 无
+    :POST 参数: 无
+    :返回:
+        :r:
+            === ===========================================================
+             0   查询成功
+             5   当前会话没有关联用户 (登陆)
+            === ===========================================================
+
+        :s: 如查询成功, 返回当前用户的详细信息; 否则不存在.
+
+            ====== ========= ==============================================
+             字段   类型      说明
+            ====== ========= ==============================================
+             i      unicode   传入的 UID
+             n      unicode   用户的显示名称 (昵称)
+             nm     int       用户上次更改显示名称 (昵称) 的时间戳
+             r      list      用户所属角色的列表
+             p      dict      用户的个人偏好设置
+            ====== ========= ==============================================
+
+    :副作用: 无
+
+    '''
+
+    user_obj = request.user
+    if user_obj is None:
+        return jsonreply(r=5)
+
+    stat_obj = _get_user_extended_stat(user_obj)
+    return jsonreply(r=0, s=stat_obj)
 
 
 @http
