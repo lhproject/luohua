@@ -133,21 +133,23 @@ def session_refresh_v1_view(request):
              0     刷新会话成功
              5     给定的 token 不合法
              22    传入参数格式不正确
-             257   当前会话已关联用户 (已登陆)
+             257   当前会话关联的 token 与传入的 token 不一致
             ===== =========================================================
 
     :副作用:
-        * 认证成功时:
+        * 刷新成功时:
 
             - 如请求未带 cookie 或 cookie 所示会话过期, 新建服务器端会话, 发送
               ``Set-Cookie`` HTTP 头
             - 在服务器会话中记录 UID
             - 刷新会话 ID
 
-    '''
+        * 当前会话已有 token 记录, 而传入token 与当前会话 token 不一致时:
 
-    if 'uid' in request.session:
-        return jsonreply(r=257)
+            - 销毁当前会话的登陆信息 (强制注销)
+            - 刷新会话 ID
+
+    '''
 
     try:
         token, = parse_form(request, 'token')
@@ -157,6 +159,24 @@ def session_refresh_v1_view(request):
     if not isinstance(token, six.text_type):
         return jsonreply(r=22)
 
+    # 取会话中记录的 token 与传入 token 比较
+    # 返回 None 意味着会话中并没有记录 token
+    maybe_session_token = request.session['login_token']
+    if maybe_session_token is not None:
+        if maybe_session_token != token:
+            # 会话 token 与传入 token 不一致, 销毁会话
+            request.session['logged_in'] = False
+            del request.session['uid']
+            del request.session['login_token']
+            request.session.new_id()
+            return jsonreply(r=257)
+
+        # 会话 token 与传入 token 相同, 不必刷新会话 ID
+        need_new_session_id = False
+    else:
+        need_new_session_id = True
+
+    # 取 token 信息
     tok = tokens.query_token('login', token)
     if tok is None:
         # token 不存在
@@ -175,7 +195,8 @@ def session_refresh_v1_view(request):
     request.session['logged_in'] = True
 
     # 刷新会话 ID
-    request.session.new_id()
+    if need_new_session_id:
+        request.session.new_id()
 
     # TODO: 在全局用户状态里做相应设置
 
