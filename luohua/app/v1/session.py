@@ -178,17 +178,9 @@ def session_refresh_v1_view(request):
     else:
         need_new_session_id = True
 
-    # 取 token 信息
-    tok = tokens.query_token('login', token)
-    if tok is None:
-        # token 不存在
-        return jsonreply(r=5)
-
-    # 检查用户
-    usr = user.User.fetch(tok['uid'])
+    # 根据 token 取得用户对象
+    usr = tokens.user_from_token('login', token)
     if usr is None:
-        # token 指定的用户不存在... 销毁 token
-        tokens.purge_token(token)
         return jsonreply(r=5)
 
     # 根据 token 设置会话

@@ -26,6 +26,7 @@ __all__ = [
         'request_token',
         'revoke_token',
         'purge_token',
+        'user_from_token',
         ]
 
 import time
@@ -33,6 +34,7 @@ import time
 from weiyu.db import db_hub
 
 from ...auth import audit
+from ...auth import user
 from ...utils import randomness
 
 SESSION_TOKENS_STORAGE_ID = 'luohua.app.session.tokens'
@@ -209,6 +211,28 @@ def purge_token(token, hash_key=None):
             pipe.hdel(TOKENS_HASH_KEY, hash_key)
 
         pipe.execute()
+
+
+def user_from_token(typ, token):
+    '''根据给定类型的给定 token 查询对应用户.
+
+    若 token 的对应用户不存在, 将销毁该 token.
+
+    '''
+
+    tok = query_token(typ, token)
+    if tok is None:
+        # token 不存在
+        return None
+
+    # 检查用户
+    usr = user.User.fetch(tok['uid'])
+    if usr is None:
+        # token 指定的用户不存在... 销毁 token
+        tokens.purge_token(token)
+        return None
+
+    return usr
 
 
 # 审计事件
