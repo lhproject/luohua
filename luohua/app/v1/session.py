@@ -136,6 +136,8 @@ def session_refresh_v1_view(request):
              257   当前会话关联的 token 与传入的 token 不一致
             ===== =========================================================
 
+        :u: 如会话刷新成功, 返回当前登陆用户的 UID; 否则不存在.
+
     :副作用:
         * 刷新成功时:
 
@@ -190,7 +192,8 @@ def session_refresh_v1_view(request):
         return jsonreply(r=5)
 
     # 根据 token 设置会话
-    request.session['uid'] = usr['id']
+    uid = usr['id']
+    request.session['uid'] = uid
     request.session['login_token'] = token
     request.session['logged_in'] = True
 
@@ -200,7 +203,7 @@ def session_refresh_v1_view(request):
 
     # TODO: 在全局用户状态里做相应设置
 
-    return jsonreply(r=0)
+    return jsonreply(r=0, u=uid)
 
 
 @http
