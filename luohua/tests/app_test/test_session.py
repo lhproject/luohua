@@ -39,9 +39,9 @@ class TestSessionViews(Case):
         # XXX 这里使用了微雨框架的实现细节
         http_views = router_hub._endpoints['http']
 
-        assert 'session-login-v1' in http_views
+        assert 'session-auth-v1' in http_views
+        assert 'session-refresh-v1' in http_views
         assert 'session-logout-v1' in http_views
-        assert 'session-ping-v1' in http_views
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
