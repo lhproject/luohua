@@ -255,6 +255,7 @@ def vfile_creat_v1_view(request):
                 )
 
     return _do_creat_vf_reply(
+            request,
             vtpid,
             vtags_json,
             vthid,
@@ -273,6 +274,8 @@ def _do_creat_vf_with_vth(
             title,
             content,
             ):
+    '''新建一组虚线索和虚文件并保存.'''
+
     # 如果新建 VThread, title 必须, vtpid 必须, vtags 必须,
     # inreply2 不能传入 (无意义)
     if title is None or vtpid is None or vtags_json is None:
@@ -305,8 +308,9 @@ def _do_creat_vf_with_vth(
     # 新建 VFile
     new_vf = VFile()
     new_vf['id'] = _new_vfid(now)
-    # TODO: 所有者
-    new_vf['owner'] = 'TODO'
+
+    uid = request.user['id']
+    new_vf['owner'] = uid
     new_vf['ctime'] = now
     new_vf['title'] = title
     new_vf['content'] = content
@@ -317,7 +321,7 @@ def _do_creat_vf_with_vth(
     new_vth = VThread()
     new_vth['id'] = _new_vthid(now)
     new_vth['title'] = title
-    new_vth['owner'] = 'TODO'
+    new_vth['owner'] = uid
     new_vth['ctime'] = now
     new_vth['mtime'] = now
     new_vth['tree'] = VThreadTree([new_vf['id'], ])
@@ -329,7 +333,17 @@ def _do_creat_vf_with_vth(
     return jsonreply(r=0, f=new_vf['id'], t=new_vth['id'], )
 
 
-def _do_creat_vf_reply(vtpid, vtags_json, vthid, inreply2, title, content):
+def _do_creat_vf_reply(
+        request,
+        vtpid,
+        vtags_json,
+        vthid,
+        inreply2,
+        title,
+        content,
+        ):
+    '''新建一个虚文件回复并保存.'''
+
     # 如果新建回复, vtpid, vtags 不能传入
     if vtpid is not None or vtags_json is not None:
         return jsonreply(r=22)
@@ -349,7 +363,7 @@ def _do_creat_vf_reply(vtpid, vtags_json, vthid, inreply2, title, content):
     # 创建虚文件
     new_vf = VFile()
     new_vf['id'] = _new_vfid(now)
-    new_vf['owner'] = 'TODO'
+    new_vf['owner'] = request.user['id']
     new_vf['ctime'] = int(time.time())
     new_vf['title'] = title if title is not None else ''
     new_vf['content'] = content
