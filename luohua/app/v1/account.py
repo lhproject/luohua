@@ -46,20 +46,35 @@ ACTIVATION_KEY_RE = re.compile(r'^[0-9A-Za-z_-]{32}$')
 
 
 def _get_user_stat(user):
+    ident_obj = user.ident
+    fident_obj = ident_obj.frozen_info
+
     return {
-            'i': user['id'],
+            'u': user['id'],
             'n': user['display_name'],
             'r': list(user['roles']),
+            'g': fident_obj['gender'],
             }
 
 
 def _get_user_extended_stat(user):
+    ident_obj = user.ident
+    fident_obj = ident_obj.frozen_info
+
     return {
-            'i': user['id'],
+            'u': user['id'],
             'n': user['display_name'],
             'nm': user['display_name_mtime'],
             'r': list(user['roles']),
             'p': user.prefs,
+            'e': ident_obj['email'],
+            'm': ident_obj['mobile'],
+
+            'id': ident_obj['id'],
+            'it': ident_obj['type'],
+
+            'rn': fident_obj['name'],
+            'g': fident_obj['gender'],
             }
 
 
@@ -95,6 +110,7 @@ def account_stat_v1_view(request, userid):
              i      unicode   传入的 UID
              n      unicode   用户的显示名称 (昵称)
              r      list      用户所属角色的列表
+             g      int       用户的性别
             ====== ========= ==============================================
 
     :副作用: 无
@@ -135,11 +151,17 @@ def account_stat_self_v1_view(request):
             ====== ========= ==============================================
              字段   类型      说明
             ====== ========= ==============================================
-             i      unicode   传入的 UID
+             u      unicode   传入的 UID
              n      unicode   用户的显示名称 (昵称)
              nm     int       用户上次更改显示名称 (昵称) 的时间戳
              r      list      用户所属角色的列表
              p      dict      用户的个人偏好设置
+             e      unicode   用户的电子邮件地址
+             m      unicode   用户的手机号码
+             id     unicode   用户的实名身份标识 (学号等)
+             it     int       用户的实名身份类型
+             rn     unicode   用户的真实姓名
+             g      int       用户的性别
             ====== ========= ==============================================
 
     :副作用: 无
