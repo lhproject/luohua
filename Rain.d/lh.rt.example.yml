@@ -3,6 +3,16 @@ luohua.rt:
     listen:
       host: 0.0.0.0
       port: 9091
+      ssl:
+        # 强烈建议给整个站点部署 SSL, 否则实时信道上的敏感信息会用明文传输!
+        # 而且如果前端是 https 协议, 而 WebSocket 服务器不启用 SSL 的话,
+        # 实时连接是无法建立的, 所以请务必生成你的证书并把这里配置好.
+        #
+        # 基于安全考虑, 这个示例设置是故意写成不能运行的.
+        # 如果你确信自己不需要 SSL 的话, 请把 enabled 属性设置成 false.
+        enabled: true
+        # keyfile: /absolute/path/to/the/file.key
+        # certfile: /absolute/path/to/the/file.crt
 
     policy_server:
       enabled: true
