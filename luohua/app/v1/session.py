@@ -25,6 +25,7 @@ from weiyu.shortcuts import http, jsonview
 from weiyu.utils.decorators import only_methods
 
 from ...auth import user
+from ...rt import state as rt_state
 from ...utils.viewhelpers import jsonreply, parse_form
 
 from ..session import tokens
@@ -137,6 +138,7 @@ def session_refresh_v1_view(request):
             ===== =========================================================
 
         :u: 如会话刷新成功, 返回当前登陆用户的 UID; 否则不存在.
+        :t: 如会话刷新成功, 返回适用当前会话的实时信道登陆 token; 否则不存在.
 
     :副作用:
         * 刷新成功时:
@@ -145,6 +147,7 @@ def session_refresh_v1_view(request):
               ``Set-Cookie`` HTTP 头
             - 在服务器会话中记录 UID
             - 刷新会话 ID
+            - 发行一个限定本会话使用的实时信道登陆 token
 
         * 当前会话已有 token 记录, 而传入token 与当前会话 token 不一致时:
 
@@ -193,9 +196,12 @@ def session_refresh_v1_view(request):
     if need_new_session_id:
         request.session.new_id()
 
+    # 发行实时信道登陆 token
+    rt_login_tok = rt_state.state_mgr.issue_rt_login_token(request.session.id)
+
     # TODO: 在全局用户状态里做相应设置
 
-    return jsonreply(r=0, u=uid)
+    return jsonreply(r=0, u=uid, t=rt_login_tok)
 
 
 @http
