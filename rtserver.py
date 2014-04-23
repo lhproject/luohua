@@ -10,6 +10,8 @@ from weiyu import init
 from weiyu import registry
 from weiyu.utils import server
 
+from luohua.rt import state as rt_state
+
 init.inject_app()
 
 
@@ -37,6 +39,10 @@ def main():
                 'certfile': ssl_conf['certfile'],
                 })
 
+    # 清空遗留的实时会话
+    rt_state.state_mgr.purge_state()
+
+    # 启动服务
     server.cli_server('socketio', **options)
 
 
