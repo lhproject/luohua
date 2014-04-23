@@ -19,6 +19,8 @@
 
 from __future__ import unicode_literals, division
 
+import time
+
 from socketio.namespace import BaseNamespace
 from socketio.mixins import BroadcastMixin
 
@@ -29,14 +31,25 @@ from .. import __version__ as luohua_version
 
 from . import state
 
+# 连接建立到必须发送 hello 消息的最长时间间隔, 单位: 秒.
+# 超过此值指定时间间隔仍未发送 hello 的客户端将被断开.
+INITIAL_TIMEOUT_SECS = 30
+
 
 @async_hub.register_ns('socketio', '/rt')
 class RTNamespace(BaseNamespace, BroadcastMixin):
     def get_initial_acl(self):
         return ['on_hello', ]
 
+    def _initial_timeout_thread(self, timeout):
+        time.sleep(timeout)
+        if not self.session['hello_done']:
+            self.disconnect()
+
     def recv_connect(self):
-        pass
+        # 限制 hello 必须尽快发生
+        self.session['hello_done'] = False
+        self.spawn(self._initial_timeout_thread, INITIAL_TIMEOUT_SECS)
 
     def recv_disconnect(self):
         print self.session
@@ -51,35 +64,40 @@ class RTNamespace(BaseNamespace, BroadcastMixin):
         self.emit('pong')
 
     def on_hello(self, data):
-        request = self.request
-        wsgi_session = request.session
-
         login_token = data['loginToken']
         if not login_token:
-            # 现在就算是未登陆用户的会话都有发行对应的 token...
-            # 再不提供简直就是作死
+            # TODO: 给未登陆用户发行实时会话 ID
+            # 现在暂时不让他们连接...
+            self.emit('helloAck', {
+                    'result': 'failed',
+                    'canReconnect': False,
+                    })
             self.disconnect()
-
-        # token 验证
-        rt_sid = state.state_mgr.do_rt_login(
-                wsgi_session.id,
-                request.user,
-                login_token,
-                )
-        if rt_sid is None:
-            # 验证不通过, 不放行
-            self.disconnect()
+            return
+        else:
+            # token 验证
+            # 直接用登陆 token 验证, 省得断开连接了还一次一次又一次地刷新会话
+            # 当然这么做的前提是通信要加密...
+            # 所以我们需要默认 SSL 为开启 (见配置)
+            rt_sid = state.state_mgr.do_rt_login(login_token)
+            if rt_sid is None:
+                # 验证不通过, 不放行
+                self.disconnect()
 
         # 记住自己的实时会话 ID, 连接断开的时候要用到
         self.session['rt_sid'] = rt_sid
 
         self.emit('helloAck', {
+                'result': 'ok',
                 'rt_sid': rt_sid,
                 'versions': {
                     'weiyu': weiyu_version,
                     'luohua': luohua_version,
                     },
                 })
+
+        # 表示 hello 序列已经完成
+        self.session['hello_done'] = True
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:

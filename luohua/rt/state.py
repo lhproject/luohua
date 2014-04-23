@@ -28,22 +28,16 @@ import time
 from weiyu.db import db_hub
 
 from ..auth import user
-from ..utils import randomness
 from ..utils import sequences
+from ..app.session import tokens
 
 from . import pubsub
 
 RT_STATE_STORAGE_ID = 'luohua.rt.state'
 
 LOGIN_DISABLED_KEY = 'rt:nologin'
-RT_LOGIN_TOKEN_KEY_FMT = 'rt:login:{0}'
-RT_LOGIN_TOKEN_TTL_SECS = 60
 RT_SESSION_KEY_FMT = 'rt:sess:{0}'
 USER_SESSIONS_KEY_FMT = 'rt:usersess:{0}'
-
-
-def get_rt_login_token_key(sid):
-    return RT_LOGIN_TOKEN_KEY_FMT.format(sid)
 
 
 def get_rt_session_key(rt_sid):
@@ -52,12 +46,6 @@ def get_rt_session_key(rt_sid):
 
 def get_user_sessions_key(uid):
     return USER_SESSIONS_KEY_FMT.format(uid)
-
-
-def generate_rt_login_token():
-    '''生成一个实时信道登陆 token 串.'''
-
-    return randomness.fixed_length_b64(64)
 
 
 class RTStateManager(object):
@@ -91,40 +79,8 @@ class RTStateManager(object):
         # 清 Redis 库
         self.conn.flushdb()
 
-    def issue_rt_login_token(self, sid):
-        '''根据会话 ID 发行一个实时信道登陆 token.'''
-
-        token_key = get_rt_login_token_key(sid)
-        new_token = generate_rt_login_token()
-
-        # 用原子操作设置 token, 以防止多个来自相同 sid 的刷新请求产生的 token
-        # 互相覆盖
-        with self.conn.pipeline() as pipe:
-            pipe.set(
-                    token_key,
-                    new_token,
-                    ex=RT_LOGIN_TOKEN_TTL_SECS,
-                    nx=True,
-                    )
-            pipe.get(token_key)
-            results = pipe.execute()
-
-        result_token_bytes = results[1]
-        assert isinstance(result_token_bytes, bytes)
-        result_token = result_token_bytes.decode('ascii')
-        assert len(result_token) > 0
-
-        return result_token
-
-    def check_rt_login_token(self, sid, login_token):
-        '''检查实时信道登陆 token 是否有效.'''
-
-        token_key = get_rt_login_token_key(sid)
-        maybe_token = self.conn.get(token_key)
-        return maybe_token == login_token
-
-    def do_rt_login(self, sid, user_obj, login_token):
-        '''试图将携带指定实时信道登陆 token 的指定会话 ID 登陆进实时信道.
+    def do_rt_login(self, token):
+        '''试图将携带指定登陆 token 的实体登陆进实时信道.
 
         如登陆成功, 将生成一个独立的实时会话 ID 并返回.
 
@@ -139,7 +95,8 @@ class RTStateManager(object):
             return None
 
         # 验证 token
-        if not self.check_rt_login_token(sid, login_token):
+        user_obj = tokens.user_from_token('login', token)
+        if user_obj is None:
             # 验证不通过
             return None
 
@@ -167,8 +124,7 @@ class RTStateManager(object):
         conn.hmset(rt_session_key, {
                 'logged_in': 1 if logged_in else 0,
                 'uid': uid or 0,
-                'sid': sid,
-                'login_token': login_token,
+                'login_token': token,
                 'ctime': curtime,
                 })
 
