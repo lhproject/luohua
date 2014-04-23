@@ -35,6 +35,11 @@ from . import state
 # 超过此值指定时间间隔仍未发送 hello 的客户端将被断开.
 INITIAL_TIMEOUT_SECS = 30
 
+# 周期性刷新 Redis 内实时会话记录的时间间隔, 单位: 秒.
+# 这是为了防止实时服务器重启后, 遗留下前一个实例来不及销毁的会话记录而设计的.
+# 此间隔必须比 state 组件中的会话记录 TTL 短, 原因显而易见.
+RT_SESSION_TOUCH_INTERVAL_SECS = 45
+
 
 @async_hub.register_ns('socketio', '/rt')
 class RTNamespace(BaseNamespace, BroadcastMixin):
@@ -45,6 +50,18 @@ class RTNamespace(BaseNamespace, BroadcastMixin):
         time.sleep(timeout)
         if not self.session['hello_done']:
             self.disconnect()
+
+    def _rt_session_touch_thread(self, interval):
+        while True:
+            time.sleep(interval)
+
+            # 虽说这个值应该不会被修改, 在登陆成功的实时会话里也不会为空...
+            # 还是小心一点为好
+            rt_sid = self.session.get('rt_sid', None)
+            if not rt_sid:
+                return
+
+            state.state_mgr.touch_rt_session(rt_sid)
 
     def recv_connect(self):
         # 限制 hello 必须尽快发生
@@ -98,6 +115,12 @@ class RTNamespace(BaseNamespace, BroadcastMixin):
 
         # 表示 hello 序列已经完成
         self.session['hello_done'] = True
+
+        # 启动实时会话 touch 线程
+        self.spawn(
+                self._rt_session_touch_thread,
+                RT_SESSION_TOUCH_INTERVAL_SECS,
+                )
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:

@@ -26,6 +26,7 @@ __all__ = [
 import time
 
 from weiyu.db import db_hub
+from weiyu.helpers.misc import smartstr
 
 from ..auth import user
 from ..utils import sequences
@@ -37,7 +38,12 @@ RT_STATE_STORAGE_ID = 'luohua.rt.state'
 
 LOGIN_DISABLED_KEY = 'rt:nologin'
 RT_SESSION_KEY_FMT = 'rt:sess:{0}'
+USERS_KEY = 'rt:users'
 USER_SESSIONS_KEY_FMT = 'rt:usersess:{0}'
+
+# Redis 中实时会话记录的 TTL, 单位: 秒
+# 该间隔必须比 ns 组件中的定期 touch 间隔长, 原因显而易见
+RT_SESSION_TTL_SECS = 120
 
 
 def get_rt_session_key(rt_sid):
@@ -100,7 +106,7 @@ class RTStateManager(object):
             # 验证不通过
             return None
 
-        # 生成实时会话 ID, 简单记录下信息
+        # 生成实时会话 ID
         rt_sid, is_sid_ok = sequences.time_ascending_suffixed(curtime), False
         rt_session_key = get_rt_session_key(rt_sid)
         for retries in range(5):
@@ -121,17 +127,39 @@ class RTStateManager(object):
 
         logged_in = user_obj is not None
         uid = user_obj['id'] if logged_in else None
-        conn.hmset(rt_session_key, {
-                'logged_in': 1 if logged_in else 0,
-                'uid': uid or 0,
-                'login_token': token,
-                'ctime': curtime,
-                })
+
+        # 写实时会话记录
+        with conn.pipeline() as pipe:
+            pipe.hmset(rt_session_key, {
+                    'logged_in': 1 if logged_in else 0,
+                    'uid': uid or 0,
+                    'login_token': token,
+                    'ctime': curtime,
+                    'atime': curtime,
+                    })
+            pipe.expire(rt_session_key, RT_SESSION_TTL_SECS)
+
+            pipe.execute()
 
         if logged_in:
-            # 当前用户已登陆, 记录到用户状态中, 并检查是否新上线
+            # 当前用户已登陆
             user_sessions_key = get_user_sessions_key(uid)
-            session_count = conn.rpush(user_sessions_key, rt_sid)
+
+            with conn.pipeline() as pipe:
+                # 记录到全局活跃用户集合
+                pipe.zadd(USERS_KEY, curtime, uid)
+
+                # 记录到用户状态中, 并检查是否新上线
+                pipe.sadd(user_sessions_key, rt_sid)
+
+                # 用户会话索引也需要 TTL...
+                pipe.expire(user_sessions_key, RT_SESSION_TTL_SECS)
+
+                pipe.scard(user_sessions_key)
+
+                results = pipe.execute()
+
+            session_count = results[3]
             if session_count == 1:
                 # 确实是该用户的新上线会话, 发送 online 通知
                 # TODO: 确定这里到底是写成全局事件还是用户事件好...
@@ -151,6 +179,56 @@ class RTStateManager(object):
             pass
 
         return rt_sid
+
+    def touch_rt_session(self, rt_sid):
+        '''touch 一次指定的实时会话.
+
+        通过 ns 组件的周期性调用, 可以在指定实时会话的活跃期间, 使该会话在
+        Redis 中的记录不过期.
+
+        '''
+
+        conn = self.conn
+        curtime = int(time.time())
+        rt_session_key = get_rt_session_key(rt_sid)
+
+        # 刷新实时会话记录, 同时拉取该实时会话的关联用户信息
+        with conn.pipeline() as pipe:
+            pipe.hset(rt_session_key, 'atime', curtime)
+            pipe.expire(rt_session_key, RT_SESSION_TTL_SECS)
+            pipe.hmget(rt_session_key, 'logged_in', 'uid')
+
+            results = pipe.execute()
+
+        # 准备刷新用户相关的数据结构, 不过先得保证 UID 的 sanity...
+        logged_in, uid = results[2]
+        # 应该是个字符串, 但如果是 None 呢?
+        if logged_in is None:
+            # 纯粹是为了能执行到下面的 except 子句
+            logged_in = ''
+
+        try:
+            logged_in = int(smartstr(logged_in)) != 0
+        except ValueError:
+            # 包括 UnicodeDecodeError
+            logged_in = uid is not None and uid != '0'
+
+        uid = uid if logged_in else None
+        if uid is not None:
+            # 是登陆用户
+            user_sessions_key = get_user_sessions_key(uid)
+
+            with conn.pipeline() as pipe:
+                # 刷新全局活跃用户集合
+                pipe.zadd(USERS_KEY, curtime, uid)
+
+                # 刷新他的会话索引 TTL
+                pipe.expire(user_sessions_key, RT_SESSION_TTL_SECS)
+
+                pipe.execute()
+        else:
+            # TODO: 未登陆用户
+            pass
 
     def do_rt_logout(self, rt_sid):
         '''注销指定的实时会话 (正常窗口关闭/掉线等情况).'''
@@ -178,13 +256,17 @@ class RTStateManager(object):
             # 从用户会话索引里删去当前会话, 检查还剩多少个会话
             # 剩下 0 个会话的话, 就发送 offline 通知
             with conn.pipeline() as pipe:
-                pipe.lrem(user_sessions_key, 0, rt_sid)
-                pipe.llen(user_sessions_key)
+                pipe.srem(user_sessions_key, rt_sid)
+                pipe.scard(user_sessions_key)
                 results = pipe.execute()
 
             remaining_sessions = results[1]
             if remaining_sessions == 0:
-                # 该用户已经没有活动的实时会话了, 发送通知
+                # 该用户已经没有活动的实时会话了
+                # 从全局活跃用户中删除
+                conn.zrem(USERS_KEY, uid)
+
+                # 发送通知
                 user_obj = user.User.fetch(uid)
                 pubsub.publish_global_event(
                         'user_offline',
