@@ -93,7 +93,7 @@ class RTNamespace(BaseNamespace, BroadcastMixin):
         self.spawn(self._initial_timeout_thread, INITIAL_TIMEOUT_SECS)
 
     def recv_disconnect(self):
-        print self.session
+        # print self.session
         rt_sid = self.session.get('rt_sid', None)
         if rt_sid is not None:
             # 注销自己的实时会话
