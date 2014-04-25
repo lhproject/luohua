@@ -29,6 +29,7 @@ from weiyu.async import async_hub
 from weiyu import VERSION_STR as weiyu_version
 from .. import __version__ as luohua_version
 
+from . import pubsub
 from . import state
 
 # 连接建立到必须发送 hello 消息的最长时间间隔, 单位: 秒.
@@ -62,6 +63,29 @@ class RTNamespace(BaseNamespace, BroadcastMixin):
                 return
 
             state.state_mgr.touch_rt_session(rt_sid)
+
+    def _rt_events_thread(self):
+        self.session['listener'] = listener = pubsub.JSONPubSub()
+
+        # 默认订阅全局事件频道
+        # TODO: 允许配置其他频道, 例如某用户的事件频道
+        listener.subscribe(['/lh/evt/GLOBAL', ])
+
+        # 准备就绪, 开听!
+        for msg in listener.listen():
+            msg_type = msg['type']
+
+            # print '[{0}] {1}: {2}'.format(
+            #         self.session['rt_sid'],
+            #         msg_type,
+            #         repr(msg),
+            #         )
+
+            if msg_type in pubsub.DATA_MESSAGE_TYPES:
+                self.emit('rtEvent', {
+                        'channel': msg['channel'],
+                        'data': msg['data'],
+                        })
 
     def recv_connect(self):
         # 限制 hello 必须尽快发生
@@ -121,6 +145,9 @@ class RTNamespace(BaseNamespace, BroadcastMixin):
                 self._rt_session_touch_thread,
                 RT_SESSION_TOUCH_INTERVAL_SECS,
                 )
+
+        # 启动实时事件监听线程
+        self.spawn(self._rt_events_thread)
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
