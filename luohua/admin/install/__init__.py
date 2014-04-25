@@ -21,7 +21,6 @@ from __future__ import unicode_literals, division
 
 __all__ = [
         'init_sysop_role',
-        'init_sysop_user',
         'init_default_roles',
         ]
 
@@ -30,7 +29,6 @@ from ...auth.role import Role, OMNI_CAP
 from ...auth.passwd import new_password
 
 SYSOP_ROLE_ID = 'root'
-SYSOP_UID = 'SYSOP'
 
 
 def init_sysop_role():
@@ -42,22 +40,6 @@ def init_sysop_role():
     sysop_role['name'] = 'SYSOP'
     sysop_role['caps'] = set(OMNI_CAP)
     sysop_role.save()
-
-    return True
-
-
-def init_sysop_user(email, psw):
-    if User.fetch(SYSOP_UID) is not None:
-        return False
-
-    sysop = User()
-    sysop['id'] = SYSOP_UID
-    sysop['password'] = new_password(psw)
-    sysop['alias'] = ''
-    sysop['email'] = email
-    sysop['roles'] = {SYSOP_ROLE_ID, }
-    sysop['xattr'] = {}
-    sysop.save()
 
     return True
 
