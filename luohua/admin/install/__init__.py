@@ -28,7 +28,10 @@ from ...auth.user import User
 from ...auth.role import Role, OMNI_CAP
 from ...auth.passwd import new_password
 
+from ...datastructures import vpool
+
 SYSOP_ROLE_ID = 'root'
+GLOBAL_VTPID = '0'
 
 
 def init_sysop_role():
@@ -66,6 +69,20 @@ def init_default_roles():
     default_role['name'] = '默认用户角色'
     default_role['caps'] = {'vth-creat', }
     default_role.save()
+
+    return True
+
+
+def init_global_vpool():
+    if vpool.VPool.fetch(GLOBAL_VTPID) is not None:
+        return False
+
+    vtp = vpool.VPool()
+    vtp['id'] = GLOBAL_VTPID
+    vtp['name'] = '全局虚线索池'
+    vtp['natural'] = True
+    vtp['xattr'] = {}
+    vtp.save()
 
     return True
 
