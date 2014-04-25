@@ -87,4 +87,10 @@ def init_global_vpool():
     return True
 
 
+def assign_sysop_to(user):
+    assert isinstance(user['roles'], set)
+    user['roles'].update({SYSOP_ROLE_ID, })
+    user.save()
+
+
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
