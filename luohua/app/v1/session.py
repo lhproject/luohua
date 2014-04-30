@@ -25,7 +25,7 @@ from weiyu.shortcuts import http, jsonview
 from weiyu.utils.decorators import only_methods
 
 from ...auth import user
-from ...rt import state as rt_state
+from ...rt import pubsub
 from ...utils.viewhelpers import jsonreply, parse_form
 
 from ..session import tokens
@@ -227,6 +227,9 @@ def session_logout_v1_view(request):
 
     # 销毁 token
     tokens.revoke_token(request, 'login', uid, token)
+
+    # 将该用户踢出实时信道
+    pubsub.publish_user_event(uid, 'logged_out')
 
     del request.session['uid']
     del request.session['login_token']

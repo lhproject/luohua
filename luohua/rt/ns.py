@@ -71,7 +71,17 @@ class RTNamespace(BaseNamespace, BroadcastMixin):
         # TODO: 允许配置其他频道, 例如某用户的事件频道
         listener.subscribe(['/lh/evt/GLOBAL', ])
 
+        # 自己的事件频道
+        rt_sid = self.session.get('rt_sid', None)
+        self_user_channel = None
+        if rt_sid is not None:
+            uid = state.state_mgr.uid_from_rt_session(rt_sid)
+            if uid is not None:
+                self_user_channel = '/lh/evt/user/{0}'.format(uid)
+                listener.subscribe([self_user_channel, ])
+
         # 准备就绪, 开听!
+        disconnect_flag = False
         for msg in listener.listen():
             msg_type = msg['type']
 
@@ -82,17 +92,34 @@ class RTNamespace(BaseNamespace, BroadcastMixin):
             #         )
 
             if msg_type in pubsub.DATA_MESSAGE_TYPES:
+                channel = msg['channel']
+                data = msg['data']
+                try:
+                    data_type = data.pop('type')
+                except KeyError:
+                    # 应该不会发生...
+                    data_type = ''
+
+                if data_type == 'logged_out' and channel == self_user_channel:
+                    # 注销事件, 强行断线
+                    disconnect_flag = True
+                    break
+
                 self.emit('rtEvent', {
-                        'channel': msg['channel'],
-                        'data': msg['data'],
+                        'channel': channel,
+                        'type': data_type,
+                        'data': data,
                         })
+
+        if disconnect_flag:
+            self._graceful_disconnect()
 
     def recv_connect(self):
         # 限制 hello 必须尽快发生
         self.session['hello_done'] = False
         self.spawn(self._initial_timeout_thread, INITIAL_TIMEOUT_SECS)
 
-    def recv_disconnect(self):
+    def _graceful_disconnect(self):
         # print self.session
         rt_sid = self.session.get('rt_sid', None)
         if rt_sid is not None:
@@ -100,6 +127,9 @@ class RTNamespace(BaseNamespace, BroadcastMixin):
             state.state_mgr.do_rt_logout(rt_sid)
 
         self.disconnect()
+
+    def recv_disconnect(self):
+        self._graceful_disconnect()
 
     def on_ping(self):
         self.emit('pong')
