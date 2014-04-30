@@ -100,16 +100,16 @@ class RTNamespace(BaseNamespace, BroadcastMixin):
                     # 应该不会发生...
                     data_type = ''
 
-                if data_type == 'logged_out' and channel == self_user_channel:
-                    # 注销事件, 强行断线
-                    disconnect_flag = True
-                    break
-
                 self.emit('rtEvent', {
                         'channel': channel,
                         'type': data_type,
                         'data': data,
                         })
+
+                if data_type == 'logged_out' and channel == self_user_channel:
+                    # 注销事件, 强行断线
+                    disconnect_flag = True
+                    break
 
         if disconnect_flag:
             self._graceful_disconnect()
