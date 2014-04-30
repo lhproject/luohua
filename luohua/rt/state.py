@@ -85,6 +85,30 @@ class RTStateManager(object):
         # 清 Redis 库
         self.conn.flushdb()
 
+    def uid_from_rt_session(self, rt_sid):
+        '''查询指定实时会话对应的 UID.'''
+
+        conn = self.conn
+        rt_session_key = get_rt_session_key(rt_sid)
+        logged_in, uid = conn.hmget(rt_session_key, 'logged_in', 'uid')
+
+        if logged_in is None or uid is None:
+            # 根本没有这个实时会话
+            return None
+
+        try:
+            logged_in = int(logged_in.decode('utf-8'))
+        except ValueError:
+            # 记录格式错误
+            return None
+
+        if logged_in == 0:
+            # 很明显这个实时会话不属于已登陆用户
+            return None
+
+        assert uid != '0'
+        return uid.decode('utf-8')
+
     def do_rt_login(self, token):
         '''试图将携带指定登陆 token 的实体登陆进实时信道.
 
