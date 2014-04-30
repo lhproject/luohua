@@ -111,6 +111,11 @@ class RTNamespace(BaseNamespace, BroadcastMixin):
                     disconnect_flag = True
                     break
 
+                if data_type == 'force_disconnect':
+                    # 强行断线事件, 比如服务器维护之类
+                    disconnect_flag = True
+                    break
+
         if disconnect_flag:
             self._graceful_disconnect()
 
