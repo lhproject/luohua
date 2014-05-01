@@ -60,6 +60,7 @@ class VTag(RiakDocument):
 def vtag_dec_v1(data):
     return {
             'name': data['n'],
+            'desc': data['d'],
             'vtpid': data['p'],
             'natural': data['t'],
             'xattr': data['x'],
@@ -70,7 +71,10 @@ def vtag_dec_v1(data):
 def vtag_enc_v1(vtag):
     assert 'name' in vtag
     assert isinstance(vtag['name'], six.text_type)
+    assert 'desc' in vtag
+    assert isinstance(vtag['desc'], six.text_type)
     assert 'vtpid' in vtag
+    assert isinstance(vtag['vtpid'], six.text_type)
     assert 'natural' in vtag
     assert isinstance(vtag['natural'], bool)
     assert 'xattr' in vtag
@@ -78,6 +82,7 @@ def vtag_enc_v1(vtag):
 
     return {
             'n': vtag['name'],
+            'd': vtag['desc'],
             'p': vtag['vtpid'],
             't': vtag['natural'],
             'x': vtag['xattr'],
