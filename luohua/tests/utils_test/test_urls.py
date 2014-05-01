@@ -82,8 +82,8 @@ class TestURLs(Case):
         assert urls.get_frontend_url('a/b/') == 'http://example.com/a/b/'
 
     def test_reverse_api_url(self):
-        url1 = urls.reverse_api_url('api:session-ping-v1')
-        assert url1 == 'https://api.example.com/v1/session/ping/'
+        url1 = urls.reverse_api_url('api:vfile-creat-v1')
+        assert url1 == 'https://api.example.com/v1/vf/creat/'
 
     def test_reverse_api_url_params(self):
         url2 = urls.reverse_api_url(
