@@ -23,6 +23,7 @@ from weiyu.helpers.misc import smartstr
 from weiyu.shortcuts import http, jsonview
 from weiyu.utils.decorators import only_methods
 
+from ..session.decorators import require_cap
 from ...utils.viewhelpers import jsonreply, parse_form
 from ...datastructures.vtag import VTag
 from ...datastructures.vthread import VThread
@@ -31,6 +32,7 @@ from ...datastructures.vthread import VThread
 @http
 @jsonview
 @only_methods(['POST', ])
+@require_cap('vtag-creat')
 def vtag_creat_v1_view(request, vtpid):
     '''v1 虚标签创建接口.
 
@@ -49,9 +51,7 @@ def vtag_creat_v1_view(request, vtpid):
         ========= ========= ===============================================
          vtagid    unicode   **可选** 希望拿到的虚标签 ID, 省略则自动生成
          name      unicode   **必须** 虚标签名称
-         natural   int       **可选** 是否为自然虚标签, 为 ``1``
-                             表示待创建的虚标签代表实际存在的一个版块,
-                             为 ``0`` 表示此虚标签为程序生成. 默认为 ``1``
+         desc      unicode   **可选** 虚标签描述
         ========= ========= ===============================================
 
     :返回:
@@ -71,21 +71,16 @@ def vtag_creat_v1_view(request, vtpid):
     '''
 
     try:
-        vtagid, name, natural = parse_form(
+        vtagid, name, desc = parse_form(
                 request,
                 'vtagid',
                 'name',
-                'natural',
+                'desc',
                 vtagid=None,
-                natural='1',
+                desc='',
                 )
     except KeyError:
         return jsonreply(r=22)
-
-    if natural not in {'0', '1', }:
-        return jsonreply(r=22)
-
-    natural = natural == '1'
 
     # 判断是否重复
     if vtagid is not None and VTag.fetch(vtagid) is not None:
@@ -98,8 +93,9 @@ def vtag_creat_v1_view(request, vtpid):
         vtag['id'] = vtagid
 
     vtag['name'] = smartstr(name)
+    vtag['desc'] = smartstr(desc)
     vtag['vtpid'] = vtpid
-    vtag['natural'] = natural
+    vtag['natural'] = True
 
     # 不设置 xattr 的原因参见 vpool.py 相应注释
     vtag['xattr'] = {}
@@ -136,13 +132,15 @@ def vtag_stat_v1_view(request, vtpid, vtagid):
         :s:
             所请求虚标签的状态. 如果查询不成功, 此属性不存在.
 
-            ======= ======== ==============================================
-             字段    类型     说明
-            ======= ======== ==============================================
-             n       unicode  虚标签名称
-             t       bool     是否为自然虚标签, ``false`` 表示程序自动生成
-             x       dict     虚标签上附着的扩展属性
-            ======= ======== ==============================================
+            ======= ========= =============================================
+             字段    类型      说明
+            ======= ========= =============================================
+             n       unicode   虚标签名称
+             d       unicode   虚标签描述
+             t       bool      是否为自然虚标签,
+                               ``false`` 表示程序自动生成
+             x       dict      虚标签上附着的扩展属性
+            ======= ========= =============================================
 
     :副作用: 无
 
@@ -154,6 +152,7 @@ def vtag_stat_v1_view(request, vtpid, vtagid):
 
     stat_obj = {
             'n': vtag['name'],
+            'd': vtag['desc'],
             't': vtag['natural'],
             'x': vtag['xattr'],
             }
