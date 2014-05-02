@@ -19,6 +19,8 @@
 
 from __future__ import unicode_literals, division
 
+import re
+
 from weiyu.helpers.misc import smartstr
 from weiyu.shortcuts import http, jsonview
 from weiyu.utils.decorators import only_methods
@@ -28,6 +30,8 @@ from ...utils.viewhelpers import jsonreply, parse_form
 from ...datastructures.vtag import VTag
 from ...datastructures.vthread import VThread
 from ...utils.sequences import time_ascending_short_suffixed
+
+VTAG_SLUG_RE = re.compile(r'^[^\s:;\\/\.\(\)\[\]\{\}]{0,16}$')
 
 
 @http
@@ -99,9 +103,17 @@ def vtag_creat_v1_view(request, vtpid):
         # 使用一个简短一点的 ID...
         vtag['id'] = time_ascending_short_suffixed()
 
+    # slug sanity 校验
     # TODO: 检查 slug 是否重复
+    slug = smartstr(slug)
+
+    # 不要接受一些特殊字符, 比如空格, '.', 各种括号之类 (详见 VTAG_SLUG_RE)
+    if VTAG_SLUG_RE.match(slug) is None:
+        # TODO: 细化出错代码?
+        return jsonreply(r=22)
+
     vtag['name'] = smartstr(name)
-    vtag['slug'] = smartstr(slug)
+    vtag['slug'] = slug
     vtag['desc'] = smartstr(desc)
     vtag['vtpid'] = vtpid
     vtag['natural'] = True
