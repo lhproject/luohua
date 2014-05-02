@@ -52,6 +52,7 @@ def vtag_creat_v1_view(request, vtpid):
         ========= ========= ===============================================
          vtagid    unicode   **可选** 希望拿到的虚标签 ID, 省略则自动生成
          name      unicode   **必须** 虚标签名称
+         slug      unicode   **可选** 虚标签 slug, 默认为空
          desc      unicode   **可选** 虚标签描述
         ========= ========= ===============================================
 
@@ -72,12 +73,14 @@ def vtag_creat_v1_view(request, vtpid):
     '''
 
     try:
-        vtagid, name, desc = parse_form(
+        vtagid, name, slug, desc = parse_form(
                 request,
                 'vtagid',
                 'name',
+                'slug',
                 'desc',
                 vtagid=None,
+                slug='',
                 desc='',
                 )
     except KeyError:
@@ -96,7 +99,9 @@ def vtag_creat_v1_view(request, vtpid):
         # 使用一个简短一点的 ID...
         vtag['id'] = time_ascending_short_suffixed()
 
+    # TODO: 检查 slug 是否重复
     vtag['name'] = smartstr(name)
+    vtag['slug'] = smartstr(slug)
     vtag['desc'] = smartstr(desc)
     vtag['vtpid'] = vtpid
     vtag['natural'] = True
@@ -140,6 +145,7 @@ def vtag_stat_v1_view(request, vtpid, vtagid):
              字段    类型      说明
             ======= ========= =============================================
              n       unicode   虚标签名称
+             s       unicode   虚标签 slug
              d       unicode   虚标签描述
              t       bool      是否为自然虚标签,
                                ``false`` 表示程序自动生成
@@ -156,6 +162,7 @@ def vtag_stat_v1_view(request, vtpid, vtagid):
 
     stat_obj = {
             'n': vtag['name'],
+            's': vtag['slug'],
             'd': vtag['desc'],
             't': vtag['natural'],
             'x': vtag['xattr'],

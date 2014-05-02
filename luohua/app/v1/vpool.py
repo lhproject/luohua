@@ -188,6 +188,7 @@ def vpool_getdents_v1_view(request, vtpid):
             ====== ========= ==============================================
              i      unicode   虚标签 ID
              n      unicode   虚标签名称
+             s      unicode   虚标签 slug
              d      unicode   虚标签描述
             ====== ========= ==============================================
 
@@ -204,6 +205,7 @@ def vpool_getdents_v1_view(request, vtpid):
         result.append({
                 'i': vtag['id'],
                 'n': vtag['name'],
+                's': vtag['slug'],
                 'd': vtag['desc'],
                 })
 
