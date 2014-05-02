@@ -44,6 +44,12 @@ TIMESTAMP_LIMIT = 1 << 35
 PRNG = random.SystemRandom()
 
 
+def _get_suffix():
+    '''生成一个随机后缀字符串.'''
+
+    return '%04x' % PRNG.randint(0, 0xffff)
+
+
 def time_ascending(timestamp=None):
     '''生成一个随时间推移而比较顺序递增的字符串.'''
 
@@ -61,13 +67,13 @@ def time_descending(timestamp=None):
 def time_ascending_suffixed(timestamp=None):
     '''生成一个随时间推移而比较顺序递增的字符串, 带上一个随机后缀.'''
 
-    return time_ascending(timestamp) + ('%04d' % PRNG.randint(0, 9999))
+    return time_ascending(timestamp) + _get_suffix()
 
 
 def time_descending_suffixed(timestamp=None):
     '''生成一个随时间推移而比较顺序递减的字符串, 带上一个随机后缀.'''
 
-    return time_descending(timestamp) + ('%04d' % PRNG.randint(0, 9999))
+    return time_descending(timestamp) + _get_suffix()
 
 
 def ascending_ts(timestamp=None):
