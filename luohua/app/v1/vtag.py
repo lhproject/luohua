@@ -27,6 +27,7 @@ from ..session.decorators import require_cap
 from ...utils.viewhelpers import jsonreply, parse_form
 from ...datastructures.vtag import VTag
 from ...datastructures.vthread import VThread
+from ...utils.sequences import time_ascending_short_suffixed
 
 
 @http
@@ -91,6 +92,9 @@ def vtag_creat_v1_view(request, vtpid):
 
     if vtagid is not None:
         vtag['id'] = vtagid
+    else:
+        # 使用一个简短一点的 ID...
+        vtag['id'] = time_ascending_short_suffixed()
 
     vtag['name'] = smartstr(name)
     vtag['desc'] = smartstr(desc)
