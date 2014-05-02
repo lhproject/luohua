@@ -24,6 +24,10 @@ __all__ = [
         'time_descending',
         'time_ascending_suffixed',
         'time_descending_suffixed',
+        'time_ascending_short',
+        'time_descending_short',
+        'time_ascending_short_suffixed',
+        'time_descending_short_suffixed',
         'ascending_ts',
         'descending_ts',
         ]
@@ -31,7 +35,7 @@ __all__ = [
 import time
 import random
 
-from .radices import to36
+from .radices import to36, to62
 
 # 这是 UTC 时间 3058/10/26 03:46:08, 一千多年之后还会有人在用这个软件么...
 # 抛开感伤, 这只是实现递减时间戳必须给定的一个 "时间尽头" 而已, 给到这个程度
@@ -74,6 +78,32 @@ def time_descending_suffixed(timestamp=None):
     '''生成一个随时间推移而比较顺序递减的字符串, 带上一个随机后缀.'''
 
     return time_descending(timestamp) + _get_suffix()
+
+
+def time_ascending_short(timestamp=None):
+    '''生成一个简短的随时间推移而比较顺序递增的字符串.'''
+
+    ts_actual = timestamp if timestamp is not None else int(time.time())
+    return to62(ts_actual)
+
+
+def time_descending_short(timestamp=None):
+    '''生成一个简短的随时间推移而比较顺序递减的字符串.'''
+
+    ts_actual = timestamp if timestamp is not None else int(time.time())
+    return to62(TIMESTAMP_LIMIT - ts_actual)
+
+
+def time_ascending_short_suffixed(timestamp=None):
+    '''生成一个简短的随时间推移而比较顺序递增的字符串, 带上一个随机后缀.'''
+
+    return time_ascending_short(timestamp) + _get_suffix()
+
+
+def time_descending_short_suffixed(timestamp=None):
+    '''生成一个简短的随时间推移而比较顺序递减的字符串, 带上一个随机后缀.'''
+
+    return time_descending_short(timestamp) + _get_suffix()
 
 
 def ascending_ts(timestamp=None):
