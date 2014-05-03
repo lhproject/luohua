@@ -185,9 +185,9 @@ def vfile_creat_v1_view(request):
          vtpid     unicode   新建虚文件所属虚线索池 ID,
                              新建虚线索时\ **必须**\ 传入, 否则\ **不能**\
                              传入
-         vtags     list      新建虚文件所属虚标签列表的 JSON 表示,
-                             长度至少为 1. 新建虚线索时\ **必须**\ 传入,
-                             否则\ **不能**\ 传入
+         vtags     list      新建虚文件所属的虚标签列表, 长度至少为 1.
+                             新建虚线索时\ **必须**\ 传入, 否则\ **不能**\
+                             传入
          inreply2  unicode   **可选** 新建虚文件属于哪个虚文件的直接回复.
                              只能支持一层间接回复; 省略则回复楼主.
                              新建虚线索时此参数\ **不能**\ 传入
@@ -219,7 +219,7 @@ def vfile_creat_v1_view(request):
     '''
 
     try:
-        vtpid, vtags_json, vthid, inreply2, title, content = parse_form(
+        vtpid, vtags, vthid, inreply2, title, content = parse_form(
                 request,
                 'vtpid',
                 'vtags',
@@ -248,7 +248,7 @@ def vfile_creat_v1_view(request):
         return _do_creat_vf_with_vth(
                 request,
                 vtpid,
-                vtags_json,
+                vtags,
                 inreply2,
                 title_str,
                 content_str,
@@ -257,7 +257,7 @@ def vfile_creat_v1_view(request):
     return _do_creat_vf_reply(
             request,
             vtpid,
-            vtags_json,
+            vtags,
             vthid,
             inreply2,
             title_str,
@@ -269,7 +269,7 @@ def vfile_creat_v1_view(request):
 def _do_creat_vf_with_vth(
             request,
             vtpid,
-            vtags_json,
+            vtags,
             inreply2,
             title,
             content,
@@ -278,18 +278,13 @@ def _do_creat_vf_with_vth(
 
     # 如果新建 VThread, title 必须, vtpid 必须, vtags 必须,
     # inreply2 不能传入 (无意义)
-    if title is None or vtpid is None or vtags_json is None:
+    if title is None or vtpid is None or vtags is None:
         return jsonreply(r=22)
 
     if inreply2 is not None:
         return jsonreply(r=22)
 
-    # 反序列化并验证 VTag ID 列表
-    try:
-        vtags = json.loads(vtags_json)
-    except ValueError:
-        return jsonreply(r=22)
-
+    # 验证 VTag ID 列表
     if not isinstance(vtags, list):
         return jsonreply(r=22)
 
@@ -336,7 +331,7 @@ def _do_creat_vf_with_vth(
 def _do_creat_vf_reply(
         request,
         vtpid,
-        vtags_json,
+        vtags,
         vthid,
         inreply2,
         title,
@@ -345,7 +340,7 @@ def _do_creat_vf_reply(
     '''新建一个虚文件回复并保存.'''
 
     # 如果新建回复, vtpid, vtags 不能传入
-    if vtpid is not None or vtags_json is not None:
+    if vtpid is not None or vtags is not None:
         return jsonreply(r=22)
 
     vth = VThread.fetch(vthid)
