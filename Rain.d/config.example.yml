@@ -2,6 +2,7 @@ $$include:
   - site.yml
   - adapter.yml
   - rendering.yml
+  - router.example.yml
   - lh.bridge.example.yml
   - lh.celery.example.yml
   - lh.mail.example.yml

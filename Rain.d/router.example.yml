@@ -1,0 +1,7 @@
+weiyu.router:
+  variables:
+    API_HOST: 127.0.0.1:9090
+    RT_HOST: 127.0.0.1:9091
+
+
+# vim:set ai et ts=2 sw=2 sts=2 fenc=utf=8:

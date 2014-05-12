@@ -2,6 +2,7 @@
 --default-type=regex
 --renderer=json
 --scope=api
+--host=${API_HOST}
 
 session/:
     ^auth/$ session-auth-v1

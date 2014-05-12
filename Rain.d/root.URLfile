@@ -4,7 +4,11 @@
 /v1/:
     --include=apiv1
 
-/socket.io rt-gateway
+/socket.io:
+    # 这个文件没有设置默认路由类, 所以这里也需要声明一下
+    --exact
+    --host=${RT_HOST}
+    "" rt-gateway
 
 # fallback (兜底), 也就是 404 的意思
 "" http-404
