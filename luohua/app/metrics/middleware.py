@@ -43,6 +43,7 @@ class LHMetricsMiddleware(object):
 
         log = get_req_prefixed_logger(request)
 
+        log('Host=' + request.host)
         log('Path=' + request.path)
         log('From=' + request.remote_addr)
 
