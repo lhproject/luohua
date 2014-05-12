@@ -50,7 +50,7 @@ class LHMetricsMiddleware(object):
         try:
             log('UA=' + request.env['HTTP_USER_AGENT'])
         except KeyError:
-            log('UA n/a')
+            log('UA=n/a')
 
     def do_post(self, response):
         end_time = time.time()
