@@ -56,3 +56,6 @@ Rain.d/lh.celery.yml
 Rain.d/lh.mail.yml
 Rain.d/lh.univ.yml
 Rain.d/lh.rt.yml
+
+# dev config
+dev-environment.sh

@@ -1,3 +1,6 @@
 #!/bin/sh
-# XXX: 一定要设置 $LH_{KEY,CERT}FILE 变量, 否则命令语法就不对了!
+
+# TODO: 相对脚本位置定位环境配置
+source ./dev-environment.sh
+
 exec gunicorn -w2 -k gevent --keyfile "${LH_KEYFILE}" --certfile "${LH_CERTFILE}" -b 127.0.0.1:9090 luohua.app.wsgi
