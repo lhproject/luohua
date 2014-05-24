@@ -309,7 +309,7 @@ def _do_creat_vf_with_vth(
 
     # 当前用户的信息快照
     assert request.user is not None
-    uid, user_snapshot = request.user['id'], request.user.encode()
+    uid, user_snapshot = smartstr(request.user['id']), request.user.encode()
 
     # 新建 VFile
     new_vf = VFile()
@@ -373,7 +373,7 @@ def _do_creat_vf_reply(
 
     # 当前用户的信息快照
     assert request.user is not None
-    uid, user_snapshot = request.user['id'], request.user.encode()
+    uid, user_snapshot = smartstr(request.user['id']), request.user.encode()
 
     # 创建虚文件
     new_vf = VFile()
