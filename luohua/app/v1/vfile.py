@@ -136,7 +136,8 @@ def vfile_read_v1_view(request, vfid):
         :s:
             所请求虚文件的内容. 如果查询不成功, 此属性不存在.
 
-            比起 stat 接口, 唯一的差别是内容长度字段变成了实际的内容.
+            该接口与 stat 接口的差别是内容长度字段变成了实际的内容,
+            并增加了内容格式的说明.
 
             ====== ========= ==============================================
              字段   类型     说明
@@ -145,6 +146,7 @@ def vfile_read_v1_view(request, vfid):
              o      unicode   所有者 ID
              c      int       创建时间 Unix 时间戳
              n      unicode   虚文件内容
+             f      unicode   虚文件内容格式, 如 ``'txt'`` 或 ``'ubb'``
              x      dict      虚文件上附着的扩展属性
             ====== ========= ==============================================
 
@@ -161,6 +163,7 @@ def vfile_read_v1_view(request, vfid):
             'o': vf['owner'],
             'c': vf['ctime'],
             'n': vf['content'],
+            'f': vf['format'],
             'x': vf['xattr'],
             }
 
@@ -172,6 +175,10 @@ def vfile_read_v1_view(request, vfid):
 @require_cap('vf-creat')
 def vfile_creat_v1_view(request):
     '''v1 虚文件创建接口.
+
+    .. note::
+
+        API v1 只能创建纯文本格式的虚文件, 这个限制将在之后的 API 版本中解除.
 
     :Allow: POST
     :URL 格式: :wyurl:`api:vfile-creat-v1`
@@ -300,15 +307,23 @@ def _do_creat_vf_with_vth(
     # 记录时间一次, 之后都用这个
     now = int(time.time())
 
+    # 当前用户的信息快照
+    assert request.user is not None
+    uid, user_snapshot = request.user['id'], request.user.encode()
+
     # 新建 VFile
     new_vf = VFile()
     new_vf['id'] = _new_vfid(now)
 
-    uid = request.user['id']
     new_vf['owner'] = uid
+    new_vf['owner_snapshot'] = user_snapshot
     new_vf['ctime'] = now
     new_vf['title'] = title
     new_vf['content'] = content
+
+    # API v1 里把内容格式写死算了
+    new_vf['format'] = 'txt'
+
     new_vf['xattr'] = {}
     new_vf.save()
 
@@ -317,6 +332,7 @@ def _do_creat_vf_with_vth(
     new_vth['id'] = _new_vthid(now)
     new_vth['title'] = title
     new_vth['owner'] = uid
+    new_vth['owner_snapshot'] = user_snapshot
     new_vth['ctime'] = now
     new_vth['mtime'] = now
     new_vth['tree'] = VThreadTree([new_vf['id'], ])
@@ -355,13 +371,22 @@ def _do_creat_vf_reply(
 
     now = int(time.time())
 
+    # 当前用户的信息快照
+    assert request.user is not None
+    uid, user_snapshot = request.user['id'], request.user.encode()
+
     # 创建虚文件
     new_vf = VFile()
     new_vf['id'] = _new_vfid(now)
-    new_vf['owner'] = request.user['id']
+    new_vf['owner'] = uid
+    new_vf['owner_snapshot'] = user_snapshot
     new_vf['ctime'] = int(time.time())
     new_vf['title'] = title if title is not None else ''
     new_vf['content'] = content
+
+    # 见上, 写死内容格式
+    new_vf['format'] = 'txt'
+
     new_vf['xattr'] = {}
     new_vf.save()
 
