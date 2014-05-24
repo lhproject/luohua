@@ -23,6 +23,7 @@ import types
 
 from ..utils import Case
 from ..shortcuts import *
+from ..fixtures import TEST_USERS
 
 from luohua.datastructures import vfile
 
@@ -30,10 +31,11 @@ from luohua.datastructures import vfile
 class TestVFile(Case):
     @classmethod
     def setup_class(cls):
-        cls.owner_id = 'foobar'
+        cls.owner_struct = TEST_USERS['9fabe73980ff48aba62303812aa93765']
         cls.ctime = 1329493828  # 这个其实是微雨 repo 的初始提交时间
         cls.title = 'Test topic 测试话题 ざわざわ'
         cls.content = '这是测试内容。\n有换行，显得比较真实\n'
+        cls.format = 'txt'
         cls.xattr = {
                 'a': 1,
                 'b': True,
@@ -42,10 +44,11 @@ class TestVFile(Case):
         cls.file_1 = vfile.VFile(
                 {
                     '_V': 1,
-                    'o': cls.owner_id,
+                    'o': cls.owner_struct,
                     'c': cls.ctime,
                     't': cls.title,
                     'n': cls.content,
+                    'f': cls.format,
                     'x': cls.xattr,
                     },
                 )
@@ -57,10 +60,11 @@ class TestVFile(Case):
     def test_props_v1(self):
         vf = self.file_1
 
-        assert vf['owner'] == self.owner_id
+        assert vf['owner'] == self.owner_struct
         assert vf['ctime'] == self.ctime
         assert vf['title'] == self.title
         assert vf['content'] == self.content
+        assert vf['format'] == self.format
         assert vf['xattr'] == self.xattr
 
     def test_db_ops(self):

@@ -23,13 +23,23 @@ import functools
 
 import six
 
-from ..utils.dblayer import RiakDocument
+from ..auth import user
+from ..utils import dblayer
 
 VF_STRUCT_ID = 'luohua.vf'
 
+VF_FORMAT_PLAIN = 'txt'
+VF_FORMAT_UBB = 'ubb'
+VF_FORMAT_MARKDOWN = 'md'
+VF_SUPPORTED_FORMATS = frozenset({
+        VF_FORMAT_PLAIN,
+        VF_FORMAT_UBB,
+        VF_FORMAT_MARKDOWN,
+        })
+
 
 @functools.total_ordering
-class VFile(RiakDocument):
+class VFile(dblayer.RiakDocument):
     '''虚文件.
 
     本结构的存储后端应为 Riak.
@@ -56,6 +66,7 @@ def vf_dec_v1(data):
             'ctime': data['c'],
             'title': data['t'],
             'content': data['n'],
+            'format': data['f'],
             'xattr': data['x'],
             }
 
@@ -63,11 +74,16 @@ def vf_dec_v1(data):
 @VFile.encoder(1)
 def vf_enc_v1(vf):
     assert 'owner' in vf
+    assert isinstance(vf['owner'], dict)
     assert 'ctime' in vf
+    assert isinstance(vf['ctime'], six.integer_types)
     assert 'title' in vf
     assert isinstance(vf['title'], six.text_type)
     assert 'content' in vf
     assert isinstance(vf['content'], six.text_type)
+    assert 'format' in vf
+    assert isinstance(vf['format'], six.text_type)
+    assert vf['format'] in VF_SUPPORTED_FORMATS
     assert 'xattr' in vf
     assert isinstance(vf['xattr'], dict)
 
@@ -76,6 +92,7 @@ def vf_enc_v1(vf):
             'c': vf['ctime'],
             't': vf['title'],
             'n': vf['content'],
+            'f': vf['format'],
             'x': vf['xattr'],
             }
 
