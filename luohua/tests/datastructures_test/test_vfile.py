@@ -31,7 +31,8 @@ from luohua.datastructures import vfile
 class TestVFile(Case):
     @classmethod
     def setup_class(cls):
-        cls.owner_struct = TEST_USERS['9fabe73980ff48aba62303812aa93765']
+        cls.owner_uid = '9fabe73980ff48aba62303812aa93765'
+        cls.owner_struct = TEST_USERS[cls.owner_uid]
         cls.ctime = 1329493828  # 这个其实是微雨 repo 的初始提交时间
         cls.title = 'Test topic 测试话题 ざわざわ'
         cls.content = '这是测试内容。\n有换行，显得比较真实\n'
@@ -44,7 +45,8 @@ class TestVFile(Case):
         cls.file_1 = vfile.VFile(
                 {
                     '_V': 1,
-                    'o': cls.owner_struct,
+                    'o': cls.owner_uid,
+                    'os': cls.owner_struct,
                     'c': cls.ctime,
                     't': cls.title,
                     'n': cls.content,
@@ -60,7 +62,8 @@ class TestVFile(Case):
     def test_props_v1(self):
         vf = self.file_1
 
-        assert vf['owner'] == self.owner_struct
+        assert vf['owner'] == self.owner_uid
+        assert vf['owner_snapshot'] == self.owner_struct
         assert vf['ctime'] == self.ctime
         assert vf['title'] == self.title
         assert vf['content'] == self.content
@@ -79,6 +82,7 @@ class TestVFile(Case):
         vf2 = vfile.VFile.fetch(vfid)
         assert vf2['id'] == vf1['id']
         assert vf2['owner'] == vf1['owner']
+        assert vf2['owner_snapshot'] == vf1['owner_snapshot']
         assert vf2['ctime'] == vf1['ctime']
         assert vf2['title'] == vf1['title']
         assert vf2['content'] == vf1['content']

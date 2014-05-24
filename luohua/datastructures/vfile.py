@@ -63,6 +63,7 @@ class VFile(dblayer.RiakDocument):
 def vf_dec_v1(data):
     return {
             'owner': data['o'],
+            'owner_snapshot': data['os'],
             'ctime': data['c'],
             'title': data['t'],
             'content': data['n'],
@@ -74,7 +75,9 @@ def vf_dec_v1(data):
 @VFile.encoder(1)
 def vf_enc_v1(vf):
     assert 'owner' in vf
-    assert isinstance(vf['owner'], dict)
+    assert isinstance(vf['owner'], six.text_type)
+    assert 'owner_snapshot' in vf
+    assert isinstance(vf['owner_snapshot'], dict)
     assert 'ctime' in vf
     assert isinstance(vf['ctime'], six.integer_types)
     assert 'title' in vf
@@ -89,6 +92,7 @@ def vf_enc_v1(vf):
 
     return {
             'o': vf['owner'],
+            'os': vf['owner_snapshot'],
             'c': vf['ctime'],
             't': vf['title'],
             'n': vf['content'],
