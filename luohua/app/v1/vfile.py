@@ -100,6 +100,12 @@ def vfile_stat_v1_view(request, vfid):
     if vf is None:
         return jsonreply(r=2)
 
+    # If-Modified-Since
+    client_cache_ts = request.conditional.get('If-Modified-Since', None)
+    if client_cache_ts is not None:
+        if vf['ctime'] <= client_cache_ts:
+            return 304, {}, {'last_modified': vf['ctime'], }
+
     stat_obj = {
             't': vf['title'],
             'o': vf['owner'],
@@ -108,7 +114,16 @@ def vfile_stat_v1_view(request, vfid):
             'x': vf['xattr'],
             }
 
-    return jsonreply(r=0, s=stat_obj)
+    return (
+            200,
+            {
+                'r': 0,
+                's': stat_obj,
+                },
+            {
+                'last_modified': vf['ctime'],
+                },
+            )
 
 
 @http
@@ -158,6 +173,12 @@ def vfile_read_v1_view(request, vfid):
     if vf is None:
         return jsonreply(r=2)
 
+    # If-Modified-Since
+    client_cache_ts = request.conditional.get('If-Modified-Since', None)
+    if client_cache_ts is not None:
+        if vf['ctime'] <= client_cache_ts:
+            return 304, {}, {'last_modified': vf['ctime'], }
+
     stat_obj = {
             't': vf['title'],
             'o': vf['owner'],
@@ -167,7 +188,16 @@ def vfile_read_v1_view(request, vfid):
             'x': vf['xattr'],
             }
 
-    return jsonreply(r=0, s=stat_obj)
+    return (
+            200,
+            {
+                'r': 0,
+                's': stat_obj,
+                },
+            {
+                'last_modified': vf['ctime'],
+                },
+            )
 
 
 @http
