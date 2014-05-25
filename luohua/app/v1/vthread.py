@@ -72,6 +72,12 @@ def vthread_stat_v1_view(request, vthid):
     if vth is None:
         return jsonreply(r=2)
 
+    # If-Modified-Since
+    client_cache_ts = request.conditional.get('If-Modified-Since', None)
+    if client_cache_ts is not None:
+        if vth['mtime'] <= client_cache_ts:
+            return 304, {}, {'last_modified': vth['mtime'], }
+
     stat_obj = {
             't': vth['title'],
             'o': vth['owner'],
@@ -81,7 +87,17 @@ def vthread_stat_v1_view(request, vthid):
             'p': vth['vtpid'],
             'x': vth['xattr'],
             }
-    return jsonreply(r=0, s=stat_obj)
+
+    return (
+            200,
+            {
+                'r': 0,
+                's': stat_obj,
+                },
+            {
+                'last_modified': vth['mtime'],
+                },
+            )
 
 
 @http
@@ -132,7 +148,22 @@ def vthread_getdents_v1_view(request, vthid):
     if vth is None:
         return jsonreply(r=2)
 
-    return jsonreply(r=0, l=vth['tree'].tree)
+    # If-Modified-Since
+    client_cache_ts = request.conditional.get('If-Modified-Since', None)
+    if client_cache_ts is not None:
+        if vth['mtime'] <= client_cache_ts:
+            return 304, {}, {'last_modified': vth['mtime'], }
+
+    return (
+            200,
+            {
+                'r': 0,
+                'l': vth['tree'].tree,
+                },
+            {
+                'last_modified': vth['mtime'],
+                },
+            )
 
 
 @http
