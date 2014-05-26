@@ -164,7 +164,11 @@ class Role(RiakDocument):
 
         '''
 
-        return combine_caps(*(r['caps'] for r in cls.fetch_multiple(rids)))
+        return combine_caps(*[
+                r['caps']
+                for r in cls.fetch_multiple(rids)
+                if r is not None
+                ])
 
     def grant_cap(self, cap):
         '''授予该角色一个权限.
