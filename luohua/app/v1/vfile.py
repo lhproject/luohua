@@ -59,75 +59,6 @@ def _new_vthid(timestamp):
 
 @http
 @jsonview
-def vfile_stat_v1_view(request, vfid):
-    '''v1 虚文件状态接口.
-
-    :Allow: GET
-    :URL 格式: :wyurl:`api:vfile-stat-v1`
-    :GET 参数:
-        ====== ========= ==================================================
-         字段   类型      说明
-        ====== ========= ==================================================
-         vfid   unicode   虚文件 ID
-        ====== ========= ==================================================
-
-    :POST 参数: 无
-    :返回:
-        :r:
-            === ===========================================================
-             0   查询成功
-             2   所请求的虚文件不存在
-            === ===========================================================
-
-        :s:
-            所请求虚文件的状态. 如果查询不成功, 此属性不存在.
-
-            ====== ======== ===============================================
-             字段   类型     说明
-            ====== ======== ===============================================
-             t      unicode  虚文件标题
-             o      unicode  所有者 ID
-             c      int      创建时间 Unix 时间戳
-             l      int      内容长度
-             x      dict     虚文件上附着的扩展属性
-            ====== ======== ===============================================
-
-    :副作用: 无
-
-    '''
-
-    vf = VFile.fetch(vfid)
-    if vf is None:
-        return jsonreply(r=2)
-
-    # If-Modified-Since
-    client_cache_ts = request.conditional.get('If-Modified-Since', None)
-    if client_cache_ts is not None:
-        if vf['ctime'] <= client_cache_ts:
-            return 304, {}, {'last_modified': vf['ctime'], }
-
-    stat_obj = {
-            't': vf['title'],
-            'o': vf['owner'],
-            'c': vf['ctime'],
-            'l': len(vf['content']),
-            'x': vf['xattr'],
-            }
-
-    return (
-            200,
-            {
-                'r': 0,
-                's': stat_obj,
-                },
-            {
-                'last_modified': vf['ctime'],
-                },
-            )
-
-
-@http
-@jsonview
 def vfile_read_v1_view(request, vfid):
     '''v1 虚文件读取接口.
 
@@ -150,9 +81,6 @@ def vfile_read_v1_view(request, vfid):
 
         :s:
             所请求虚文件的内容. 如果查询不成功, 此属性不存在.
-
-            该接口与 stat 接口的差别是内容长度字段变成了实际的内容,
-            并增加了内容格式的说明.
 
             ====== ========= ==============================================
              字段   类型     说明

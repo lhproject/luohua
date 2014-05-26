@@ -39,7 +39,6 @@ class TestVFileViews(Case):
         # XXX 这里使用了微雨框架的实现细节
         http_views = router_hub._endpoints['http']
 
-        assert 'vfile-stat-v1' in http_views
         assert 'vfile-read-v1' in http_views
         assert 'vfile-creat-v1' in http_views
         assert 'vfile-fcntl-v1' in http_views

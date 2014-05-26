@@ -44,7 +44,6 @@ vth/:
 vf/:
     ^creat/$ vfile-creat-v1
     ^(?P<vfid>[^/]+)/:
-        ^stat/$ vfile-stat-v1
         ^read/$ vfile-read-v1
         ^fcntl/$ vfile-fcntl-v1
 
