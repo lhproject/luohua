@@ -136,7 +136,8 @@ def vfile_creat_v1_view(request):
 
     .. note::
 
-        API v1 只能创建纯文本格式的虚文件, 这个限制将在之后的 API 版本中解除.
+        API v1 只能创建 Markdown 格式的虚文件,
+        这个限制将在之后的 API 版本中解除.
 
     :Allow: POST
     :URL 格式: :wyurl:`api:vfile-creat-v1`
@@ -280,7 +281,7 @@ def _do_creat_vf_with_vth(
     new_vf['content'] = content
 
     # API v1 里把内容格式写死算了
-    new_vf['format'] = 'txt'
+    new_vf['format'] = 'md'
 
     new_vf['xattr'] = {}
     new_vf.save()
@@ -343,7 +344,7 @@ def _do_creat_vf_reply(
     new_vf['content'] = content
 
     # 见上, 写死内容格式
-    new_vf['format'] = 'txt'
+    new_vf['format'] = 'md'
 
     new_vf['xattr'] = {}
     new_vf.save()
