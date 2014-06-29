@@ -26,8 +26,13 @@ def main():
             'listen': (listen_conf['host'], listen_conf['port']),
             'resource': 'socket.io',
             'policy_server': policy_conf['enabled'],
-            'policy_listener': (policy_conf['host'], policy_conf['port']),
             }
+
+    # 只有启用 policy_server 才设置这个参数, 否则会报错
+    if policy_conf['enabled']:
+        options.update({
+                'policy_listener': (policy_conf['host'], policy_conf['port']),
+                })
 
     if ssl_conf.get('enabled', True):
         # ssl_args
