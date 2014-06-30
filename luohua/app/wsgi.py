@@ -25,7 +25,20 @@ from weiyu import init
 
 _PROJECT_PATH = os.path.join(os.path.dirname(__file__), '../..')
 os.chdir(_PROJECT_PATH)
+
+# calm lint
+application = None
 init.inject_app()
+
+
+# Sentry init
+if 'SENTRY_DSN' in os.environ:
+    from raven import Client
+    from raven.middleware import Sentry
+
+    sentry_client = Client()
+    application = Sentry(application, client=sentry_client)
+
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
