@@ -64,6 +64,7 @@ __all__ = [
         ]
 
 import six
+import time
 
 from weiyu.helpers.misc import smartbytes
 
@@ -233,6 +234,39 @@ class FrozenIdent(dblayer.RiakDocument):
                 )
 
         return obj
+
+    @property
+    def is_student(self):
+        return self['type'] in IDENT_TYPES_STUDENT
+
+    @property
+    def is_staff(self):
+        return self['type'] == IDENT_TYPE_STAFF
+
+    @property
+    def is_undergrad_graduated(self):
+        # TODO: 这里存在各种问题, 比如延长毕业什么的...
+        # 作为一个程序, 处理这些人类世界的例外情况显然不合适, 让我们等到第一个
+        # 这种同学的 use case 再来完善数据结构吧
+
+        # 首先判断是不是本科生...
+        if self['type'] != IDENT_TYPE_UNDERGRAD:
+            raise AttributeError(
+                    'non-undergrads have no defined graduation time for now'
+                    )
+
+        # 然后检查入学年份和当前年月...
+        # 把入学年份 + 4 年的 7 月 1 号当作毕业时间点
+        grad_yr = self['student_year'] + 4
+
+        curr_tm = time.localtime(time.time())
+        if curr_tm.tm_year > grad_yr:
+            return True
+        elif curr_tm.tm_year < grad_yr:
+            return False
+        else:
+            # 年份一致, 检查月份
+            return curr_tm.tm_month >= 7
 
 
 class Ident(dblayer.RiakDocument):
