@@ -1,4 +1,4 @@
-# 落花项目  [![Build Status](https://travis-ci.org/jnrainerds/luohua.png)](https://travis-ci.org/jnrainerds/luohua) [![Coverage Status](https://coveralls.io/repos/jnrainerds/luohua/badge.png?branch=master)](https://coveralls.io/r/jnrainerds/luohua?branch=master) [![Total views](https://sourcegraph.com/api/repos/github.com/jnrainerds/luohua/counters/views.png)](https://sourcegraph.com/github.com/jnrainerds/luohua) [![Views in the last 24 hours](https://sourcegraph.com/api/repos/github.com/jnrainerds/luohua/counters/views-24h.png?no-count=1)](https://sourcegraph.com/github.com/jnrainerds/luohua)
+# 落花项目  [![Build Status](https://travis-ci.org/jnrain/luohua.png)](https://travis-ci.org/jnrain/luohua) [![Coverage Status](https://coveralls.io/repos/jnrain/luohua/badge.png?branch=master)](https://coveralls.io/r/jnrain/luohua?branch=master) [![Total views](https://sourcegraph.com/api/repos/github.com/jnrain/luohua/counters/views.png)](https://sourcegraph.com/github.com/jnrain/luohua) [![Views in the last 24 hours](https://sourcegraph.com/api/repos/github.com/jnrain/luohua/counters/views-24h.png?no-count=1)](https://sourcegraph.com/github.com/jnrain/luohua)
 
 ![luohua logo](/docs/_static/logo-720x240.png)
 
@@ -32,7 +32,7 @@
 
 ## 部署说明
 
-**注意** 这里仅仅描述本项目 (后端) 的部署; 前端环境部署请参见 `jnrainerds/jnrain-web` 项目的说明.
+**注意** 这里仅仅描述本项目 (后端) 的部署; 前端环境部署请参见 `jnrain/jnrain-web` 项目的说明.
 
 为简化描述, 假定操作者具备基本的 Linux 命令行生存能力, 例如路径, 工作目录, 命令参数, 转义 (escape) 之类的基本概念不再赘述.
 
