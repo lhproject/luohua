@@ -38,6 +38,8 @@ from ...datastructures.vtag import VTag
 from ...datastructures.vthread import VThread, VThreadTree
 from ...datastructures.vfile import VFile
 
+from ...rt import pubsub
+
 
 def _new_vfid(timestamp):
     for trial in xrange(5):
@@ -300,6 +302,22 @@ def _do_creat_vf_with_vth(
     new_vth['xattr'] = {}
     new_vth.save()
 
+    # 发送实时事件
+    rt_event_params = {
+            'vthid': new_vth['id'],
+            'vtpid': vtpid,
+            'vtags': vtags,
+            'title': title,
+            'owner': {
+                'uid': uid,
+                'display_name': request.user['display_name'],
+                },
+            }
+
+    # 用户频道
+    pubsub.publish_user_event(uid, 'new_vth', **rt_event_params)
+    # TODO: vtp 频道, vtag 频道
+
     return jsonreply(r=0, f=new_vf['id'], t=new_vth['id'], )
 
 
@@ -355,6 +373,24 @@ def _do_creat_vf_reply(
     vth['mtime'] = now
     vth['tree'].append_to(inreply2, new_vf['id'])
     vth.save()
+
+    # 发送实时事件
+    rt_event_params = {
+            'vfid': new_vf['id'],
+            'vthid': vthid,
+            'vtpid': vth['vtpid'],
+            'vtags': vth['vtags'],
+            'inreply2': inreply2,
+            'title': title,
+            'owner': {
+                'uid': uid,
+                'display_name': request.user['display_name'],
+                },
+            }
+
+    # 用户频道
+    pubsub.publish_user_event(uid, 'new_reply', **rt_event_params)
+    # TODO: vtp, vtag, vth 频道
 
     return jsonreply(r=0, f=new_vf['id'], )
 
