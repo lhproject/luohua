@@ -27,7 +27,7 @@ from ..utils.dblayer import RiakDocument
 
 VTAG_STRUCT_ID = 'luohua.vtag'
 
-VTAG_VTP_INDEX = 'vtp_bin'
+VTAG_VTP_INDEX = b'vtp_bin'
 
 
 class VTag(RiakDocument):
