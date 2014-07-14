@@ -21,6 +21,8 @@ from __future__ import unicode_literals, division
 
 import six
 
+from weiyu.helpers.misc import smartbytes
+
 from ..utils.dblayer import RiakDocument
 
 VTAG_STRUCT_ID = 'luohua.vtag'
@@ -52,7 +54,7 @@ class VTag(RiakDocument):
         return cls._do_fetch_by_index(VTAG_VTP_INDEX, vtpid)
 
     def _do_sync_2i(self, obj):
-        obj.set_index(VTAG_VTP_INDEX, self['vtpid'])
+        obj.set_index(VTAG_VTP_INDEX, smartbytes(self['vtpid']))
         return obj
 
 
