@@ -21,18 +21,20 @@ from __future__ import unicode_literals, division
 
 import six
 
+from weiyu.helpers.misc import smartbytes
+
 from ..utils.dblayer import RiakDocument
 from ..utils.sequences import time_descending
 from .vfile import VFile
 
 VTH_STRUCT_ID = 'luohua.vth'
 
-VTH_VTP_INDEX = 'vtp_bin'
-VTH_VTAG_INDEX = 'vtag_bin'
-VTH_CTIME_INDEX = 'ctime_int'
-VTH_MTIME_INDEX = 'mtime_int'
-VTH_VTAG_CTIME_COMPOSITE_INDEX = 'vtagctime_bin'
-VTH_VTAG_MTIME_COMPOSITE_INDEX = 'vtagmtime_bin'
+VTH_VTP_INDEX = b'vtp_bin'
+VTH_VTAG_INDEX = b'vtag_bin'
+VTH_CTIME_INDEX = b'ctime_int'
+VTH_MTIME_INDEX = b'mtime_int'
+VTH_VTAG_CTIME_COMPOSITE_INDEX = b'vtagctime_bin'
+VTH_VTAG_MTIME_COMPOSITE_INDEX = b'vtagmtime_bin'
 
 
 class VThreadTree(object):
@@ -237,7 +239,7 @@ class VThread(RiakDocument):
         obj.set_index(VTH_MTIME_INDEX, mtime)
 
         # 虚线索池
-        obj.set_index(VTH_VTP_INDEX, self['vtpid'])
+        obj.set_index(VTH_VTP_INDEX, smartbytes(self['vtpid']))
 
         # 虚标签, 虚标签-时间复合检索索引
         # 这里根本没必要计算差异, 因为实际存储的时候本来就是全部替换掉的
@@ -253,10 +255,10 @@ class VThread(RiakDocument):
         descending_mtime = time_descending(mtime)
 
         for vtag in new_vtags_set:
-            obj.add_index(VTH_VTAG_INDEX, vtag)
+            obj.add_index(VTH_VTAG_INDEX, smartbytes(vtag))
 
-            ctime_idx_val = '%s_%s' % (vtag, descending_ctime, )
-            mtime_idx_val = '%s_%s' % (vtag, descending_mtime, )
+            ctime_idx_val = smartbytes('%s_%s' % (vtag, descending_ctime, ))
+            mtime_idx_val = smartbytes('%s_%s' % (vtag, descending_mtime, ))
             obj.add_index(VTH_VTAG_CTIME_COMPOSITE_INDEX, ctime_idx_val)
             obj.add_index(VTH_VTAG_MTIME_COMPOSITE_INDEX, mtime_idx_val)
 
