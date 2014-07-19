@@ -45,7 +45,7 @@ RT_SESSION_TOUCH_INTERVAL_SECS = 45
 @async_hub.register_ns('socketio', '/rt')
 class RTNamespace(BaseNamespace, BroadcastMixin):
     def get_initial_acl(self):
-        return ['on_hello', ]
+        return ['recv_connect', 'on_hello', ]
 
     def _initial_timeout_thread(self, timeout):
         time.sleep(timeout)
