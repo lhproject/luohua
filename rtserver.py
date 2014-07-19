@@ -25,7 +25,7 @@ try:
 
     from luohua.rt import state as rt_state
 
-    init.inject_app()
+    init.boot()
 except Exception:
     if SENTRY_CLIENT is not None:
         SENTRY_CLIENT.captureException()
