@@ -6,13 +6,30 @@ from __future__ import unicode_literals
 from gevent import monkey
 monkey.patch_all()
 
-from weiyu import init
-from weiyu import registry
-from weiyu.utils import server
+import os
 
-from luohua.rt import state as rt_state
+# Sentry
+if 'SENTRY_DSN' in os.environ:
+    try:
+        from raven import Client
+        SENTRY_CLIENT = Client()
+    except ImportError:
+        SENTRY_CLIENT = None
+else:
+    SENTRY_CLIENT = None
 
-init.inject_app()
+try:
+    from weiyu import init
+    from weiyu import registry
+    from weiyu.utils import server
+
+    from luohua.rt import state as rt_state
+
+    init.inject_app()
+except Exception:
+    if SENTRY_CLIENT is not None:
+        SENTRY_CLIENT.captureException()
+    raise
 
 
 def main():
@@ -51,8 +68,17 @@ def main():
     server.cli_server('socketio', **options)
 
 
+def main_wrapper(*args, **kwargs):
+    try:
+        return main(*args, **kwargs)
+    except Exception:
+        if SENTRY_CLIENT is not None:
+            SENTRY_CLIENT.captureException()
+        raise
+
+
 if __name__ == '__main__':
-    main()
+    main_wrapper()
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
