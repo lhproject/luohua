@@ -216,22 +216,27 @@ class FrozenIdent(dblayer.RiakDocument):
         return IDENT_OK
 
     def _do_sync_2i(self, obj):
-        obj.set_index(
-                FIDENT_STUD_SCHOOL_INDEX,
-                smartbytes(self['student_school']),
-                )
-        obj.set_index(
-                FIDENT_STUD_MAJOR_INDEX,
-                smartbytes(self['student_major']),
-                )
-        obj.set_index(
-                FIDENT_STUD_CLASS_INDEX,
-                smartbytes(self['student_class']),
-                )
-        obj.set_index(
-                FIDENT_STUD_YEAR_INDEX,
-                smartbytes(self['student_year']),
-                )
+        typ = self['type']
+
+        if typ in (IDENT_TYPE_UNDERGRAD, IDENT_TYPE_GRADUATE, ):
+            obj.set_index(
+                    FIDENT_STUD_SCHOOL_INDEX,
+                    smartbytes(self['student_school']),
+                    )
+            obj.set_index(
+                    FIDENT_STUD_MAJOR_INDEX,
+                    smartbytes(self['student_major']),
+                    )
+            obj.set_index(
+                    FIDENT_STUD_YEAR_INDEX,
+                    smartbytes(self['student_year']),
+                    )
+
+        if typ == IDENT_TYPE_UNDERGRAD:
+            obj.set_index(
+                    FIDENT_STUD_CLASS_INDEX,
+                    smartbytes(self['student_class']),
+                    )
 
         return obj
 
