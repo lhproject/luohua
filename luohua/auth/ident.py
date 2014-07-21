@@ -603,14 +603,24 @@ def frozen_ident_dec_v1(data):
             'id_number': data['in'],
             }
 
-    if typ in IDENT_TYPES_CURRENT_STUDENT:
-        # 学生信息
+    if typ == IDENT_TYPE_UNDERGRAD:
+        # 本科生信息
         result.update({
                 'student_school': data['ss'],
                 'student_major': data['sm'],
                 'student_class': data['sc'],
                 'student_year': data['sy'],
                 })
+    elif typ == IDENT_TYPE_GRADUATE:
+        # 研究生信息
+        result.update({
+                'student_school': data['ss'],
+                'student_year': data['sy'],
+                })
+    elif typ in (IDENT_TYPE_STAFF, IDENT_TYPE_OTHER, ):
+        raise NotImplementedError('ident type %s: TODO' % (repr(typ), ))
+    else:
+        raise ValueError('ident type %s not recognized' % (repr(typ), ))
 
     return result
 
@@ -643,8 +653,8 @@ def frozen_ident_enc_v1(ident):
             'in': ident['id_number'],
             }
 
-    # 学生信息
-    if typ in IDENT_TYPES_CURRENT_STUDENT:
+    if typ == IDENT_TYPE_UNDERGRAD:
+        # 本科生信息
         assert 'student_school' in ident
         assert 'student_major' in ident
         assert isinstance(ident['student_major'], six.text_type)
@@ -659,6 +669,25 @@ def frozen_ident_enc_v1(ident):
                 'sc': ident['student_class'],
                 'sy': ident['student_year'],
                 })
+    elif typ == IDENT_TYPE_GRADUATE:
+        # 研究生信息
+        assert 'student_school' in ident
+        assert isinstance(ident['student_school'], six.text_type)
+        assert 'student_major' in ident
+        assert isinstance(ident['student_major'], six.text_type)
+        # TODO: 研究生的班级划分是怎么一回事?
+        assert 'student_year' in ident
+        assert isinstance(ident['student_year'], six.integer_types)
+
+        result.update({
+                'ss': ident['student_school'],
+                'sm': ident['student_major'],
+                'sy': ident['student_year'],
+                })
+    elif typ in (IDENT_TYPE_STAFF, IDENT_TYPE_OTHER, ):
+        raise NotImplementedError('ident type %s: TODO' % (repr(typ), ))
+    else:
+        raise ValueError('ident type %s not recognized' % (repr(typ), ))
 
     return result
 
