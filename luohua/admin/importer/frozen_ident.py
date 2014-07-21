@@ -34,7 +34,7 @@ def import_student_frozen_idents(data):
             'male': True,  # 性别, 男性为真
             'school': '数字媒体学院',  # 学院名称
             'major': '0305',  # 专业代码
-            'klass': 1,  # 班级序号
+            'klass': 1,  # 班级序号, 如为研究生则忽略此字段
             'year': 2013,  # 入学年份
             'id_number_type': 0,  # 身份证号类型, 0 为后六位
             'id_number': '12345X',  # 身份证号
