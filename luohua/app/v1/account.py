@@ -369,7 +369,7 @@ def ident_query_v1_view(request):
             ==== ========= ================================================
              ss   unicode   所属学院全称, 如 ``'数字媒体学院'``.
              sm   unicode   所属专业代码, 如 ``'0305'``.
-             sc   int       所属班级序号, 从 1 开始.
+             sc   int       所属班级序号, 从 1 开始. 研究生个体无此字段.
              sy   int       入学年份.
             ==== ========= ================================================
 
@@ -418,11 +418,17 @@ def ident_query_v1_view(request):
             't': typ,
             }
 
-    if typ in ident.IDENT_TYPES_CURRENT_STUDENT:
+    if typ == ident.IDENT_TYPE_UNDERGRAD:
         result.update({
                 'ss': fident['student_school'],
                 'sm': fident['student_major'],
                 'sc': fident['student_class'],
+                'sy': fident['student_year'],
+                })
+    elif typ == ident.IDENT_TYPE_GRADUATE:
+        result.update({
+                'ss': fident['student_school'],
+                'sm': fident['student_major'],
                 'sy': fident['student_year'],
                 })
 
