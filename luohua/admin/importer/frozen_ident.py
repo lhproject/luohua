@@ -59,7 +59,7 @@ def import_student_frozen_idents(data):
 
                 # 公共信息
                 obj['id'] = record['id']
-                obj['type'] = record['type']
+                typ = obj['type'] = record['type']
                 obj['name'] = record['name']
                 obj['gender'] = (
                         ident.GENDER_MALE
@@ -70,10 +70,20 @@ def import_student_frozen_idents(data):
                 obj['id_number'] = record['id_number']
 
                 # 学生信息
-                obj['student_school'] = record['school']
-                obj['student_major'] = record['major']
-                obj['student_class'] = record['klass']
-                obj['student_year'] = record['year']
+                if typ == ident.IDENT_TYPE_UNDERGRAD:
+                    obj['student_school'] = record['school']
+                    obj['student_major'] = record['major']
+                    obj['student_class'] = record['klass']
+                    obj['student_year'] = record['year']
+                elif typ == ident.IDENT_TYPE_GRADUATE:
+                    obj['student_school'] = record['school']
+                    obj['student_major'] = record['major']
+                    obj['student_year'] = record['year']
+                else:
+                    raise NotImplementedError(
+                            'TODO: ident type %s' % (
+                                repr(typ),
+                                ))
 
                 obj.save_to_conn(conn)
             except Exception as e:
