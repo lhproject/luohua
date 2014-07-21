@@ -620,6 +620,7 @@ def frozen_ident_dec_v1(data):
         # 研究生信息
         result.update({
                 'student_school': data['ss'],
+                'student_major': data['sm'],
                 'student_year': data['sy'],
                 })
     elif typ in (IDENT_TYPE_STAFF, IDENT_TYPE_OTHER, ):
