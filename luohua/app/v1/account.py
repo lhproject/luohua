@@ -373,6 +373,14 @@ def ident_query_v1_view(request):
              sy   int       入学年份.
             ==== ========= ================================================
 
+        若所查询个体身份为教职工, 返回还将包括一些教职工特定的信息:
+
+            ==== ========= ================================================
+            字段  类型      说明
+            ==== ========= ================================================
+             ts   unicode   工作地点, 如 ``'校行政'``.
+            ==== ========= ================================================
+
     :副作用: 无
 
     '''
@@ -431,6 +439,13 @@ def ident_query_v1_view(request):
                 'sm': fident['student_major'],
                 'sy': fident['student_year'],
                 })
+    elif typ == ident.IDENT_TYPE_STAFF:
+        result.update({
+                'ts': fident['staff_site'],
+                })
+    else:
+        # TODO: 这么直接坠毁真的没问题么... (应该是没问题, 毕竟数据源可控)
+        raise ValueError('unexpected ident type: %s' % (repr(typ), ))
 
     return jsonreply(**result)
 
