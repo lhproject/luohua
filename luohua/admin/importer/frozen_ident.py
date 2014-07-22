@@ -22,22 +22,27 @@ from __future__ import unicode_literals, division
 from ...auth import ident
 
 
-def import_student_frozen_idents(data):
-    '''向数据库导入学生的不可变实名信息.
+def import_frozen_idents(data):
+    '''向数据库导入不可变实名信息.
 
     接受一个包含欲导入记录的列表, 记录格式形如::
 
         {
             'id': '1030567890',  # 学号
-            'type': 0,  # 记录性质, 0 为本科生, 1 为研究生
+            'type': 0,  # 记录性质, 0 为本科生, 1 为研究生, 2 为教职工
             'name': '王尼玛',  # 姓名
             'male': True,  # 性别, 男性为真
+            'id_number_type': 0,  # 身份证号类型, 0 为后六位
+            'id_number': '12345X',  # 身份证号
+
+            # 以下为学生专用字段
             'school': '数字媒体学院',  # 学院名称
             'major': '0305',  # 专业代码
             'klass': 1,  # 班级序号, 如为研究生则忽略此字段
             'year': 2013,  # 入学年份
-            'id_number_type': 0,  # 身份证号类型, 0 为后六位
-            'id_number': '12345X',  # 身份证号
+
+            # 以下为教职工专用字段
+            'site': '校行政',  # 工作地点
         }
 
     注意所有字符串都应该是文本类型 (:data:`six.text_type`), 在 Python 2.x
@@ -79,6 +84,8 @@ def import_student_frozen_idents(data):
                     obj['student_school'] = record['school']
                     obj['student_major'] = record['major']
                     obj['student_year'] = record['year']
+                elif typ == ident.IDENT_TYPE_STAFF:
+                    obj['staff_site'] = record['site']
                 else:
                     raise NotImplementedError(
                             'TODO: ident type %s' % (
