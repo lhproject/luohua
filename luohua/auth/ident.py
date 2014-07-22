@@ -92,15 +92,14 @@ FIDENT_STUD_YEAR_INDEX = b'fident_sy_bin'
 IDENT_TYPES = (
         IDENT_TYPE_UNDERGRAD,
         IDENT_TYPE_GRADUATE,
-        IDENT_TYPE_ALUMNI,
         IDENT_TYPE_STAFF,
+        IDENT_TYPE_ALUMNI,
         IDENT_TYPE_OTHER,
         ) = six.moves.range(5)
 IDENT_TYPES = frozenset(IDENT_TYPES)
 IDENT_TYPES_STUDENT = frozenset({
         IDENT_TYPE_UNDERGRAD,
         IDENT_TYPE_GRADUATE,
-        IDENT_TYPE_ALUMNI,
         })
 IDENT_TYPES_CURRENT_STUDENT = frozenset({
         IDENT_TYPE_UNDERGRAD,
