@@ -507,11 +507,6 @@ def ident_dec_v1(data):
                 'student_dorm_building': data['sdb'],
                 'student_dorm_room': data['sdr'],
                 })
-    elif typ == IDENT_TYPE_STAFF:
-        result.update({
-                # 教职工字段
-                'staff_site': data['ts'],
-                })
     elif typ == IDENT_TYPE_OTHER:
         result.update({
                 # 社会人员字段
@@ -567,14 +562,9 @@ def ident_enc_v1(ident):
         return result
 
     if typ == IDENT_TYPE_STAFF:
-        # 教职工字段
-        assert 'staff_site' in ident
-
-        result.update({
-                # 教职工字段
-                'ts': ident['staff_site'],
-                })
-        return result
+        # 教职工
+        # TODO: 还需要啥字段? 工作地点一般不是由个人改变的所以放进不可变部分了
+       return result
 
     if typ == IDENT_TYPE_OTHER:
         # 社会人员字段
@@ -623,7 +613,12 @@ def frozen_ident_dec_v1(data):
                 'student_major': data['sm'],
                 'student_year': data['sy'],
                 })
-    elif typ in (IDENT_TYPE_STAFF, IDENT_TYPE_OTHER, ):
+    elif typ == IDENT_TYPE_STAFF:
+        # 教职工信息
+        result.update({
+                'staff_site': data['ts'],
+                })
+    elif typ in (IDENT_TYPE_OTHER, ):
         raise NotImplementedError('ident type %s: TODO' % (repr(typ), ))
     else:
         raise ValueError('ident type %s not recognized' % (repr(typ), ))
@@ -690,7 +685,15 @@ def frozen_ident_enc_v1(ident):
                 'sm': ident['student_major'],
                 'sy': ident['student_year'],
                 })
-    elif typ in (IDENT_TYPE_STAFF, IDENT_TYPE_OTHER, ):
+    elif typ == IDENT_TYPE_STAFF:
+        # 教职工信息
+        assert 'staff_site' in ident
+        assert isinstance(ident['staff_site'], six.text_type)
+
+        result.update({
+                'ts': ident['staff_site'],
+                })
+    elif typ in (IDENT_TYPE_OTHER, ):
         raise NotImplementedError('ident type %s: TODO' % (repr(typ), ))
     else:
         raise ValueError('ident type %s not recognized' % (repr(typ), ))
