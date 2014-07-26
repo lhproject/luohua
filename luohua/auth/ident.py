@@ -584,6 +584,114 @@ def ident_enc_v1(ident):
     assert False, 'should never happen'
 
 
+@Ident.decoder(2)
+def ident_dec_v2(data):
+    typ = data['t']
+    result = {
+            # 公共信息
+            'type': typ,
+            'email': data['e'],
+            'mobile': data['m'],
+            'activation_key': data['ak'],
+            }
+
+    if typ in IDENT_TYPES_STUDENT:
+        dorm_data_present = result['student_dorm_present'] = data['sdp']
+        if dorm_data_present:
+            result.update({
+                    # 学生专用字段
+                    'student_dorm_building': data['sdb'],
+                    'student_dorm_room': data['sdr'],
+                    })
+    elif typ == IDENT_TYPE_OTHER:
+        result.update({
+                # 社会人员字段
+                'other_full_id': data['oi'],
+                'other_address': data['oa'],
+                })
+    else:
+        raise ValueError('Wrong type field for ident %s' % (repr(data), ))
+
+    return result
+
+
+@Ident.encoder(2)
+def ident_enc_v2(ident):
+    # 公共信息
+    assert 'type' in ident
+    typ = ident['type']
+    assert typ in IDENT_TYPES
+
+    assert 'email' in ident
+    assert isinstance(ident['email'], six.text_type)
+    # TODO: assert ident['email'] 为合法 email 地址
+    assert 'mobile' in ident
+    assert isinstance(ident['mobile'], six.text_type)
+    assert ident['mobile'].isdigit()
+
+    assert 'activation_key' in ident
+    ak = ident['activation_key']
+    assert isinstance(ak, six.text_type)
+    assert ak == ALREADY_ACTIVATED_KEY or len(ak) == ACTIVATION_KEY_LENGTH
+
+    result = {
+            # 公共信息
+            't': ident['type'],
+            'e': ident['email'],
+            'm': ident['mobile'],
+            'ak': ak,
+            }
+
+    if typ in IDENT_TYPES_STUDENT:
+        # 学生专用字段
+        assert 'student_dorm_present' in ident
+        dorm_data_present = ident['student_dorm_present']
+        assert isinstance(dorm_data_present, bool)
+        result.update({
+                'sdp': dorm_data_present,
+                })
+
+        if dorm_data_present:
+            assert 'student_dorm_building' in ident
+            student_dorm_building = ident['student_dorm_building']
+            assert isinstance(student_dorm_building, six.integer_types)
+            assert 'student_dorm_room' in ident
+            student_dorm_room = ident['student_dorm_room']
+            assert isinstance(student_dorm_room, six.text_type)
+            assert student_dorm_room.isdigit()
+
+            result.update({
+                    # 学生专用字段
+                    'sdb': student_dorm_building,
+                    'sdr': student_dorm_room,
+                    })
+
+        return result
+
+    if typ == IDENT_TYPE_STAFF:
+        # 教职工
+        # TODO: 还需要啥字段? 工作地点一般不是由个人改变的所以放进不可变部分了
+       return result
+
+    if typ == IDENT_TYPE_OTHER:
+        # 社会人员字段
+        assert 'other_full_id' in ident
+        # TODO: 完整身份证号校验
+        assert isinstance(ident['other_full_id'], six.text_type)
+        assert 'other_address' in ident
+        assert isinstance(ident['other_address'], six.text_type)
+
+        result.update({
+                # 社会人员字段
+                'oi': ident['other_full_id'],
+                'oa': ident['other_address'],
+                })
+        return result
+
+    # WTF?!
+    assert False, 'should never happen'
+
+
 @FrozenIdent.decoder(1)
 def frozen_ident_dec_v1(data):
     typ = data['t']
