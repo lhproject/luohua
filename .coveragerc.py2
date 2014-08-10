@@ -7,7 +7,7 @@ omit =
     */python?.?/*
     */lib-python/?.?/*
     */lib_pypy/*
-    */site-packages/nose/*
+    */site-packages/*
 
 exclude_lines =
     pragma: no cover
