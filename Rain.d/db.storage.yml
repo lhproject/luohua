@@ -18,5 +18,8 @@ luohua.vtag: main-kv/vtag
 luohua.rt.state: mem-kv/(int)10
 luohua.rt.pubsub: mem-kv/(int)10  # db index is unused
 
+luohua.blob.riaknative: main-kv/blob.store
+luohua.blob.riaknative.upload: main-kv/blob.uploads
+
 
 # vim:set ai et ts=2 sw=2 sts=2 fenc=utf=8:
