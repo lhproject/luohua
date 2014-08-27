@@ -2,12 +2,12 @@ language: python
 
 python:
   - "2.7"
-  # - "3.3"
+  - "3.3"
   - "pypy"
 
 matrix:
   allow_failures:
-    # - python: 3.3
+    - python: 3.3
     - python: pypy
 
 services:
@@ -19,25 +19,25 @@ before_install:
   - 'if [[ "${TRAVIS_PYTHON_VERSION}" == "pypy" ]]; then export IS_PYPY=true ; else export IS_PYPY=false ; fi'
 
   # apt index
-  - '${IS_PY3K} || sudo apt-get update -qq'
+  # - '${IS_PY3K} || sudo apt-get update -qq'
+  - 'sudo apt-get update -qq'
 
   # Python deps
-  - 'if ${IS_PY3K}; then export REQ_FILE=requirements.py3.txt ; else export REQ_FILE=requirements.txt ; fi ; printf "\033[1;32m * \033[mUsing requirements file: ${REQ_FILE}\n"'
+  # - 'if ${IS_PY3K}; then export REQ_FILE=requirements.py3.txt ; else export REQ_FILE=requirements.txt ; fi ; printf "\033[1;32m * \033[mUsing requirements file: ${REQ_FILE}\n"'
+  - 'export REQ_FILE=requirements.txt'
+  - 'printf "\033[1;32m * \033[mUsing requirements file: ${REQ_FILE}\n"'
 
 
 install:
-  # Protobuf deps, only applicable if not running Python 3.x
-  - '${IS_PY3K} || sudo apt-get install protobuf-compiler'
+  # Protobuf deps
+  # - '${IS_PY3K} || sudo apt-get install protobuf-compiler'
+  - 'sudo apt-get install protobuf-compiler'
 
   # gevent, needs master if on PyPy
   - 'if ${IS_PYPY}; then git clone https://github.com/surfly/gevent.git && ( cd gevent && ./setup.py install ) ; fi'
 
   # Python deps
   - pip install -r "${REQ_FILE}"
-  # riak depends on riak-pb which pulls in protobuf, which is not supported by
-  # Python 3.x at the moment. So we have to exclude it from weiyu's deps, and
-  # install it ourselves, ignoring deps.
-  - 'if ${IS_PY3K}; then pip install riak --no-deps ; fi'
 
   # coveralls.io integration
   - pip install coveralls

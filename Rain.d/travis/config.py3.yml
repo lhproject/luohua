@@ -11,7 +11,7 @@ $$include:
 # 数据库配置
 weiyu.db:
   databases:
-    $$include: db.databases.py3.yml
+    $$include: db.databases.yml
 
   storage:
     $$include: ../db.storage.yml
