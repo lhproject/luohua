@@ -32,8 +32,8 @@ install:
   # - '${IS_PY3K} || sudo apt-get install protobuf-compiler'
   - 'sudo apt-get install protobuf-compiler'
 
-  # gevent, needs master if on PyPy
-  - 'if ${IS_PYPY}; then git clone https://github.com/surfly/gevent.git && ( cd gevent && ./setup.py install ) ; fi'
+  # gevent, needs master if on PyPy or Python 3.x
+  - 'if ${IS_PYPY} || $(IS_PY3K} ; then git clone https://github.com/surfly/gevent.git && ( cd gevent && ./setup.py install ) ; fi'
 
   # Python deps
   - pip install -r "${REQ_FILE}"
