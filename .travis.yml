@@ -23,8 +23,7 @@ before_install:
   - 'sudo apt-get update -qq'
 
   # Python deps
-  # - 'if ${IS_PY3K}; then export REQ_FILE=requirements.py3.txt ; else export REQ_FILE=requirements.txt ; fi ; printf "\033[1;32m * \033[mUsing requirements file: ${REQ_FILE}\n"'
-  - 'export REQ_FILE=requirements.txt'
+  - 'if ${IS_PY3K}; then export REQ_FILE=requirements.py3.txt ; else export REQ_FILE=requirements.txt ; fi'
   - 'printf "\033[1;32m * \033[mUsing requirements file: ${REQ_FILE}\n"'
 
 
@@ -38,6 +37,10 @@ install:
 
   # Python deps
   - pip install -r "${REQ_FILE}"
+  # riak depends on riak-pb which pulls in protobuf<2.6.0 for the moment...
+  # Let's fix that again by ignoring deps, this time riak-pb's.
+  - 'if ${IS_PY3K}; then pip install "protobuf>=2.6.0" ; fi'
+  - 'if ${IS_PY3K}; then pip install riak "riak-pb>=2.0.0" "pyOpenSSL>=0.14" --no-deps ; fi'  # these are deps of riak
 
   # coveralls.io integration
   - pip install coveralls
