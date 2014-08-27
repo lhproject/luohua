@@ -33,7 +33,7 @@ install:
   - 'sudo apt-get install protobuf-compiler'
 
   # gevent, needs master if on PyPy or Python 3.x
-  - 'if ${IS_PYPY}; then export USE_GIT_GEVENT=true ; fi ; if ${IS_PY3K}; then export USE_GIT_GEVENT=true ; fi'
+  - 'if ${IS_PYPY}; then export USE_GIT_GEVENT=true ; else if ${IS_PY3K}; then export USE_GIT_GEVENT=true ; else export USE_GIT_GEVENT=false ; fi ; fi'
   - 'if ${USE_GIT_GEVENT} ; then git clone https://github.com/surfly/gevent.git && ( cd gevent && ./setup.py install ) ; fi'
 
   # Python deps
