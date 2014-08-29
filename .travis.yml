@@ -44,6 +44,9 @@ install:
   # Let's fix that again by ignoring deps, this time riak-pb's.
   - 'if ${IS_PY3K}; then pip install python3-protobuf ; fi'
   - 'if ${IS_PY3K}; then pip install riak "riak-pb>=2.0.0" "pyOpenSSL>=0.14" --no-deps ; fi'  # these are deps of riak
+  # gevent-socketio doesn't support Python 3.x atm, 2to3 should be manually
+  # done.
+  - 'if ${IS_PY3K}; then git clone https://github.com/abourget/gevent-socketio.git && ( cd gevent-socketio && 2to3 --no-diffs -w -n . && python ./setup.py install ) ;  fi'
 
   # coveralls.io integration
   - pip install coveralls

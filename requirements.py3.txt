@@ -1,5 +1,4 @@
 # riak should be manually added later, ignoring its transitive dependency on
 # protobuf<2.6.0.
 git+https://github.com/xen0n/weiyu.git#egg=weiyu [redis,mako,beaker]
-gevent-socketio>=0.3.6
 Envelopes>=0.4
