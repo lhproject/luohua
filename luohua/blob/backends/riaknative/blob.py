@@ -145,7 +145,8 @@ class RiakBlob(object):
             is_partial=False,
             is_multipart=False,
             ):
-        self._owner = None
+        # 缓存的所有者对象
+        self._owner, self._is_owner_fresh = None, False
 
         if blob_id is None:
             blob_id_to_use = new_blob_id()
@@ -202,10 +203,11 @@ class RiakBlob(object):
 
     @property
     def owner(self):
-        if self._owner is not None:
+        if self._is_owner_fresh:
             return self._owner
 
         owner = self._owner = user.User.fetch(self._owner_uid)
+        self._is_owner_fresh = True
         return owner
 
     @property
@@ -215,7 +217,10 @@ class RiakBlob(object):
     @owner_uid.setter
     def owner_uid(self, value):
         # 清空可能缓存的上一个用户对象
-        self._owner_uid, self._owner = value, None
+        # NOTE: 这几个赋值显然不是线程安全的 (可自行反汇编字节码验证), 是否
+        # 需要加锁待考
+        self._owner, self._is_owner_fresh = None, False
+        self._owner_uid = value
 
     def get_encoded_metadata(self):
         return RiakBlobMetadata.encode_for_blob(self)
