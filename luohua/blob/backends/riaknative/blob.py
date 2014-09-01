@@ -63,8 +63,8 @@ class RiakBlobMetadata(Document):
     '''Blob 元数据.
 
     因为该数据并非作为底层 Riak 对象的本体存在, 而是以元数据形式附着在实际
-    blob 数据上, 所以本类并不直接参与数据库操作, 而没有从 ``RiakDocument``
-    继承.
+    blob 数据上, 所以本类并不直接参与数据库操作, 从而没有继承
+    ``RiakDocument``.
 
     '''
 
