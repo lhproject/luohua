@@ -137,6 +137,39 @@ class TestRiakNativeBlob(Case):
         assert isinstance(ret, six.text_type)
         assert ret[:2] == 'bb'
 
+    def test_ctor_auto_blob_id(self):
+        blob = rn_blob.RiakBlob()
+        assert blob.blob_id is not None
+
+    def test_roundtrip(self):
+        # 创建一个 blob 并保存
+        blob = rn_blob.RiakBlob()
+        saved_blob_id = blob.blob_id
+        saved_data = blob.data = b'12345678' * 131072  # 1MiB
+        saved_filename = blob.filename = 'test_roundtrip.txt'
+        saved_content_type = blob.content_type = 'text/plain'
+        saved_ctime = blob.ctime = time.time()
+        saved_owner_uid = blob.owner_uid = '0'
+        saved_is_partial = blob.is_partial = False
+        saved_is_multipart = blob.is_multipart = False
+        blob.save()
+
+        assert saved_blob_id == blob.blob_id
+        del blob
+
+        blob2 = rn_blob.RiakBlob(saved_blob_id)
+        assert blob2.blob_id == saved_blob_id
+        assert blob2.data == saved_data
+        assert blob2.filename == saved_filename
+        assert blob2.content_type == saved_content_type
+        assert blob2.ctime - saved_ctime < 1e-6
+        assert blob2.owner_uid == saved_owner_uid
+        assert blob2.is_partial == saved_is_partial
+        assert blob2.is_multipart == saved_is_multipart
+
+        # 删除测试用 blob
+        blob2.purge()
+
 
 class TestRiakNative(Case):
     @classmethod
