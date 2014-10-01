@@ -184,8 +184,6 @@ class RiakBlob(object):
             self.is_partial = metadata['partial']
             self.is_multipart = metadata['multipart']
 
-        self._rawobj.reload()
-
     @classproperty
     def storage(cls):
         '''``Document``-like interface for accessing underlying database.'''
@@ -240,9 +238,7 @@ class RiakBlob(object):
 
     def save(self):
         # Riak 最佳实践: 写入之前先取回对象的最新版本 (主要是为了 vclock)
-        # 但创建新对象的时候不要这么做...
-        if self._rawobj.exists:
-            self._rawobj.reload()
+        # 但对于体积相对巨大的 blob 对象而言这样做真的合适?
 
         encoded_metadata = self.get_encoded_metadata()
         self._rawobj.usermeta = encoded_metadata
