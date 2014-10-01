@@ -75,10 +75,19 @@ class RiakBlobMetadata(Document):
         '''从一个表示 blob 的 Riak 对象中解出元数据.'''
 
         # 处理 _V 字段
-        # 这里的 copy 纯粹是为了不造成副作用的强迫症, 因为取出来的 RiakObject
-        # 不是在销毁前再也不会写入, 就是写入前马上被更新成正确的 usermeta
-        meta_dict = obj.usermeta.copy()
-        meta_dict[b'_V'] = int(meta_dict[b'_V'])
+        # 因为解码过程显然并不关心 _V 字段内容, 所以直接处理出整数类型的版本,
+        # 然后直接传入框架, 不修改原数据结构, 就能省掉一些内存访问了
+        # NOTE: 这里取出的是 _V 或 _v 字段, 显然是因为 HTTP 协议下头部名称
+        # 大小写不敏感, 而 usermeta 是作为头部传回的...
+        meta_dict = obj.usermeta
+
+        try:
+            version = meta_dict[b'_V']
+        except KeyError:
+            version = meta_dict[b'_v']
+            del meta_dict[b'_v']
+
+        version = int(version)
 
         return cls.decode(meta_dict, version)
 
@@ -150,11 +159,12 @@ class RiakBlob(object):
 
         if blob_id is None:
             blob_id_to_use = new_blob_id()
-            self._rawobj = self.storage.new(
-                    key=blob_id_to_use,
-                    data=data,
-                    content_type=content_type,
-                    )
+            with self.storage as conn:
+                self._rawobj = conn.new(
+                        key=blob_id_to_use,
+                        data=data,
+                        content_type=content_type,
+                        )
 
             self._blob_id = blob_id_to_use
             self.filename = filename
@@ -163,7 +173,8 @@ class RiakBlob(object):
             self.is_partial = is_partial
             self.is_multipart = is_multipart
         else:
-            obj = self._rawobj = self.storage.get(blob_id)
+            with self.storage as conn:
+                obj = self._rawobj = conn.get(blob_id)
             metadata = RiakBlobMetadata.decode_from_obj(obj)
 
             self._blob_id = blob_id
@@ -172,6 +183,8 @@ class RiakBlob(object):
             self._owner_uid = metadata['uid']
             self.is_partial = metadata['partial']
             self.is_multipart = metadata['multipart']
+
+        self._rawobj.reload()
 
     @classproperty
     def storage(cls):
@@ -199,7 +212,7 @@ class RiakBlob(object):
 
     @content_type.setter
     def content_type(self, value):
-        self._rawobj.content_type = value
+        self._rawobj.content_type = smartbytes(value)
 
     @property
     def owner(self):
@@ -226,10 +239,20 @@ class RiakBlob(object):
         return RiakBlobMetadata.encode_for_blob(self)
 
     def save(self):
+        # Riak 最佳实践: 写入之前先取回对象的最新版本 (主要是为了 vclock)
+        # 但创建新对象的时候不要这么做...
+        if self._rawobj.exists:
+            self._rawobj.reload()
+
         encoded_metadata = self.get_encoded_metadata()
         self._rawobj.usermeta = encoded_metadata
 
         self._rawobj.store()
+
+    def purge(self):
+        self._rawobj.reload()
+        self._rawobj.delete()
+
 
 
 # vim:set ai et ts=4 sw=4 sts=4 fenc=utf-8:
